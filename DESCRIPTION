@@ -1,0 +1,19 @@
+Package: manoSIAR
+Title: Datos y Funciones Para Trabajar con el SIA
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Juan Manuel",
+           family = "Barreneche",
+           role = c("aut", "cre"),
+           email = "jumanbar@gmail.com",
+           comment = c(GitHub = "jumanbar"))
+Description: Paquete creado con la intención de separar el código de funciones y
+    datos que se usan en las aplicaciones shiny del SIA (sia_apps). En las
+    primeras versiones también va a incluir funciones varias para trabajar con 
+    los datos del SIA. Es posible que en el futuro se descomponga en 2 o más
+    paquetes separados.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.0
