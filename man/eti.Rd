@@ -4,11 +4,13 @@
 \alias{eti}
 \title{Crear etiquetas para gráficos}
 \usage{
-eti(id)
+eti(id_parametro, t_eti)
 }
 \arguments{
-\item{id}{Escalar (integer). Número de id de parámetro (i.e.:
+\item{id_parametro}{Escalar (integer). Número de id de parámetro (i.e.:
 \code{id_parametro}).}
+
+\item{t_eti}{data.frame. Tabla generada con \code{\link{t_eti_add}}}
 }
 \value{
 
@@ -18,27 +20,17 @@ Devuelve la etiqueta para el parámetro seleccionado por su \code{id}, basado
 en la tabla \code{t_eti} (ver detalles).
 }
 \details{
-Ea función buscará en el ambiente de trabajo la tabla \code{t_eti},
-la cual debe contener las columnas \code{id_parametro} y \code{etiqueta}.
-Usando el valor del argumento \code{id} se filtra dicha tabla y se extrae
-la etiqueta. Se espera que la tabla \code{t_eti} sea definida al inicio de
-la plantilla de R markdown usada para la creación de informes
-automatizados. En caso de no encontrar \code{t_eti}, la función buscará la
-tabla \code{t_eti_base} (la cual se guarda como  \code{file.path(ruta_base,
-  "data/t_eti_base.rds")}). Si tampoco encuentra esta tabla, devuelve un
-error.
+Si no se provee una tabla \code{t_eti}, la función usará \code{t_eti_add()}
+como tabla de referencia.
 }
 \examples{
-t_eti_base <- readRDS(file.path(ruta_base, "data/t_eti_base.rds"))
-t_eti <- tibble::tibble(
-  id_parametro = c(2032L, 2017L, 2101L),
-  etiqueta = c('Temperatura (ºC)', 'OD (mg/L)',
-               expression('NO'[2]*' (mg-N/L)')))
-eti(2017)
-eti(2101)
-ggplot(iris) +
-  aes(Species, Sepal.Length) +
-  geom_boxplot() +
-  ylab(eti(2101))
-eti(2098)
+e <- eti(2101, tibble::tibble(
+  id_parametro = 2101,
+  etiqueta = expression('NO'[2]*' (mg NO'[2] * '-N/L)')
+))
+ggplot() + geom_blank() + xlab(eti(2101))
+ggplot() + geom_blank() + xlab(e)
+}
+\seealso{
+\code{\link{t_eti_add}}
 }

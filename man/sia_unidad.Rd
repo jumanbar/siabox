@@ -13,7 +13,7 @@ Tabla con 1321 filas y 4 columnas:
 
 \item{uni_nombre}{Texto para cada unidad de medida (ej: "mg CaCO3/L")}
 
-\item{uni_factor_conversion}{no sé}
+\item{uni_factor_conversion}{..completar..}
 
 }
 }

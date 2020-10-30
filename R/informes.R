@@ -3,6 +3,8 @@
 # Estas son funciones que se usan solamente para crear informes o gráficos
 # automatizados.
 
+
+
 # UTILES ----
 
 # + Calculos ----
@@ -75,17 +77,14 @@ media_geom <- function(x) {
 #' \code{x ^ (1 / n)} y con \code{abs(x) ^ (1 / n)}.
 #'
 #' @keywords arith univar
-#' 
+#'
 #' @seealso \code{\link{media_geom}}
-#' 
+#'
 #' @export
 #'
 #' @examples
-#' require(dplyr)
-#' require(tibble)
-#' require(magrittr)
-#' tibble(x = c(4, -4, 4, -4), n = c(2, 2, 3, 3)) %>%
-#'   mutate(raiz(x, n), x ^ (1 / n), abs(x) ^ (1 / n))
+#' d <- data.frame(x = c(4, -4, 4, -4), n = c(2, 2, 3, 3))
+#' dplyr::mutate(d, raiz(x, n), x ^ (1 / n), abs(x) ^ (1 / n))
 raiz <- function(x, n) {
   #else: x negativo y n par
   ifelse(x > 0 | n %% 2 == 1, sign(x) * abs(x) ^ (1 / n), NaN)
@@ -95,68 +94,116 @@ raiz <- function(x, n) {
 
 # + Para informes -----
 
-#' Crear etiquetas para gráficos
+#' Crea o modifica tabla de etiquetas
 #'
-#' Devuelve la etiqueta para el parámetro seleccionado por su \code{id}, basado
-#' en la tabla \code{t_eti} (ver detalles).
+#' Sin argumentos definidos, genera una tabla de etiquetas estándar, basada en
+#' las tablas del SIA (infambientalbd): \code{sia_parametro},
+#' \code{sia_param_unidad} y \code{sia_unidad}. Con argumentos, agrega o
+#' modifica las etiquetas de uno o más parámetros.
 #'
-#' @param id Escalar (integer). Número de id de parámetro (i.e.:
-#'   \code{id_parametro}).
+#' La idea de la tabla de etiquetas es generar una referencia que se usará en
+#' funciones para crear gráficos, tablas, etc...
 #'
-#' @details Ea función buscará en el ambiente de trabajo la tabla \code{t_eti},
-#'   la cual debe contener las columnas \code{id_parametro} y \code{etiqueta}.
-#'   Usando el valor del argumento \code{id} se filtra dicha tabla y se extrae
-#'   la etiqueta. Se espera que la tabla \code{t_eti} sea definida al inicio de
-#'   la plantilla de R markdown usada para la creación de informes
-#'   automatizados. En caso de no encontrar \code{t_eti}, la función buscará la
-#'   tabla \code{t_eti_base} (la cual se guarda como  \code{file.path(ruta_base,
-#'   "data/t_eti_base.rds")}). Si tampoco encuentra esta tabla, devuelve un
-#'   error.
+#' @seealso \code{\link{make_t_eti_base}}
+#'
+#' @param id_parametro Vector integer
+#' @param etiqueta Vector character o expression
 #'
 #' @return
 #' @export
 #'
 #' @examples
-#' t_eti_base <- readRDS(file.path(ruta_base, "data/t_eti_base.rds"))
-#' t_eti <- tibble::tibble(
-#'   id_parametro = c(2032L, 2017L, 2101L),
-#'   etiqueta = c('Temperatura (ºC)', 'OD (mg/L)',
-#'                expression('NO'[2]*' (mg-N/L)')))
-#' eti(2017)
-#' eti(2101)
-#' ggplot(iris) +
-#'   aes(Species, Sepal.Length) +
-#'   geom_boxplot() +
-#'   ylab(eti(2101))
-#' eti(2098)
-eti <- function(id) {
-  if (!exists("t_eti")) {
-    if (!exists("t_eti_base")) {
-      stop("No se encontró la tabla 't_eti', ni la tabla 't_eti_base',",
-           " necesarias para crear etiquetas")
-    } else {
-      warning("No se encontró la tabla 't_eti': se utilizó la tabla ",
-              "'t_eti_base' en su lugar")
-      t_eti <- t_eti_base
-    }
+#' # Sin ninguna etiqueta nueva:
+#' t_eti <- t_eti_add()
+#' plot(0, 0, xlab = dplyr::filter(t_eti, id_parametro == 2005)[[2]])
+#'
+#' # Modificando un parámetro existente:
+#' t_eti <- t_eti_add(2005L, expression('AlcT (mg CaCO' [3] * ' /L)'))
+#' plot(0, 0, xlab = dplyr::filter(t_eti, id_parametro == 2005)[[2]])
+#'
+#' # Modificando un parámetro existente, agregando uno nuevo y mezclando
+#' # etiquetas del tipo expression y character:
+#' t_eti <- t_eti_add(
+#'   c(2005L, 9999L),
+#'   c(expression('AlcT (mg CaCO' [3] * ' /L)'), "YOLO (Mb/min)")
+#' )
+#' plot(0, 0,
+#'      xlab = dplyr::filter(t_eti, id_parametro == 2005L)[[2]],
+#'      ylab = dplyr::filter(t_eti, id_parametro == 9999L)[[2]])
+t_eti_add <- function(id_parametro = NULL, etiqueta) {
+
+  out <- make_t_eti_base()
+  if (is.null(id_parametro))
+    return(out)
+
+  if (!is.integer(id_parametro)) {
+    id_parametro <- as.integer(id_parametro)
+    warning("id_parametro no es integer --> se coerciona a integer")
   }
 
-  w <- which(t_eti$id_parametro == id[[1]])
-  if (!length(w)) {
-    w <- which(t_eti_base$id_parametro == id[[1]])
-    warning("Parámetro no encontrado en 't_eti': se usó la tabla 't_eti_base' ",
-            "en su lugar")
-    if (length(w))
-      return(t_eti_base$etiqueta[[w]]) else
-        stop("No se encontró el parámetro (id = ", id,
-             ") en la tabla t_eti_base")
+  out <- dplyr::filter(out, !(id_parametro %in% !!id_parametro))
+
+  out <- if (is.expression(etiqueta)) {
+    p <- out[[1]]
+    e <- as.list(out[[2]])
+    for (i in 1:length(id_parametro)) {
+      w <- which(p == id_parametro[i])
+      if (length(w)) {
+        e[[w]] <- etiqueta[i]
+      } else {
+        p <- c(p, id_parametro[i])
+        e <- c(e, etiqueta[i])
+      }
+    }
+    tibble::tibble(id_parametro = p, etiqueta = e)
+  } else dplyr::add_row(out,
+                        id_parametro = !!id_parametro,
+                        etiqueta = !!etiqueta)
+  return(out)
+}
+
+#' Crear etiquetas para gráficos
+#'
+#' Devuelve la etiqueta para el parámetro seleccionado por su \code{id}, basado
+#' en la tabla \code{t_eti} (ver detalles).
+#'
+#' Si no se provee una tabla \code{t_eti}, la función usará \code{t_eti_add()}
+#' como tabla de referencia.
+#'
+#' @seealso \code{\link{t_eti_add}}
+#'
+#' @param id_parametro Escalar (integer). Número de id de parámetro (i.e.:
+#'   \code{id_parametro}).
+#'
+#' @param t_eti data.frame. Tabla generada con \code{\link{t_eti_add}}
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' e <- eti(2101, tibble::tibble(
+#'   id_parametro = 2101,
+#'   etiqueta = expression('NO'[2]*' (mg NO'[2] * '-N/L)')
+#' ))
+#' ggplot() + geom_blank() + xlab(eti(2101))
+#' ggplot() + geom_blank() + xlab(e)
+eti <- function(id_parametro, t_eti) {
+
+  if (missing(t_eti)) {
+    t_eti <- make_t_eti_base()
+    warning("Argumento t_eti faltante: se usa la tabla base (ver ?t_eti_base)")
   }
+
+  w <- which(t_eti$id_parametro == id_parametro[[1]])
   if (length(w))
-    return(t_eti$etiqueta[[w]]) else stop("No se encontró el parámetro ",
-                                          "(id = ", id, ") en la tabla t_eti")
+    return(t_eti$etiqueta[[w]]) else
+      stop("No se encontró el parámetro ", "(id = ", id_parametro,
+           ") en la tabla t_eti")
 }
 
 #' Graficar un parámetro por mes
+#'
+#' Hace una gráfica del parámetro por mes
 #'
 #' @param .data Tabla con datos
 #' @param nombre_clave_param Nombre clave del parámetro, tal como aparece en la
@@ -183,7 +230,8 @@ g_mes <- function(.data, id_param = NULL, pos_leyenda = 'none',
                   ylab = NULL) {
 
   id <- if (is.null(id_param)) {
-    dplyr::filter(sia_parametro, nombre_clave == nombre_clave_param)$id_parametro
+    dplyr::filter(sia_parametro,
+                  nombre_clave == nombre_clave_param)$id_parametro
   } else id_param
 
   if (is.null(ylab))
@@ -378,7 +426,8 @@ g_iet <- function(.data) {
 }
 
 # + Graficos sueltos ----
-#' Title
+
+#' Graficar valores anuales por estacion
 #'
 #' @param .data Daos tomados
 #' @param id_parametro

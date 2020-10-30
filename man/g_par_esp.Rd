@@ -2,7 +2,7 @@
 % Please edit documentation in R/informes.R
 \name{g_par_esp}
 \alias{g_par_esp}
-\title{Title}
+\title{Graficar valores anuales por estacion}
 \usage{
 g_par_esp(
   .data,
@@ -21,7 +21,7 @@ g_par_esp(
 
 }
 \description{
-Title
+Graficar valores anuales por estacion
 }
 \examples{
 d <- readRDS("tmp/datos_cuareim.rds")

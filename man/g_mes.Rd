@@ -39,6 +39,6 @@ horizontales correspondientes a los valores límites aceptados para la clase
 dfo <- data.frame(mes = 3:6, codigo_pto = 100200:100203,
                   id_parametro = 2009, valor = c(140, 120, 198, 166))
 decreto_long <- readRDS(file.path(ruta_base, "data/decreto_long.rds"))
-g_mes(dfo, id_param = 2009, ylab = 'Cond (μS/cm)')
-g_mes(dfo, nombre_clave_param = 'Conduc', ylab = 'Cond (μS/cm)')
+g_mes(dfo, id_param = 2009, ylab = 'Cond (Î¼S/cm)')
+g_mes(dfo, nombre_clave_param = 'Conduc', ylab = 'Cond (Î¼S/cm)')
 }

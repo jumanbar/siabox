@@ -21,19 +21,19 @@ cómo llegar, etc...)}
 \item{gid}{Identificador único (número entero) para el contexto de trabajo
 con GIS}
 
-\item{id_playa}{no sé}
+\item{id_playa}{..completar..}
 
 \item{prog_monitoreo}{Identificador único (id) del programa de monitoreo
 correspondiente a cada estación.}
 
 \item{id}{Identificador único (número entero) de la estación.}
 
-\item{version}{no sé}
+\item{version}{..completar..}
 
 \item{tipo_punto_id}{Número que indica el id del tipo de muestras tomadas:
 superficie o fondo (1 o 2 respectivamente)}
 
-\item{estacion_asociada_id}{no sé}
+\item{estacion_asociada_id}{..completar..}
 
 \item{departamento}{Número que indica el id del departamento en el que se
 encuentra la estación}
@@ -41,15 +41,15 @@ encuentra la estación}
 \item{sub_cuenca}{Número que indica el id de la subcuenca en el que se
 encuentra la estación}
 
-\item{orden_ingreso}{no sé}
+\item{orden_ingreso}{..completar..}
 
-\item{ingreso_interno}{no sé}
+\item{ingreso_interno}{..completar..}
 
 \item{matriz_estacion}{Número que indica el id de la matriz asociada a la
 estación (de momento: 6 = Aguas superficiales y 11 = Sedimentos;
 15/10/2020)}
 
-\item{estacion_activa}{no sé}
+\item{estacion_activa}{..completar..}
 
 }
 }

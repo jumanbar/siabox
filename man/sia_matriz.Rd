@@ -15,9 +15,9 @@ Tabla de 15 filas y 5 columnas:
 
 \item{codigo}{Código o nombre corto de la matriz}
 
-\item{vigente}{no sé}
+\item{vigente}{..completar..}
 
-\item{fca_habilitado}{no sé}
+\item{fca_habilitado}{..completar..}
 
 }
 }

@@ -14,16 +14,16 @@ Tabla de 356 filas y 7 columnas:
 \item{parametro}{Nombre (largo) del parámetro. Puede ser una frase corta.
 Texto.}
 
-\item{enumerado}{no sé}
+\item{enumerado}{..completar..}
 
 \item{nombre_clave}{Nombre corto o código creado para cada parámetro
 (debería ser único). Texto.}
 
-\item{decimales}{no sé}
+\item{decimales}{..completar..}
 
-\item{par_vigente}{no sé}
+\item{par_vigente}{..completar..}
 
-\item{codigo_airviro}{no sé}
+\item{codigo_airviro}{..completar..}
 
 }
 }

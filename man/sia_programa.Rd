@@ -15,11 +15,11 @@ Tabla de 32 filas y 6 columnas:
 
 \item{codigo_programa}{Código (corto) que identifica a cada programa}
 
-\item{visible_externos}{no sé}
+\item{visible_externos}{..completar..}
 
-\item{version}{no sé}
+\item{version}{..completar..}
 
-\item{id_programa_silad}{no sé}
+\item{id_programa_silad}{..completar..}
 
 }
 }
