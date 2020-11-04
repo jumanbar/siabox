@@ -3,9 +3,11 @@
 \docType{data}
 \name{datos_sia}
 \alias{datos_sia}
-\title{Tabla con datos pre extraídos}
+\alias{datos_sia,}
+\alias{datos_sia_sed}
+\title{Datos extraídos del SIA.}
 \format{
-Tabla con 231702 filas y 38 columnas:
+Tabla con 228226 filas y 40 columnas:
 
 \describe{
 
@@ -137,7 +139,43 @@ parámetros tienen un código nuevo propuesto.}
 datos_sia
 }
 \description{
-Última modificación: 2020-10-15
+La tibble \code{datos_sia} tiene datos de matriz Aguas superficiales y
+\code{datos_sia_sed} de Sedimentos. Fecha de extracción: 2020-11-04.
+}
+\details{
+Código de creación de las tablas:\preformatted{cp <-
+codigos_param \%>\%
+  dplyr::filter(!is.na(id_parametro)) \%>\%
+  select(grupo, codigo_nuevo, id_parametro)
+
+con <- con_sia()
+
+datos_sia <- consulta_muestras(con) \%>\%
+  valores_numericos(metodo = "informe", filtrar_no_num = TRUE) \%>\%
+  left_join(cp, by = "id_parametro") \%>\%
+  mutate(codigo_nuevo = if_else(is.na(codigo_nuevo),
+                                nombre_clave,
+                                codigo_nuevo),
+         anio = as.integer(anio),
+         mes = as.integer(mes)
+  ) \%>\%
+  left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") \%>\%
+  select(-id_estado)
+
+datos_sia_sed <- consulta_muestras(con, id_matriz = 11L)
+  valores_numericos(metodo = "informe", filtrar_no_num = TRUE) \%>\%
+  left_join(cp, by = "id_parametro") \%>\%
+  mutate(codigo_nuevo = if_else(is.na(codigo_nuevo),
+                                nombre_clave,
+                                codigo_nuevo),
+         anio = as.integer(anio),
+         mes = as.integer(mes)
+  ) \%>\%
+  left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") \%>\%
+  select(-id_estado)
+
+save(datos_sia_sed, file = "data/datos_sia_sed.rda")
+}
 }
 \seealso{
 \code{\link{tipos_de_dato}}, \code{\link{consulta_muestras}},

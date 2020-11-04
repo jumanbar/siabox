@@ -692,8 +692,29 @@ filtrar_datos <- function(.data,
 
   if (is.null(rango_fechas)) {
     rango_fechas <- c("1900-01-01", as.character(Sys.Date() + 1))
+  } else if (length(rango_fechas) == 1L) {
+
+    if (grepl("^[12][0-9]{3}$", rango_fechas)) {
+      rango_fechas <- paste0(rep.int(rango_fechas, 2), c("-01-01", "-12-31"))
+    } else {
+      anio <- lubridate::year(as.Date(rango_fechas))
+      rango_fechas <- c(rango_fechas,
+                        gsub("^[12][0-9]{3}", anio + 1L, rango_fechas))
+    }
+
+
+
+    warning("rango_fechas tiene un solo valor: se filtran fechas en el",
+            " rango de ", rango_fechas[1], " a ", rango_fechas[2])
+
   } else if (length(rango_fechas) != 2L) {
+
     stop("rango_fechas debe ser un vector con dos fechas en formato AAAA-MM-DD")
+
+  } else if (all(grepl("^[12][0-9]{3}$", rango_fechas))) {
+    rango_fechas <- paste0(rango_fechas, c("-01-01", "-12-31"))
+    warning("rango_fechas se modificó. Filtrando desde ",
+            rango_fechas[1], " a ", rango_fechas[2])
   }
 
   if (is.null(id_parametro)) {

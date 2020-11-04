@@ -19,14 +19,25 @@ g_mes_all(.data, id_parametro, t_eti, ...)
 
 }
 \description{
-Juntar varias gráficas por mes
+En escencia llama a \code{\link{g_mes}} tantas veces como id de parámetros en
+el vector \code{id_parametro}, realizando una figura única que combina los
+gráficos de los parámetros individuales.
 }
 \examples{
 p <- c(PT=2098, NT=2102, ST=2028, Conduc=2009)
-dfo <- data.frame(mes = 3:6, codigo_pto = c("RN1", "RN2", "RN3", "RN5"),
-                  id_parametro = rep(p, each = 4),
-                  valor = rnorm(16))
+dfo <- data.frame(mes = rep(3:6, 4),
+                  codigo_pto = rep(c("RN1", "RN2", "RN3", "RN5"), each = 4),
+                  id_parametro = rep(p, each = 4*4),
+                  valor = c(rnorm(4*4, mean = 30, sd = 5),
+                            rnorm(4*4, mean = 55, sd = 15),
+                            rnorm(4*4, mean = 315, sd = 50),
+                            rnorm(4*4, mean = 500, sd = 80)))
+dfo$valor[sample(4*4*4, 5)] <- NA
+dplyr::filter(dfo, is.na(valor))
 g_mes_all(dfo, id_parametro = p)
+g_mes_all(dfo, id_parametro = 2098L)
+g_mes_all(dfo, id_parametro = 2008L) # VacÃ­o
+g_mes_all(dfo, id_parametro = c(p, 2008L)) # VacÃ­o
 }
 \seealso{
 \code{\link{g_mes}}, \code{\link{t_eti_base}}

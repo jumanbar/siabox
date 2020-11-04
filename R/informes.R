@@ -266,7 +266,13 @@ g_mes <- function(.data, id_parametro = NULL, pos_leyenda = 'none',
       ggplot() +
       theme_void() +
       geom_text(aes(0, 0, label = paste0(texto_par, ":\nNO HAY DATOS"))) +
-      xlab(NULL)
+      theme(panel.grid.minor = element_blank(),
+            panel.grid.major = element_blank(),
+            text = element_text(size = 10),
+            axis.text = element_blank(),
+            legend.position = pos_leyenda) +
+      xlab(NULL) +
+      ylab(NULL)
     return(out)
   }
 
@@ -274,6 +280,7 @@ g_mes <- function(.data, id_parametro = NULL, pos_leyenda = 'none',
                        clase == "1",
                        !is.na(valor))
   if (nrow(dec)) {
+    dec <- dplyr::mutate(dec, valor = coef_conversion * valor)
     out <- out +
       geom_hline(yintercept = dec$valor, linetype = "longdash", color = 'red')
   }
@@ -282,6 +289,10 @@ g_mes <- function(.data, id_parametro = NULL, pos_leyenda = 'none',
 }
 
 #' Juntar varias gráficas por mes
+#'
+#' En escencia llama a \code{\link{g_mes}} tantas veces como id de parámetros en
+#' el vector `id_parametro`, realizando una figura única que combina los
+#' gráficos de los parámetros individuales.
 #'
 #' @param .data Datos
 #' @param id_parametro `integer`. id de varios parámetros
@@ -296,10 +307,19 @@ g_mes <- function(.data, id_parametro = NULL, pos_leyenda = 'none',
 #'
 #' @examples
 #' p <- c(PT=2098, NT=2102, ST=2028, Conduc=2009)
-#' dfo <- data.frame(mes = 3:6, codigo_pto = c("RN1", "RN2", "RN3", "RN5"),
-#'                   id_parametro = rep(p, each = 4),
-#'                   valor = rnorm(16))
+#' dfo <- data.frame(mes = rep(3:6, 4),
+#'                   codigo_pto = rep(c("RN1", "RN2", "RN3", "RN5"), each = 4),
+#'                   id_parametro = rep(p, each = 4*4),
+#'                   valor = c(rnorm(4*4, mean = 30, sd = 5),
+#'                             rnorm(4*4, mean = 55, sd = 15),
+#'                             rnorm(4*4, mean = 315, sd = 50),
+#'                             rnorm(4*4, mean = 500, sd = 80)))
+#' dfo$valor[sample(4*4*4, 5)] <- NA
+#' dplyr::filter(dfo, is.na(valor))
 #' g_mes_all(dfo, id_parametro = p)
+#' g_mes_all(dfo, id_parametro = 2098L)
+#' g_mes_all(dfo, id_parametro = 2008L) # Vacío
+#' g_mes_all(dfo, id_parametro = c(p, 2008L)) # Vacío
 g_mes_all <- function(.data, id_parametro, t_eti, ...) {
 
   if (missing(t_eti)) {
@@ -391,8 +411,8 @@ g_comp_est_all <- function(.data, id_parametro, ...) {
   #                                nrow = 1)) +
   #   theme_bw()
 
-  out <- wrap_plots(lista, ...) +
-    plot_annotation(tag_levels = 'A')
+  out <- patchwork::wrap_plots(lista, ...) +
+    patchwork::plot_annotation(tag_levels = 'A')
 
   print(out)
 }
