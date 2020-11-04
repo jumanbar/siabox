@@ -510,7 +510,10 @@ g_iet <- function(.data) {
 
 # + Graficos sueltos ----
 
-#' Graficar valores anuales por estacion
+#' Graficar valores anuales longitudinales
+#'
+#' Gráfica los valores de los parámetros por estaciones, ordenadas en orden de
+#' la cuenca
 #'
 #' @param .data data.frame. Datos del SIA
 #' @param id_parametro integer.
@@ -525,8 +528,8 @@ g_iet <- function(.data) {
 #' decreto <- readRDS("../data/decreto.rds")
 #' d$mes <- as.integer(d$mes)
 #' d$anio <- as.integer(d$anio)
-#' g_par_esp(d, 2032, 2019L, horiz = c(min = 5, max = 28))
-g_par_esp <- function(.data, id_parametro, anio,
+#' g_long(d, 2032, 2019L, horiz = c(min = 5, max = 28))
+g_long <- function(.data, id_parametro, anio,
                       colores_meses = scales::hue_pal()(12),
                       horiz = NULL) {
   require(dplyr)
@@ -534,7 +537,7 @@ g_par_esp <- function(.data, id_parametro, anio,
   require(lubridate)
 
   # if (id_parametro == 2032L)
-  #   save(.data, id_parametro, anio, colores_meses, file = "tmp/g_par_esp.RData")
+  #   save(.data, id_parametro, anio, colores_meses, file = "tmp/g_long.RData")
 
   .data <- dplyr::filter(.data, id_parametro == !!id_parametro)
 
@@ -615,7 +618,7 @@ g_par_esp <- function(.data, id_parametro, anio,
 
   valores_color <- c(
     # Para que los colores sean consistentes entre diferentes gráficas
-    # (especialmente cuando g_par_esp es llamada por g_par_esp_files):
+    # (especialmente cuando g_long es llamada por g_long_files):
     colores_meses[meses],
     # El promedio de los 5 (o n) años anteriores, por estación, en gris:
     if (!is.null(eti_lustro)) "#a6a6a6" else NULL,
@@ -699,7 +702,7 @@ g_par_esp <- function(.data, id_parametro, anio,
   return(g)
 }
 
-#' Hacer archivos con gráficos g_par_esp
+#' Hacer archivos con gráficos g_long
 #'
 #' @param .data
 #' @param id_programa
@@ -713,10 +716,10 @@ g_par_esp <- function(.data, id_parametro, anio,
 #' d <- readRDS("tmp/datos_cuareim.rds") %>%
 #'   dplyr::filter(id_parametro %in% c(2035, 2017:2018, 2091, 2098, 2111))
 #' h <- dplyr::filter(decreto, clase == "1", !is.na(valor))
-#' g_par_esp_files(d, 2019L, tabla_horiz = h, path = "tmp")
-g_par_esp_files <- function(.data, anio, tabla_horiz = NULL, path = NULL) {
+#' g_long_files(d, 2019L, tabla_horiz = h, path = "tmp")
+g_long_files <- function(.data, anio, tabla_horiz = NULL, path = NULL) {
 
-  # save(.data, id_programa, anio, path, file = "tmp/g_par_esp_files.RData")
+  # save(.data, id_programa, anio, path, file = "tmp/g_long_files.RData")
 
   # if (is.null(id_prog)) {
   #   prog <- adiv_prog(unique(.data$codigo_pto))
@@ -762,7 +765,7 @@ g_par_esp_files <- function(.data, anio, tabla_horiz = NULL, path = NULL) {
         }
       }
 
-      g <- g_par_esp(.data, id_par[i], anio,
+      g <- g_long(.data, id_par[i], anio,
                      colores_meses = paleta,
                      horiz = horiz)
 
