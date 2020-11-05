@@ -105,6 +105,33 @@ limpia_num <- function(x) {
   return(out)
 }
 
+#' Buscador de parámetros
+#'
+#' Buscador de id_parametro según un texto (un google de id_parametros)
+#'
+#' @param patron character. Patrón (expresión regular tipo
+#'   \code{\link[base]{regex}}).
+#' @param ... Argumentos pasados a \code{\link[base]{agrepl}}
+#'
+#' @return
+#'
+#' @examples
+#' param_id("fósforo")
+#' param_id("pt", max.distance = 0)
+param_id <- function(patron, ...) {
+
+  patron <- toascii(patron)
+
+  resA <- agrepl(patron, toascii(sia_parametro$nombre_clave),
+                 ignore.case = TRUE,
+                 ...)
+
+  resB <- agrepl(patron, toascii(sia_parametro$parametro),
+                 ignore.case = TRUE,
+                 ...)
+
+  sia_parametro[resA | resB,]
+}
 
 #' Auxiliar para `consulta_muestras`
 #'

@@ -203,26 +203,39 @@ eti <- function(id_parametro, t_eti) {
 
 #' Graficos de parámetros por mes
 #'
-#' `g_mes` grafica los valores de un parámetro por mes. `g_mes_all` en escencia
-#' llama a \code{\link{g_mes}} tantas veces como id de parámetros en
-#' `id_parametro`, realizando una figura única que combina los gráficos de los
-#' parámetros individuales.
-
-#' @param .data data.frame. Datos del SIA
-#' @param id_parametro integer. Id de uno/escalar (`g_mes`) o varios elementos
-#'   (`g_mes_all`). Se debe(n) corresponder con los ids encontrados columna
-#'   homónima de \code{\link{sia_parametro}}
-#' @param pos_leyenda character. Valor enviado directamente al argumento
+#' `g_mes_pto` grafica los valores de un parámetro por mes, usando colores para
+#' diferenciar las estaciones; `g_est_bar` muestra promedios y desvíos
+#' estándares de un parámetro, según las estaciones encontradas en `.data`
+#' (internamente procesa los datos con `d_est_bar`); `g_cue_box` Grafica valores
+#' de un parámetro con gráficos de cajas (boxplot), para comparar subcuencas.
+#' Las versiones `[..funcion..]_all` agrupan en una misma figura los gráficos
+#' generados con `[..funcion..]` para el total de parámetros encontrados en
+#' `id_parametro`.
+#'
+#'
+#' `g_mes_pto_all` en escencia llama a \code{\link{g_mes_pto}} tantas veces como
+#' id de parámetros en `id_parametro`, realizando una figura única que combina
+#' los gráficos de los parámetros individuales. , mientras que
+#'
+#' @param .data data.frame. Datos del SIA (ver \code{\link{datos_sia}} y
+#'   ejemplos)
+#' @param id_parametro integer. Id de uno/escalar (`g_mes_pto`) o varios
+#'   elementos (`g_mes_pto_all`). Se debe(n) corresponder con los ids
+#'   encontrados columna homónima de \code{\link{sia_parametro}}
+#' @param legend.position character. Valor enviado directamente al argumento
 #'   `legend.position` de la función \code{\link[ggplot2]{theme}}
-#' @param nombre_clave_param character. Opcional. Nombre clave del parámetro
-#'   (ej.: "PT"). Se corresponde con la columna `nombre_clave` de
+#' @param nombre_clave character. Nombre clave del parámetro (ej.: "PT"), según
+#'   los nombres usados en la columna `nombre_clave` de
 #'   \code{\link{sia_parametro}}
 #' @param t_eti `tbl_df`. Opcional. Tabla de etiquetas
 #' @param ylab Opcional. Etiqueta para el eje y del gráfico resultante. Si este
 #'   argumento no es especificado, se utilizará la función \code{eti} para crear
 #'   la etiqueta.
-#' @param ... Argumentos adicionales para pasar a
-#'   \code{\link[patchwork]{wrap_plots}}
+#' @param ... En caso de las funciones `*_all`, son argumentos adicionales para
+#'   pasar a \code{\link[patchwork]{wrap_plots}}. En caso de `d_est_bar`, se
+#'   trata de una o más columnas de `.data` sin comillas
+#' @param fun_moda function. Funcion para calulcular la moda de `valor`
+#' @param fun_desvio function. Función para calcular desvío de `valor`
 #'
 #' @details Requiere de la tabla decreto para agregar las líneas horizontales
 #'   correspondientes a los valores límites aceptados para la clase 1 de aguas
@@ -237,49 +250,70 @@ eti <- function(id_parametro, t_eti) {
 #'
 #' @examples
 #' p <- c(PT=2098, NT=2102, ST=2028, Conduc=2009)
-#' dfo <- data.frame(mes = rep(3:6, 4),
-#'                   codigo_pto = rep(c("RN1", "RN2", "RN3", "RN5"), each = 4),
-#'                   id_parametro = rep(p, each = 4*4),
-#'                   valor = c(rnorm(4*4, mean = 30, sd = 5),
-#'                             rnorm(4*4, mean = 55, sd = 15),
-#'                             rnorm(4*4, mean = 315, sd = 50),
-#'                             rnorm(4*4, mean = 500, sd = 80)))
-#' dfo$valor[sample(4*4*4, 5)] <- NA
-#' dplyr::filter(dfo, is.na(valor))
-#' g_mes(dfo, id_parametro = 2009, ylab = 'Cond (μS/cm)')
-#' g_mes(dfo, nombre_clave_param = 'Conduc', ylab = 'Cond (μS/cm)')
-#' g_mes_all(dfo, id_parametro = p)
-#' g_mes_all(dfo, id_parametro = 2098L)
-#' g_mes_all(dfo, id_parametro = 2008L) # Vacío
-#' g_mes_all(dfo, id_parametro = c(p, 2008L)) # Vacío
-g_mes <- function(.data, id_parametro = NULL, pos_leyenda = 'none',
-                  nombre_clave_param, ylab = NULL, t_eti) {
+#'
+#' d <- datos_sia %>%
+#'   filtrar_datos(datos_sia, id_programa = 10L,
+#'                 rango_fechas = 2019, id_parametro = p)
+#'
+#' cebo <- dplyr::filter(d, nombre_subcuenca_informes == "Cebollatí")
+#'
+#' g_mes_pto(cebo, id_parametro = 2009, ylab = 'Cond (μS/cm)')
+#' g_mes_pto(cebo, nombre_clave = 'Conduc', ylab = 'Cond (μS/cm)')
+#' g_mes_pto_all(cebo, id_parametro = p)
+#' g_mes_pto_all(cebo, id_parametro = 2098L)
+#' g_mes_pto_all(cebo, id_parametro = 2008L) # Vacío
+#' g_mes_pto_all(cebo, id_parametro = c(p, 2008L)) # Vacío
+#' g_cue_box(d, nombre_clave = "PT")
+#'
+#' e <- datos_sia %>%
+#'   filtrar_datos(id_programa = 4L,
+#'                 rango_fechas = c(2017, 2019),
+#'                 id_parametro = p)
+#' g_est_bar(e, nombre_clave = "PT")
+#' g_est_bar_all(e, p)
+#' g_cue_box(e, p)
+g_mes_pto <- function(.data,
+                      id_parametro,
+                      nombre_clave,
+                      legend.position = 'none',
+                      ylab,
+                      t_eti) {
 
-  if (missing(t_eti)) {
-    t_eti <- t_eti_base
-    warning("Se usa t_eti_base como sustituta del argumento t_eti")
+  if (missing(id_parametro)) {
+    if (missing(nombre_clave))
+      stop("id_parametro y nombre_clave no especificados")
+    id_parametro <-
+      dplyr::filter(sia_parametro, nombre_clave == !!nombre_clave)$id_parametro
+    if (!length(id_parametro))
+      stop("nombre_clave no encontrado en sia_parametro")
   }
-  id_parametro <- if (is.null(id_parametro)) {
-    dplyr::filter(sia_parametro,
-                  nombre_clave == nombre_clave_param)$id_parametro
-  } else id_parametro
 
-  if (is.null(ylab))
+  if (missing(ylab)) {
+    if (missing(t_eti)) {
+      t_eti <- t_eti_base
+      warning("Se usa t_eti_base como sustituta del argumento t_eti")
+    }
     ylab <- eti(id_parametro, t_eti)
+  }
+
+  datos <-
+    .data %>%
+    dplyr::filter(id_parametro == !!id_parametro)
 
   out <-
-    .data %>%
-    dplyr::filter(id_parametro == !!id_parametro) %>%
-    ggplot() +
+    ggplot(datos) +
     aes(mes, valor, color = codigo_pto) +
+    # aes(fecha_muestra, valor, color = codigo_pto) +
     geom_jitter(width = 0.1, alpha = 0.7) +
     labs(x = NULL, y = ylab) +
     theme_bw() +
     theme(panel.grid.minor = element_blank(),
           text = element_text(size = 10),
           axis.text.x = element_text(angle = 0, vjust = 1),
-          legend.position = pos_leyenda)
+          legend.position = legend.position) +
+    scale_x_continuous(breaks = 1:12)
 
+  # Si no hay datos del parámetro:
   if (!nrow(out$data)) {
     corte <-
       sia_parametro %>%
@@ -296,12 +330,13 @@ g_mes <- function(.data, id_parametro = NULL, pos_leyenda = 'none',
             panel.grid.major = element_blank(),
             text = element_text(size = 10),
             axis.text = element_blank(),
-            legend.position = pos_leyenda) +
+            legend.position = legend.position) +
       xlab(NULL) +
       ylab(NULL)
     return(out)
   }
 
+  # Decreto 253/79: Líneas Horizontales
   dec <- dplyr::filter(decreto, id_parametro == !!id_parametro,
                        clase == "1",
                        !is.na(valor))
@@ -314,9 +349,9 @@ g_mes <- function(.data, id_parametro = NULL, pos_leyenda = 'none',
   return(out)
 }
 
-#' @describeIn g_mes Varios gráficos de valores de parámetros por mes en una
-#'   misma figura
-g_mes_all <- function(.data, id_parametro, t_eti, ...) {
+#' @describeIn g_mes_pto Varios gráficos de valores de parámetros por mes en una
+#'   misma figura, usando `g_mes_pto`.
+g_mes_pto_all <- function(.data, id_parametro, t_eti, ...) {
 
   if (missing(t_eti)) {
     t_eti <- t_eti_base
@@ -326,7 +361,7 @@ g_mes_all <- function(.data, id_parametro, t_eti, ...) {
   lista <- vector(mode = "list", length = length(id_parametro))
   # for (i in 1:(length(id_parametro) - 1))
   for (i in 1:(length(id_parametro)))
-    lista[[i]] <- g_mes(.data, id_parametro = id_parametro[i], t_eti = t_eti)
+    lista[[i]] <- g_mes_pto(.data, id_parametro = id_parametro[i], t_eti = t_eti)
 
   lista[[i]] <-
     lista[[i]] +
@@ -345,32 +380,66 @@ g_mes_all <- function(.data, id_parametro, t_eti, ...) {
   print(out)
 }
 
-g_comp_est <- function(.data, nombre_clave_param,
-                       id_parametro = NULL, ylab = NULL, t_eti) {
+#' @describeIn g_mes_pto Prepara datos para presentar modas y desvíos
+d_est_bar <- function(.data,
+                      id_parametro,
+                      ...,
+                      nombre_clave,
+                      fun_moda = base::mean, fun_desvio = stats::sd) {
 
-  if (missing(t_eti)) {
-    t_eti <- t_eti_base
-    warning("Se usa t_eti_base como sustituta del argumento t_eti")
+  if (missing(id_parametro)) {
+    if (missing(nombre_clave))
+      stop("id_parametro y nombre_clave no especificados")
+    id_parametro <-
+      dplyr::filter(sia_parametro, nombre_clave == !!nombre_clave)$id_parametro
+    if (!length(id_parametro))
+      stop("nombre_clave no encontrado en sia_parametro")
   }
 
-  id <- if (is.null(id_parametro))
-    dplyr::filter(sia_parametro, nombre_clave == nombre_clave_param)$id_parametro else
-      id_parametro
-
-  if (is.null(ylab))
-    ylab <- eti(id, t_eti)
+  grupo <- rlang::enquos(...)
 
   out <-
     .data %>%
-    dplyr::filter(id_parametro == id) %>%
-    group_by(codigo_pto) %>%
-    summarise(Media = mean(valor),
-              sd = sd(valor)) %>%
-    mutate(ymin = Media - sd,
-           ymax = Media + sd) %>%
+    dplyr::filter(id_parametro == !!id_parametro) %>%
+    dplyr::group_by(!!!grupo) %>%
+    dplyr::summarise(moda = fun_moda(valor),
+                     desv = fun_desvio(valor)) %>%
+    dplyr::mutate(ymin = moda - desv,
+                  ymax = moda + desv)
+
+  return(out)
+}
+
+#' @describeIn g_mes_pto Muestra promedios y desvíos estándares de un parámetro para
+#'   las estaciones encontradas en `.data`
+g_est_bar <- function(.data,
+                      id_parametro,
+                      nombre_clave,
+                      ylab,
+                      t_eti) {
+
+  if (missing(id_parametro)) {
+    if (missing(nombre_clave))
+      stop("id_parametro y nombre_clave no especificados")
+    id_parametro <-
+      dplyr::filter(sia_parametro, nombre_clave == !!nombre_clave)$id_parametro
+    if (!length(id_parametro))
+      stop("nombre_clave no encontrado en sia_parametro")
+  }
+
+  if (missing(ylab)) {
+    if (missing(t_eti)) {
+      t_eti <- t_eti_base
+      warning("Se usa t_eti_base como sustituta del argumento t_eti")
+    }
+    ylab <- eti(id_parametro, t_eti)
+  }
+
+  out <-
+    d_est_bar(.data, id_parametro, codigo_pto) %>%
     ggplot() +
-    aes(x = codigo_pto, y = Media) +
-    geom_errorbar(aes(ymin = Media - sd, ymax = Media + sd), width = .3,
+    aes(x = codigo_pto, y = moda) +
+    geom_errorbar(aes(ymin = ymin, ymax = ymax), width = .3,
                   position = position_dodge(.5), size = .5) +
     geom_point(position = position_dodge(.5), size = 2, alpha = .7)+
     labs(y = ylab, x = NULL, colour = "Cuenca")+
@@ -379,7 +448,7 @@ g_comp_est <- function(.data, nombre_clave_param,
           text = element_text(size = 10),
           axis.text.x = element_text(angle=30, vjust=1))
 
-  dec <- dplyr::filter(decreto, id_parametro == id & clase == "1")
+  dec <- dplyr::filter(decreto, id_parametro == !!id_parametro & clase == "1")
 
   if (nrow(dec)) {
     out <- out +
@@ -390,22 +459,13 @@ g_comp_est <- function(.data, nombre_clave_param,
 
 }
 
-g_comp_est_all <- function(.data, id_parametro, ...) {
+#' @describeIn g_mes_pto Varios gráficos de promedios y desvíos estándares para
+#'   parámetros por estación, en una misma figura, usando `g_est_bar`
+g_est_bar_all <- function(.data, id_parametro, t_eti, ...) {
 
   lista <- vector(mode = "list", length = length(id_parametro))
-  # for (i in 1:(length(id_parametro) - 1))
   for (i in 1:(length(id_parametro)))
-    lista[[i]] <- g_comp_est(.data, id_parametro = id_parametro[i])
-
-  # lista[[i]] <-
-  #   lista[[i]] +
-  #   theme_update(legend.position = "bottom") +
-  #   guides(colour = guide_legend("Estación", title.position = 'left',
-  #                                direction = "horizontal",
-  #                                label.hjust = .5,
-  #                                label.vjust = .5,
-  #                                nrow = 1)) +
-  #   theme_bw()
+    lista[[i]] <- g_est_bar(.data, id_parametro = id_parametro[i])
 
   out <- patchwork::wrap_plots(lista, ...) +
     patchwork::plot_annotation(tag_levels = 'A')
@@ -415,43 +475,34 @@ g_comp_est_all <- function(.data, id_parametro, ...) {
 
 
 
-#' Gráfico de comparación entre cuencas
-#'
-#' @param .data data.frame. Datos del SIA
-#' @param nombre_clave_param character. Nombre clave del parámetro (ej.: "PT").
-#'   Se corresponde con la columna `nombre_clave` de \code{\link{sia_parametro}}
-#' @param id_parametro integer. Id del parámetro. Se corresponde con la columna
-#'   homónima de \code{\link{sia_parametro}}
-#' @param ylab character. Etiqueta opcional para usar en la gráfica
-#'
-#' @return
-#' @export
-#'
-#' @examples
-#' d <- filtrar_datos(datos_sia, id_programa = 10L,
-#'                    rango_fechas = c(2017, 2019),
-#'                    id_parametro = 2098)
-#' g_comp_cue(d, "PT")
-#'
-#' e <- filtrar_datos(datos_sia, id_programa = 4L,
-#'                    rango_fechas = c(2017, 2019),
-#'                    id_parametro = 2098)
-#' g_comp_cue(e, "PT")
-g_comp_cue <- function(.data,
-                       nombre_clave_param,
-                       id_parametro = NULL,
-                       ylab = NULL) {
-  id <- if (is.null(id_parametro))
-    dplyr::filter(sia_parametro,
-                  nombre_clave == nombre_clave_param)$id_parametro else
-      id_parametro
+#' @describeIn g_mes_pto Gráfico de cajas (boxplot) para comparación de valores de
+#'   un parámetro entre cuencas
+g_cue_box <- function(.data,
+                       id_parametro,
+                       nombre_clave,
+                       ylab,
+                       t_eti) {
 
-  if (is.null(ylab))
-    ylab <- eti(id)
+  if (missing(id_parametro)) {
+    if (missing(nombre_clave))
+      stop("id_parametro y nombre_clave no especificados")
+    id_parametro <-
+      dplyr::filter(sia_parametro, nombre_clave == !!nombre_clave)$id_parametro
+    if (!length(id_parametro))
+      stop("nombre_clave no encontrado en sia_parametro")
+  }
+
+  if (missing(ylab)) {
+    if (missing(t_eti)) {
+      t_eti <- t_eti_base
+      warning("Se usa t_eti_base como sustituta del argumento t_eti")
+    }
+    ylab <- eti(id_parametro, t_eti)
+  }
 
   out <-
     .data %>%
-    dplyr::filter(id_parametro == id) %>%
+    dplyr::filter(id_parametro == !!id_parametro) %>%
     ggplot() +
     geom_boxplot(fill = "lightblue", outlier.size = 1.2,
                  outlier.fill = "#000000") +
@@ -462,9 +513,9 @@ g_comp_cue <- function(.data,
           axis.text.x = element_text(angle=90, vjust=1))
 
   out <- if (all(is.na(.data$nombre_subcuenca_informes))) {
-    out + aes(sub_cue_nombre, valor)
     warning("Usando sub_cue_nombre en lugar de nombre_subcuenca_informes ",
             "debido a que no se encontraron valores válidos para la última")
+    out + aes(sub_cue_nombre, valor)
   } else out + aes(nombre_subcuenca_informes, valor)
 
   return(out)
@@ -479,6 +530,11 @@ g_comp_cue <- function(.data,
 #' @export
 #'
 #' @examples
+#' datos_sia %>%
+#'   filtrar_datos(id_programa = 3L, rango_fechas = 2019,
+#'                 tipo_punto_id = 1L, id_parametro = 2098) %>%
+#'   dplyr::mutate(IET = iet(valor)) %>%
+#'   g_iet
 g_iet <- function(.data) {
   out <-
     .data %>%
@@ -515,10 +571,20 @@ g_iet <- function(.data) {
 #' Gráfica los valores de los parámetros por estaciones, ordenadas en orden de
 #' la cuenca
 #'
-#' @param .data data.frame. Datos del SIA
-#' @param id_parametro integer.
-#' @param anio
-#' @param colores_meses
+#' @param .data data.frame. Datos del SIA (ver \code{\link{datos_sia}} y
+#'   ejemplos)
+#' @param id_parametro integer. Id de uno/escalar (`g_mes_pto`) o varios
+#'   elementos (`g_mes_pto_all`). Se debe(n) corresponder con los ids
+#'   encontrados columna homónima de \code{\link{sia_parametro}}
+#' @param anio intger. Año
+#' @param colores_meses character. Paleta de colores para usar en los distintos
+#'   meses.
+#' @param horiz numeric. Vector con dos valores: min y max, para ser graficados
+#'   con líneas horizontales.
+#' @param tabla_horiz data.frame. Debe tener las columnas `id_parametro`,
+#'   `valor`, y `extremo` tal como en la tabla \code{\link{decreto}}
+#' @param path character. Ruta de directorio en donde guardar las imágenes
+#'   generadas por `g_long`
 #'
 #' @return
 #' @export
@@ -529,9 +595,11 @@ g_iet <- function(.data) {
 #' d$mes <- as.integer(d$mes)
 #' d$anio <- as.integer(d$anio)
 #' g_long(d, 2032, 2019L, horiz = c(min = 5, max = 28))
-g_long <- function(.data, id_parametro, anio,
-                      colores_meses = scales::hue_pal()(12),
-                      horiz = NULL) {
+g_long <- function(.data,
+                   id_parametro,
+                   anio,
+                   colores_meses = scales::hue_pal()(12),
+                   horiz) {
   require(dplyr)
   require(magrittr)
   require(lubridate)
@@ -669,7 +737,7 @@ g_long <- function(.data, id_parametro, anio,
     theme_bw() +
     theme(legend.position = "bottom")
 
-  if (!is.null(horiz)) {
+  if (!missing(horiz)) {
 
     rango_y <- ggplot_build(g)$layout$panel_params[[1]]$y.range
 
@@ -704,10 +772,7 @@ g_long <- function(.data, id_parametro, anio,
 
 #' Hacer archivos con gráficos g_long
 #'
-#' @param .data
-#' @param id_programa
-#' @param anio
-#' @param path
+
 #'
 #' @return
 #' @export
@@ -717,7 +782,7 @@ g_long <- function(.data, id_parametro, anio,
 #'   dplyr::filter(id_parametro %in% c(2035, 2017:2018, 2091, 2098, 2111))
 #' h <- dplyr::filter(decreto, clase == "1", !is.na(valor))
 #' g_long_files(d, 2019L, tabla_horiz = h, path = "tmp")
-g_long_files <- function(.data, anio, tabla_horiz = NULL, path = NULL) {
+g_long_files <- function(.data, anio, tabla_horiz, path) {
 
   # save(.data, id_programa, anio, path, file = "tmp/g_long_files.RData")
 
@@ -733,7 +798,7 @@ g_long_files <- function(.data, anio, tabla_horiz = NULL, path = NULL) {
   # id_par <- c(2032L, 2009, 2098, 2097, 2105)
   id_par <- sort(unique(.data$id_parametro))
 
-  directorio <- if (is.null(path)) tempdir() else path
+  directorio <- if (missing(path)) tempdir() else path
 
   out <- character(n <- length(id_par))
 
@@ -754,7 +819,7 @@ g_long_files <- function(.data, anio, tabla_horiz = NULL, path = NULL) {
     for (i in 1:n) {
 
       horiz <- NULL
-      if (!is.null(tabla_horiz)) {
+      if (!missing(tabla_horiz)) {
         v <- dplyr::filter(tabla_horiz, id_parametro == id_par[i])
         if (nrow(v)) {
           horiz <- v$valor

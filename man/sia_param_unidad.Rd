@@ -8,7 +8,7 @@
 Tabla con 1321 filas y
 4)` columnas:
 
-\describe {
+\describe{
 
 \item{id}{identificador único para las entradas de esta tabla (i.e.:
 combinaciones de \code{id_unidad_medida}, \code{id_parametro} e \code{id_matriz})}

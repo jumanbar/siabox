@@ -238,9 +238,9 @@
 #'
 #' @format Tabla con `r nrow(sia_matriz)` filas y `r ncol(sia_matriz)` columnas:
 #'
-#' \describe {
+#' \describe{
 #'
-#'   \item{id_matriz}{}
+#'   \item{id_matriz}{..completar..}
 #'
 #'   \item{nombre}{Nombre de la matriz}
 #'
@@ -268,7 +268,7 @@
 #' @format Tabla con `r nrow(sia_param_unidad)` filas y
 #'   `r ncol(sia_param_unidad)` columnas:
 #'
-#'   \describe {
+#'   \describe{
 #'
 #'   \item{id}{identificador único para las entradas de esta tabla (i.e.:
 #'   combinaciones de `id_unidad_medida`, `id_parametro` e `id_matriz`)}
@@ -433,6 +433,37 @@
 
 ## AGREGADAS ----
 
+# . cuencas_informes -----
+
+#' Cuencas y subcuencas en informes
+#'
+#' @seealso \code{\link{sia_estacion}}
+#'
+#' @format Tabla con `r nrow(cuencas_informes)` filas y
+#' `r ncol(cuencas_informes)` columnas:
+#'
+#'   \describe{
+#'
+#'   \item{nombre_subcuenca_informes}{}
+#'
+#'   \item{codigo_pto}{}
+#'
+#'   \item{codigo_pto_mod}{}
+#'
+#'   \item{id_estacion}{}
+#'
+#'   \item{id_cuenca}{}
+#'
+#'   \item{cue_nombre}{}
+#'
+#'   \item{id_programa}{}
+#'
+#'   \item{nombre_programa}{}
+#'
+#'   }
+#'
+"cuencas_informes"
+
 # . programa_matriz ----
 
 #' Matrices de programas
@@ -550,39 +581,33 @@
 #' Código de creación de las tablas:
 #'
 #' ```
-#' cp <-
-#' codigos_param %>%
-#'   dplyr::filter(!is.na(id_parametro)) %>%
-#'   select(grupo, codigo_nuevo, id_parametro)
+#'
+#' cp <- codigos_param %>% dplyr::filter(!is.na(id_parametro)) %>%
+#' dplyr::select(grupo, codigo_nuevo, id_parametro)
 #'
 #' con <- con_sia()
 #'
-#' datos_sia <- consulta_muestras(con) %>%
-#'   valores_numericos(metodo = "informe", filtrar_no_num = TRUE) %>%
-#'   left_join(cp, by = "id_parametro") %>%
-#'   mutate(codigo_nuevo = if_else(is.na(codigo_nuevo),
-#'                                 nombre_clave,
-#'                                 codigo_nuevo),
-#'          anio = as.integer(anio),
-#'          mes = as.integer(mes)
-#'   ) %>%
-#'   left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") %>%
-#'   select(-id_estado)
+#' datos_sia <- consulta_muestras(con) %>% valores_numericos(metodo = "informe",
+#' filtrar_no_num = TRUE) %>% dplyr::left_join(cp, by = "id_parametro") %>%
+#' dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo), nombre_clave,
+#' codigo_nuevo), anio = as.integer(anio), mes = as.integer(mes) ) %>%
+#' dplyr::left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") %>%
+#' dplyr::select(-id_estado)
 #'
-#' datos_sia_sed <- consulta_muestras(con, id_matriz = 11L)
-#'   valores_numericos(metodo = "informe", filtrar_no_num = TRUE) %>%
-#'   left_join(cp, by = "id_parametro") %>%
-#'   mutate(codigo_nuevo = if_else(is.na(codigo_nuevo),
-#'                                 nombre_clave,
-#'                                 codigo_nuevo),
-#'          anio = as.integer(anio),
-#'          mes = as.integer(mes)
-#'   ) %>%
-#'   left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") %>%
-#'   select(-id_estado)
+#' save(datos_sia, file = "data/datos_sia.rda")
+#'
+#' datos_sia_sed <- consulta_muestras(con, id_matriz = 11L) %>%
+#' valores_numericos(metodo = "informe", filtrar_no_num = TRUE) %>%
+#' dplyr::left_join(cp, by = "id_parametro") %>% dplyr::mutate(param =
+#' dplyr::if_else(is.na(codigo_nuevo), nombre_clave, codigo_nuevo), anio =
+#' as.integer(anio), mes = as.integer(mes) ) %>%
+#' dplyr::left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") %>%
+#' dplyr::select(-id_estado)
 #'
 #' save(datos_sia_sed, file = "data/datos_sia_sed.rda")
+#'
 #' ```
+#'
 #' @format Tabla con `r nrow(datos_sia)` filas y `r ncol(datos_sia)` columnas:
 #'
 #'   \describe{
@@ -675,42 +700,25 @@
 #'   especificado en "Método".}
 #'
 #'   \item{id_tipo_dato}{Es un número asignado a cada valor. Se trata de una
-#'   clasificación de cada dato según siete categorías (ver también
-#'   \code{\link{tipos_de_dato}}):
-#'
-#'   \enumerate{
-#'
-#'   1. `Numérico`
-#'
-#'   2. `<LD`
-#'
-#'   3. `<LC`
-#'
-#'   4. `LD<X<LC`
-#'
-#'   5. `<X`
-#'
-#'   6. `>X`
-#'
-#'   7. `Otros`
-#'
-#'   }
-#'
-#'   }
+#'   clasificación de cada dato según siete categorías (ver
+#'   \code{\link{tipos_de_dato}})}
 #'
 #'   \item{tipo_dato}{Descripción, en texto, de la categoría correspondiente a
 #'   `id_tipo_dato`.}
-#'
-#'   \item{nombre_subcuenca_informes}{Nombre dado a cada subcuenca dentro de los
-#'   informes anuales de los programas de monitoreo.}
 #'
 #'   \item{grupo}{Grupo al que pertenece el parámetro (ej.: Parámetros de
 #'   Biológicos, Parámetros de Ecotoxicidad). No todos los parámetros tienen un
 #'   grupo asignado.}
 #'
-#'   \item{codigo_nuevo}{Nombre (abreviado, o código) nuevo propuesto para el
-#'   parámetro (ver [tabla de códigos nuevos](codigos_param.html)). No todos los
-#'   parámetros tienen un código nuevo propuesto.}
+#'   \item{codigo_nuevo}{Nombre corto del parámetro segun
+#'   \code{\link{codigos_param}}}
+#'
+#'   \item{param}{Nombre corto del parámetro (mejorado a partir de
+#'   \code{\link{codigos_param}}; en caso de parámetros que no figuran en esa
+#'   tabla, se usa el `nombre_clave` de \code{\link{sia_parametro}})}
+#'
+#'   \item{nombre_subcuenca_informes}{Nombre dado a cada subcuenca dentro de los
+#'   informes anuales de los programas de monitoreo.}
 #'
 #'   }
 #'
@@ -720,8 +728,6 @@
 #' @source \code{infambientalbd}
 #'
 #' @aliases datos_sia, datos_sia_sed
-#'
-#' @examples
 "datos_sia"
 
 ## . tipos_de_dato -----
@@ -900,7 +906,7 @@
 #'
 #'   \item{id_parametro}{integer. Vector con 2 o más id de parámetros}
 #'
-#'   \item{fun}{function. Función que acepta una \code{\link[base]{data.frame}}}
+#'   \item{fun}{function. Función que acepta una \code{\link[base]{data.frame}}
 #'   como único argumento, y en la que las columnas se corresponden con los
 #'   parámetros correspondientes (en el mismo orden)}
 #'

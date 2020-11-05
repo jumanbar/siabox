@@ -12,7 +12,7 @@ clasif_tipo_dato(x, metodo = "simple")
 base de datos infambientalbd (SIA).}
 
 \item{metodo}{String. El valor de este argumento define la forma en que se
-clasifican los valores de X. Ver detalles.}
+clasifican los valores de X. Opciones: "simple" o "informe". Ver detalles.}
 }
 \value{
 Lista con dos elementos:

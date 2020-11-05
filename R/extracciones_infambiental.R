@@ -205,7 +205,7 @@ ancho_old <- function(.data, id_x, id_y,
 #'   \code{valor_minimo_str} de la tabla \code{datos_muestra_parametros} de la
 #'   base de datos infambientalbd (SIA).
 #' @param metodo String. El valor de este argumento define la forma en que se
-#'   clasifican los valores de X. Ver detalles.
+#'   clasifican los valores de X. Opciones: "simple" o "informe". Ver detalles.
 #'
 #' @details El método por defecto, "simple", no diferencia "<LC" de "LD<X<LC",
 #'   cosa que sí ocurre cuando el método es "informe". En cualquiera de estos
@@ -295,7 +295,9 @@ clasif_tipo_dato <- function(x, metodo = "simple") {
 
 #' Consultar muestras de parámetros de infambiental
 #'
-#' Trae datos de infambiental a través de una PostgreSQLConnection.
+#' Trae datos de infambiental a través de una PostgreSQLConnection. Normalmente
+#' en vez de usar esta función, se usa el set \code{\link{datos_sia}}, que ya
+#' tiene datos extraidos y preparados para ensayar ejemplos.
 #'
 #' @param con `PostgreSQLConnection`: objeto utilizado para conectarse con la
 #'   base de datos. Ver details.
@@ -418,7 +420,10 @@ clasif_tipo_dato <- function(x, metodo = "simple") {
 #'   En caso de que lo anterior no sea suficiente para desambigüar, se usa el id
 #'   más reciente de la tabla `datos_muestra_parametros` y se descarta el resto.
 #'
-#' @seealso \code{\link{sia_datos_muestra_parametros}}, \code{\link{sia_muestra}}, \code{\link{clasif_tipo_dato}}, \code{\link{valores}}, \code{\link{sia_datos_muestra_parametros}}, \code{\link{sia_datos_muestra_parametros}}
+#' @seealso \code{\link{sia_datos_muestra_parametros}},
+#'   \code{\link{sia_muestra}}, \code{\link{clasif_tipo_dato}},
+#'   \code{\link{valores}}, \code{\link{sia_datos_muestra_parametros}},
+#'   \code{\link{sia_datos_muestra_parametros}}
 #' @export
 #'
 #' @examples
@@ -629,7 +634,7 @@ consulta_muestras <- function(con, id_matriz = 6L,
     }
   }
 
-  out <- select(out, -id)
+  out <- dplyr::select(out, -id)
 
   return(out)
 }
@@ -789,15 +794,15 @@ filtrar_datos <- function(.data,
 #'
 #' Agrega una columna,llamada \code{valor}, de clase numeric, a una tabla con
 #' datos del SIA,  con los valores originales convertidos a numéricos. Los
-#' requisitos se exponen en la sección "Details".
+#' requisitos se exponen en detalles.
 #'
 #' @param .data `data.frame` con datos provenientes de la base de datos del SIA
 #'   (infambientalbd), con al menos tres columnas: `valor_minimo_str`,
 #'   `limite_deteccion` y `limite_cuantificacion` (ver detalles).
-#'
 #' @param filtrar_no_num `logical` (bandera). ¿Conservar los valores que no se
 #'   pudieron convertir en numéricos?
-#' @param inheritParams clasif_tipo_dato
+#' @param metodo character. Opciones: "sin_cambios", "basico", "simple",
+#'   "informe". Ver \code{\link{clasif_tipo_dato}}
 #'
 #' @return `tibble` con datos originales y una columna numérica extra, `valor`,
 #'   cuyos valores son el resultado de sustitución realizadas con expresiones
@@ -833,6 +838,15 @@ filtrar_datos <- function(.data,
 #'   un valor numérico):
 #'
 #'   \describe{
+#'
+#'   \item{sin_cambios}{No se aplican cambios, de forma que la columna `valor`
+#'   resultante es character e idéntica a `valor_minimo_str`}
+#'
+#'   \item{basico}{Se aplica \code{\link[base]{as.numeric}} a la columna
+#'   `valor_minimo_str`, luego de hacer unos cambios mínimos (corrigiendo comas
+#'   por puntos, etc...). El resultado concreto es que todo lo que es
+#'   reconocible como valor numérico, se mantiene en `valor`, mientras que el
+#'   resto serán `NA`s}
 #'
 #'   \item{simple}{
 #'
@@ -877,6 +891,7 @@ filtrar_datos <- function(.data,
 #'
 #' valores_numericos(d)
 #' valores_numericos(d, metodo = "informe")
+#' valores_numericos(d, metodo = "simple")
 #' # Porcentajes de algunos tipos de dato:
 #' valores_numericos(d, metodo = "informe") %>%
 #'   dplyr::group_by(id_parametro) %>%
@@ -884,6 +899,9 @@ filtrar_datos <- function(.data,
 #'     porcentaje_numerico = sum(id_tipo_dato == 1L) / dplyr::n(),
 #'     porcentaje_menor_lim = sum(id_tipo_dato %in% 2:4) / dplyr::n()
 #'     )
+#'
+#' filtrar_datos(datos_sia, id_programa = 3) %>%
+#'   valores_numericos(metodo = "basico")
 valores_numericos <- function(.data,
                               filtrar_no_num = FALSE,
                               metodo = "simple") {
@@ -964,16 +982,17 @@ valores_numericos <- function(.data,
     }
   }
 
-  if (sinc) {
+  out$valor <- if (metodo == "sin_cambios") {
     warning('La opción "filtrar_no_num" es ignorada debido a que fue ',
             'seleccionada la opción "sin_cambios"')
     filtrar_no_num <- FALSE
-    out$valor <- out$valor_minimo_str
-  } else out$valor <- vnum
+    out$valor_minimo_str
+  } else vnum
 
   out$id_tipo_dato <- clasif$tipos
 
-  out <- dplyr::left_join(out, tipos_de_dato, by = "id_tipo_dato")
+  if (!any(names(out) == "id_tipo_dato"))
+    out <- dplyr::left_join(out, tipos_de_dato, by = "id_tipo_dato")
 
   if (filtrar_no_num) out <- dplyr::filter(out, !is.na(valor))
 

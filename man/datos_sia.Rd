@@ -7,7 +7,7 @@
 \alias{datos_sia_sed}
 \title{Datos extraídos del SIA.}
 \format{
-Tabla con 228226 filas y 40 columnas:
+Tabla con 228226 filas y 41 columnas:
 
 \describe{
 
@@ -98,37 +98,25 @@ transformados de a partir de \code{valor_minimo_str} y de forma acorde a lo
 especificado en "Método".}
 
 \item{id_tipo_dato}{Es un número asignado a cada valor. Se trata de una
-clasificación de cada dato según siete categorías (ver también
-\code{\link{tipos_de_dato}}):
-
-\enumerate{
-\enumerate{
-\item \code{Numérico}
-\item \verb{<LD}
-\item \verb{<LC}
-\item \verb{LD<X<LC}
-\item \verb{<X}
-\item \verb{>X}
-\item \code{Otros}
-}
-
-}
-
-}
+clasificación de cada dato según siete categorías (ver
+\code{\link{tipos_de_dato}})}
 
 \item{tipo_dato}{Descripción, en texto, de la categoría correspondiente a
 \code{id_tipo_dato}.}
-
-\item{nombre_subcuenca_informes}{Nombre dado a cada subcuenca dentro de los
-informes anuales de los programas de monitoreo.}
 
 \item{grupo}{Grupo al que pertenece el parámetro (ej.: Parámetros de
 Biológicos, Parámetros de Ecotoxicidad). No todos los parámetros tienen un
 grupo asignado.}
 
-\item{codigo_nuevo}{Nombre (abreviado, o código) nuevo propuesto para el
-parámetro (ver \href{codigos_param.html}{tabla de códigos nuevos}). No todos los
-parámetros tienen un código nuevo propuesto.}
+\item{codigo_nuevo}{Nombre corto del parámetro segun
+\code{\link{codigos_param}}}
+
+\item{param}{Nombre corto del parámetro (mejorado a partir de
+\code{\link{codigos_param}}; en caso de parámetros que no figuran en esa
+tabla, se usa el \code{nombre_clave} de \code{\link{sia_parametro}})}
+
+\item{nombre_subcuenca_informes}{Nombre dado a cada subcuenca dentro de los
+informes anuales de los programas de monitoreo.}
 
 }
 }
@@ -143,38 +131,31 @@ La tibble \code{datos_sia} tiene datos de matriz Aguas superficiales y
 \code{datos_sia_sed} de Sedimentos. Fecha de extracción: 2020-11-04.
 }
 \details{
-Código de creación de las tablas:\preformatted{cp <-
-codigos_param \%>\%
-  dplyr::filter(!is.na(id_parametro)) \%>\%
-  select(grupo, codigo_nuevo, id_parametro)
+Código de creación de las tablas:\preformatted{
+cp <- codigos_param \%>\% dplyr::filter(!is.na(id_parametro)) \%>\%
+dplyr::select(grupo, codigo_nuevo, id_parametro)
 
 con <- con_sia()
 
-datos_sia <- consulta_muestras(con) \%>\%
-  valores_numericos(metodo = "informe", filtrar_no_num = TRUE) \%>\%
-  left_join(cp, by = "id_parametro") \%>\%
-  mutate(codigo_nuevo = if_else(is.na(codigo_nuevo),
-                                nombre_clave,
-                                codigo_nuevo),
-         anio = as.integer(anio),
-         mes = as.integer(mes)
-  ) \%>\%
-  left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") \%>\%
-  select(-id_estado)
+datos_sia <- consulta_muestras(con) \%>\% valores_numericos(metodo = "informe",
+filtrar_no_num = TRUE) \%>\% dplyr::left_join(cp, by = "id_parametro") \%>\%
+dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo), nombre_clave,
+codigo_nuevo), anio = as.integer(anio), mes = as.integer(mes) ) \%>\%
+dplyr::left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") \%>\%
+dplyr::select(-id_estado)
 
-datos_sia_sed <- consulta_muestras(con, id_matriz = 11L)
-  valores_numericos(metodo = "informe", filtrar_no_num = TRUE) \%>\%
-  left_join(cp, by = "id_parametro") \%>\%
-  mutate(codigo_nuevo = if_else(is.na(codigo_nuevo),
-                                nombre_clave,
-                                codigo_nuevo),
-         anio = as.integer(anio),
-         mes = as.integer(mes)
-  ) \%>\%
-  left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") \%>\%
-  select(-id_estado)
+save(datos_sia, file = "data/datos_sia.rda")
+
+datos_sia_sed <- consulta_muestras(con, id_matriz = 11L) \%>\%
+valores_numericos(metodo = "informe", filtrar_no_num = TRUE) \%>\%
+dplyr::left_join(cp, by = "id_parametro") \%>\% dplyr::mutate(param =
+dplyr::if_else(is.na(codigo_nuevo), nombre_clave, codigo_nuevo), anio =
+as.integer(anio), mes = as.integer(mes) ) \%>\%
+dplyr::left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") \%>\%
+dplyr::select(-id_estado)
 
 save(datos_sia_sed, file = "data/datos_sia_sed.rda")
+
 }
 }
 \seealso{

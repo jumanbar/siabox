@@ -29,6 +29,7 @@ Imports:
     stringr,
     tibble,
     tidyr,
-    tidyselect
+    tidyselect,
+    rlang
 Depends: 
     R (>= 2.10)

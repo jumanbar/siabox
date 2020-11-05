@@ -18,7 +18,7 @@ cumpla la regla.}
 
 \item{id_parametro}{integer. Vector con 2 o más id de parámetros}
 
-\item{fun}{function. Función que acepta una \code{\link[base]{data.frame}}}
+\item{fun}{function. Función que acepta una \code{\link[base]{data.frame}}
 como único argumento, y en la que las columnas se corresponden con los
 parámetros correspondientes (en el mismo orden)}
 

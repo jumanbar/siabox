@@ -15,3 +15,10 @@ g_iet(.data)
 \description{
 Gráfico de IET
 }
+\examples{
+datos_sia \%>\%
+  filtrar_datos(id_programa = 3L, rango_fechas = 2019,
+                tipo_punto_id = 1L, id_parametro = 2098) \%>\%
+  dplyr::mutate(IET = iet(valor)) \%>\%
+  g_iet
+}

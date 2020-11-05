@@ -7,9 +7,9 @@
 \format{
 Tabla con 15 filas y 5 columnas:
 
-\describe {
+\describe{
 
-\item{id_matriz}{}
+\item{id_matriz}{..completar..}
 
 \item{nombre}{Nombre de la matriz}
 

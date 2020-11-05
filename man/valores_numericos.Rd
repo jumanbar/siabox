@@ -14,7 +14,8 @@ valores_numericos(.data, filtrar_no_num = FALSE, metodo = "simple")
 \item{filtrar_no_num}{\code{logical} (bandera). ¿Conservar los valores que no se
 pudieron convertir en numéricos?}
 
-\item{inheritParams}{clasif_tipo_dato}
+\item{metodo}{character. Opciones: "sin_cambios", "basico", "simple",
+"informe". Ver \code{\link{clasif_tipo_dato}}}
 }
 \value{
 \code{tibble} con datos originales y una columna numérica extra, \code{valor},
@@ -24,7 +25,7 @@ regulares. Ver detalles.
 \description{
 Agrega una columna,llamada \code{valor}, de clase numeric, a una tabla con
 datos del SIA,  con los valores originales convertidos a numéricos. Los
-requisitos se exponen en la sección "Details".
+requisitos se exponen en detalles.
 }
 \details{
 Esta función se creó en el contexto de analizar datos numéricos para
@@ -56,6 +57,15 @@ Los métodos contemplados implican las siguientes conversiones (X representa
 un valor numérico):
 
 \describe{
+
+\item{sin_cambios}{No se aplican cambios, de forma que la columna \code{valor}
+resultante es character e idéntica a \code{valor_minimo_str}}
+
+\item{basico}{Se aplica \code{\link[base]{as.numeric}} a la columna
+\code{valor_minimo_str}, luego de hacer unos cambios mínimos (corrigiendo comas
+por puntos, etc...). El resultado concreto es que todo lo que es
+reconocible como valor numérico, se mantiene en \code{valor}, mientras que el
+resto serán \code{NA}s}
 
 \item{simple}{
 
@@ -100,6 +110,7 @@ d <- datos_sia \%>\%
 
 valores_numericos(d)
 valores_numericos(d, metodo = "informe")
+valores_numericos(d, metodo = "simple")
 # Porcentajes de algunos tipos de dato:
 valores_numericos(d, metodo = "informe") \%>\%
   dplyr::group_by(id_parametro) \%>\%
@@ -107,4 +118,7 @@ valores_numericos(d, metodo = "informe") \%>\%
     porcentaje_numerico = sum(id_tipo_dato == 1L) / dplyr::n(),
     porcentaje_menor_lim = sum(id_tipo_dato \%in\% 2:4) / dplyr::n()
     )
+
+filtrar_datos(datos_sia, id_programa = 3) \%>\%
+  valores_numericos(metodo = "basico")
 }
