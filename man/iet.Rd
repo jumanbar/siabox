@@ -2,27 +2,58 @@
 % Please edit documentation in R/informes.R
 \name{iet}
 \alias{iet}
+\alias{iet_tabla}
 \title{Índice de Estado Trófico}
 \usage{
 iet(x)
+
+iet_tabla(.data, ...)
 }
 \arguments{
 \item{x}{numeric: valores de concentración de fósforo total (id_parametro =
-2090), en microgramos por litro (\verb{µg P/L}; id_unidad = 1054).}
+2090), en microgramos por litro (\verb{µg P/L}; id_unidad = 1054). Tabla con
+valores de IET por codigo_pto}
+
+\item{.data}{data.frame. Debe tener las columnas \code{id_parametro},
+\code{codigo_pto} y \code{valor} (ver \code{link{datos_sia}}), como mínimo,
+incluyendo medias del parámetro Fósforo Total (id_parametro = 2098).}
+
+\item{...}{Columnas para aregar los datos. Por defecto el IET se calcula
+solamente por codigo_pto, pero se pueden agregar otras como mes o anio (ver
+\code{\link{datos_sia}}).}
 }
 \value{
-Un vector numérico con los valores del IET.
+\code{iet}: Un vector numérico con los valores del IET.
+
+\code{iet_tabla}: data.frame con valores de IET por codigo_pto y las columnas
+de \code{.data} especificadas en \code{...}.
 }
 \description{
 Calcula valores del IET a partir de la concentración de Fósforo Total (PT),
 en microgramos por litro.
 }
 \details{
-Cálculo: \deqn{IET = 10 \times (6-\frac{0.42-0.36 \times ln(\overline{PT%
-(\mu g/L)})}{ln(2)})-20}{% IET = 10 (6 - (.42 - .36 log(PT \mu g/L)) /
-log(2)) - 20}
+Cálculo:
+
+\deqn{ IET = 10 \times (6-\frac{0.42 - 0.36 \times ln(\overline{PT\% (\mu g/L)})}{ln(2)}) - 20}{\% IET = 10 (6 - (.42 - .36 log(PT \mu g/L)) / log(2)) -s 20}
 }
+\section{Functions}{
+\itemize{
+\item \code{iet_tabla}: Utiliza \code{iet} para calcular el Índice de Estado
+Trófico por codigo_pto y presentarlo en formato de data.frame
+}}
+
 \examples{
 iet(25)
 iet(rlnorm(10, meanlog = 3, 1))
+
+d <- filtrar_datos(datos_sia, id_programa = 10L, rango_fechas = 2019)
+iet_tabla(d)
+iet_tabla(d, mes)
+d <- filtrar_datos(datos_sia, id_programa = 10L,
+                   rango_fechas = c("2009-01-01", "2019-12-31"))
+iet_tabla(d, anio)
+iet_tabla(d, anio) \%>\%
+  dplyr::group_by(anio) \%>\%
+  dplyr::summarise(n = sum(!is.na(IET)), IET = mean(IET, na.rm = TRUE))
 }

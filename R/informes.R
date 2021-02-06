@@ -1,9 +1,9 @@
-# INFO ----
+# README ----
 #
 # Estas son funciones que se usan solamente para crear informes o gráficos
 # automatizados.
 
-
+# . . . . . . . . .  . . . . .  .  . . . . . . . . -----
 
 # UTILES ----
 
@@ -14,23 +14,72 @@
 #' Calcula valores del IET a partir de la concentración de Fósforo Total (PT),
 #' en microgramos por litro.
 #'
-#' Cálculo: \deqn{IET = 10 \times (6-\frac{0.42-0.36 \times ln(\overline{PT%
-#' (\mu g/L)})}{ln(2)})-20}{% IET = 10 (6 - (.42 - .36 log(PT \mu g/L)) /
-#' log(2)) - 20}
+#' Cálculo:
+#'
+#' \deqn{ IET = 10 \times (6-\frac{0.42 - 0.36 \times ln(\overline{PT% (\mu g/L)})}{ln(2)}) - 20}{% IET = 10 (6 - (.42 - .36 log(PT \mu g/L)) / log(2)) - 20}
 #'
 #' @param x numeric: valores de concentración de fósforo total (id_parametro =
-#'   2090), en microgramos por litro (`µg P/L`; id_unidad = 1054).
+#'   2090), en microgramos por litro (`µg P/L`; id_unidad = 1054). Tabla con
+#'   valores de IET por codigo_pto
 #'
-#' @return Un vector numérico con los valores del IET.
+#' @param .data data.frame. Debe tener las columnas \code{id_parametro},
+#'   \code{codigo_pto} y \code{valor} (ver \code{link{datos_sia}}), como mínimo,
+#'   incluyendo medias del parámetro Fósforo Total (id_parametro = 2098).
 #'
+#' @param ... Columnas para aregar los datos. Por defecto el IET se calcula
+#'   solamente por codigo_pto, pero se pueden agregar otras como mes o anio (ver
+#'   \code{\link{datos_sia}}).
+#'
+#' @examples
+#' @return \code{iet}: Un vector numérico con los valores del IET.
+#'
+#' \code{iet_tabla}: data.frame con valores de IET por codigo_pto y las columnas
+#' de \code{.data} especificadas en \code{...}.
 #'
 #' @export
 #'
 #' @examples
 #' iet(25)
 #' iet(rlnorm(10, meanlog = 3, 1))
+#'
+#' d <- filtrar_datos(datos_sia, id_programa = 10L, rango_fechas = 2019)
+#' iet_tabla(d)
+#' iet_tabla(d, mes)
+#' d <- filtrar_datos(datos_sia, id_programa = 10L,
+#'                    rango_fechas = c("2009-01-01", "2019-12-31"))
+#' iet_tabla(d, anio)
+#' iet_tabla(d, anio) %>%
+#'   dplyr::group_by(anio) %>%
+#'   dplyr::summarise(n = sum(!is.na(IET)), IET = mean(IET, na.rm = TRUE))
 iet <- function(x) {
   10 * (6 - (0.42 - 0.36 * log(x)) / log(2)) - 20
+}
+
+#' @describeIn iet Utiliza \code{iet} para calcular el Índice de Estado
+#'   Trófico por codigo_pto y presentarlo en formato de data.frame
+iet_tabla <- function(.data, ...) {
+  grupo <- quos(...)
+  out <-
+    .data %>%
+    # Sólo quiero PT:
+    dplyr::filter(id_parametro == 2098L) %>%
+    # Para agregar por estación y posiblemente alguna otra variable, como mes o
+    # año:
+    dplyr::group_by(codigo_pto, !!!grupo) %>%
+    # En este paso se hacen los cálculos, agregando por codigo_pto (i.e.:
+    # estación):
+    dplyr::summarise(IET = valor %>% media_geom %>% iet %>% round(1)) %>%
+    # Clasificación de cada estación según IET:
+    dplyr::mutate(categ = dplyr::case_when(
+      IET <= 47 ~ "Ultraoligotrófico",
+      47 < IET & IET <= 52 ~ "Oligotrófico",
+      52 < IET & IET <= 59 ~ "Mesotrófico",
+      59 < IET & IET <= 63 ~ "Eutrófico",
+      63 < IET & IET <= 67 ~ "Supereutrófico",
+      67 < IET             ~ "Hipereutrófico"
+    )) %>%
+    dplyr::ungroup()
+  return(out)
 }
 
 #' Cálculo de Amoníaco Libre (NH3L)
@@ -39,16 +88,90 @@ iet <- function(x) {
 #'
 #' @param NH4 numeric. Nitrógeno amoniacal (id_parametro = 2090) en unidades de
 #'   `mg NH4-N/L` (id_unidad = 32).
+#'
 #' @param pH numeric. Potencial de Hidrógeno (id_parametro = 2018).
+#'
 #' @param Temp numeric. Nitrógeno amoniacal (id_parametro = 2032) en unidades de
 #'   `ºC` (id_unidad = 18).
+#'
+#' @param .data Tabla con datos con ciertas características (ej.:
+#'   \code{\link{datos_sia}}). Debe incluir los id_parametros 2032, 2018 y 2090
+#'   (Temperatura, pH y NH4).
 #'
 #' @return
 #' @export
 #'
 #' @examples
+#' amoniaco_libre(.065, 6.82, 16.9)
+#'
+#' d <- data.frame(NH4 = c(0.021, 0.046, 0.04),
+#'                 pH = c(7.16, 6.87, 7.49),
+#'                 Tem = c(12.6, 14.9, 12.8))
+#' dplyr::mutate(d, NH3L = amoniaco_libre(NH4, pH, Tem))
+#'
+#' d <-
+#'   datos_sia %>%
+#'   filtrar_datos(id_programa = 10L,
+#'                 rango_fechas = 2019,
+#'                 id_parametro = c(2032L, 2018L, 2090L),
+#'                 tipo_punto_id = 1L) %>%
+#'   amoniaco_libre_add()
+#' dplyr::group_by(d, param) %>% tsummary(valor)
+#' hist(log10(d[d$id_parametro == 2091L,]$valor))
 amoniaco_libre <- function(NH4, pH, Temp) {
   1000 * NH4 / (1 + 10 ^ (-pH + (0.0901821 + 2729.92 / (Temp + 273.15))))
+}
+
+#'
+#' @describeIn amoniaco_libre Agrega el parámetro Amoníaco Libre a una tabla
+#'   "alta"
+amoniaco_libre_add <- function(.data) {
+
+  # Parámetros necesarios:
+  parnec <- c(2032L, 2018L, 2090L)
+
+  if (!all(parnec %in% .data$id_parametro))
+    stop("Parámetro(s) ausente(s). Se necesitan los id_parametros: ",
+         colapsar_secuencia(parnec), " (Temperatura, pH y NH4)")
+
+  # Para agregar el parámetro NH3L, a la tabla que está en formato "largo", hace
+  # falta hacer algunos trucos:
+  tmp <-
+    # 1. Tomar Temperatura, pH y NAmoniacal y convertir la tabla a formato ancho:
+    .data %>%
+    dplyr::filter(id_parametro %in% parnec) %>%
+    dplyr::mutate(param = dplyr::case_when(
+      # Cambiar los nombres de los parámetros facilita escribir el código más
+      # abajo:
+      id_parametro == 2032L ~ "Tem",
+      id_parametro == 2018L ~ "pH",
+      TRUE ~ "NH4"
+    )) %>%
+    ancho %>%
+    # 2. Calcular NH3L (observar los nombres cambiados de los parámetros):
+    dplyr::mutate(
+      valor = amoniaco_libre(NH4, pH, Tem),
+      # Usar el nombre "valor" facilita el siguiente paso (bind_rows).
+      # Compatibilizar tmp con d (necesario para el bind_rows), implica agregar
+      # las columnas que se eliminan al usar la función ancho:
+      id_parametro = 2091L,
+      parametro = "Amoniaco libre",
+      param = "NH3L",
+      id_tipo_dato = 7L,
+      tipo_dato = "OTRO",
+      grupo = "Parámetros Inorgánicos no Metálicos",
+      codigo_nuevo = "NH3L"
+    ) %>%
+    # 3. Eliminar las columnas de pH, Temperatura y NH4:
+    dplyr::select(-tidyselect::starts_with("pH"),
+                  -tidyselect::starts_with("Tem"),
+                  -tidyselect::starts_with("NH4"))
+
+  # Combinar .data y tmp:
+  out <-
+    dplyr::bind_rows(.data, tmp) %>%
+    dplyr::arrange(id_muestra, id_parametro)
+  return(out)
 }
 
 #' Media geométrica
@@ -524,7 +647,6 @@ g_cue_box <- function(.data,
     ggplot() +
     geom_boxplot(fill = "lightblue", outlier.size = 1.2,
                  outlier.fill = "#000000") +
-    labs(x = NULL, y = ylab) +
     theme_bw() +
     theme(panel.grid.minor = element_blank(),
           text = element_text(size=10),
@@ -536,6 +658,8 @@ g_cue_box <- function(.data,
     out + aes(sub_cue_nombre, valor)
   } else out + aes(nombre_subcuenca_informes, valor)
 
+  # Esto al final, pues sino aparece la etiqueta "valor"
+  out <- out + labs(x = NULL, y = ylab)
   return(out)
 }
 

@@ -1,3 +1,56 @@
+# README ----
+#
+# (PARA USAR EN LA VIÑETA)
+#
+# Las funciones aquí sirven para extraer datos de INFAMBIENTAL (o sea, datos del
+# SIA correspondiente a matrices de Aguas) y hacer algunas manipulaciones
+# simples. Las funciones consulta_muestras, filtrar_datos y valores_numericos
+# hacen lo mismo que cuando se extraen datos de iSIA, si es que no son las
+# mismas funciones (ahora no me acuerdo si es el caso, casi seguro que deben
+# haber, al menos, diferencias sutiles.)
+#
+# La basica es:
+#
+# 1. Importar datos con consulta_muestras, si estás trabajando con una conexión
+# a la base de datos (ver ejemplos en consulta_muestras).
+#
+# 2. En caso de no tener conexión con la base de datos INFAMBIENTAL, usar los
+# datos ya extraidos, contenidos en datos_sia. En ese caso conviene usar
+# filtrar_datos u otro método, ya que en datos_sia hay **de todo**.
+#
+# 3. Usar valores_numericos, que le agrega una columna con valores numéricos a
+# una tabla que contenga la columna valor_minimo_str (tal como en la tabla
+# datos_sia). NOTA: por defecto datos_sia ya tiene columna con valores
+# numéricos, obtenidos con métedo "informe".
+#
+# Tener en cuenta:
+#
+# Los datos están por defecto en formato "alto" (ie: hay una sola columna con
+# datos numéricos, mientras que información como parámetro, fecha, programa,
+# unidaes, etc, está en otras columnas), pero a veces los queremos en formato
+# "ancho" (ie: varias columnas con datos numéricos; por ejemplo, una columna
+# para el parámetro A, otra columna para el parámetro B, y todo así). R tiene
+# funciones para ese tipo de manipulaciones, como stats::reshape o
+# tidyr::pivot_wider, tidyr::pivot_longer. La función ancho usa estas últimas
+# para facilitar al usuario de datos del SIA: toma datos (como datos_sia), **con
+# una única matriz ambiental**, y los "ensancha", de forma que se obtiene una
+# tabla con varias columnas tipo "Parámetro A", "Parámetro B" y todo así, que es
+# el caso típico de uso para analizar estos datos.
+#
+# Nota: para referencia de formatos "alto" y "ancho", es útil mirar el esquema
+# en esta pregunta de StackOverflow:
+# https://es.stackoverflow.com/questions/357580/c%C3%B3mo-puedo-convertir-columnas-a-filas-y-filas-a-columnas-en-r-es-decir-conver.
+#
+# En todo momento las funciones *_id están para ayudar: permiten encontrar el
+# número que identifica parámetros, unidades, programas, etc., usando una
+# búsqueda de texto aproximada (ej: `par_id("fosfo")`).
+#
+# De manera similar, la función unipar sirve para buscar rápidamente las
+# unidades de medida oficiales para un parámetro (y matriz) dado, usando id o
+# nombre clave.
+
+# . . . . . . . . .  . . . . .  .  . . . . . . . . -----
+
 #' Formato ancho
 #'
 #' Ensanchar datos provenientes de consulta_muestras. Espera la presencia de
@@ -26,8 +79,13 @@
 #' @importFrom magrittr %>%
 #'
 #' @examples
-#' d <- dplyr::filter(datos_sia, id_matriz == 6L) %>%
-#'   dplyr::select(-parametro, -id_tipo_dato, -tipo_dato, -grupo, -codigo_nuevo)
+#' d <- filtrar_datos(datos_sia,
+#'                    id_programa = 10L,
+#'                    rango_fechas = c("2019-01-01", "2020-12-31"),
+#'                    id_parametro = c(2099, 2098)) %>%
+#'   dplyr::select(codigo_pto, fecha_muestra, id_parametro, param, id_unidad,
+#'                 uni_nombre, limite_deteccion, limite_cuantificacion, valor)
+#' print(d)
 #' ancho(d)
 #'
 #' # Cómo usar ancho en lugar de ancho_old:
@@ -35,7 +93,7 @@
 #'   # Primero filtrar para tener sólo 2 parámetros:
 #'   dplyr::filter(id_programa == 4, id_parametro %in% c(2017, 2021)) %>%
 #'   ancho %>%
-#'   select(matches("^SatO |^OD ")) %>%
+#'   dplyr::select(tidyselect::matches("^SatO$|^OD$")) %>%
 #'   plot
 ancho <- function(.data) {
 
@@ -68,6 +126,16 @@ ancho <- function(.data) {
     .data <- .data[-w]
   }
 
+  columnasok <- c("id_muestra", "nro_muestra", "nombre_programa", "id_programa",
+                  "cue_nombre", "id_cuenca", "sub_cue_nombre", "id_sub_cuenca",
+                  "codigo_pto", "id_estacion", "tipo_punto_id",
+                  "tip_pun_est_descripcion", "id_depto", "departamento",
+                  "id_institucion", "institucion", "usuario", "periodo", "anio",
+                  "mes", "anio_mes", "fecha_muestra", "fecha_hora",
+                  "observaciones", "id_matriz", "id_tipo_dato",
+                  "grupo", "codigo_nuevo", "param", "nombre_subcuenca_informes",
+                  "codigo_pto_mod", "LD", "LC", "valor")
+
   out <- .data %>%
     dplyr::mutate(LD = limite_deteccion %>%
              stringr::str_trim() %>%
@@ -77,11 +145,12 @@ ancho <- function(.data) {
              stringr::str_trim() %>%
              stringr::str_replace_all("[.,]+", ".") %>%
              as.numeric()) %>%
-    dplyr::select(-id_parametro:-limite_cuantificacion, valor) %>%
-    tidyr::pivot_wider(names_from = param, values_from = c(valor, LD, LC)) %>%
-    dplyr::arrange(id_muestra)
+    dplyr::select(tidyselect::any_of(columnasok)) %>%
+    tidyr::pivot_wider(names_from = param, values_from = c(valor, LD, LC))
 
   nombres <- names(out)
+  if ("id_muestra" %in% nombres) out <- dplyr::arrange(out, id_muestra)
+
   m <- matrix(c(grep("^valor_", nombres),
                 grep("^LD_", nombres),
                 grep("^LC_", nombres)),
@@ -199,9 +268,11 @@ ancho_old <- function(.data, id_x, id_y,
 #' Evalúa vector character que expresan valores numéricos, según las categorías
 #' de la tabla \code{\link{tipos_de_dato}}.
 #'
-#' @param x Character. Específicamente, espera los valores de la columna
+#' @param x Character. En principio puede ser cualquier vector de tipo
+#'   character, pero está pensado específicamente para los valores de la columna
 #'   \code{valor_minimo_str} de la tabla \code{datos_muestra_parametros} de la
 #'   base de datos infambientalbd (SIA).
+#'
 #' @param metodo String. El valor de este argumento define la forma en que se
 #'   clasifican los valores de X. Opciones: "simple" o "informe". Ver detalles.
 #'
@@ -238,7 +309,7 @@ ancho_old <- function(.data, id_x, id_y,
 #' @examples
 #' x <- c(" 32,87 ", "2.14", "5e-3", "<ld", ">LC", "ld<x<LC", " < 10", "L.O.Q",
 #'        "ND", "L.O, D ", "LC>X>LD")
-#' clasif_tipo_dato(x)
+#' clasif_tipo_dato(x) %>% as.data.frame()
 #' clasif_tipo_dato(x, "informe")
 #' clasif_tipo_dato(x, "")
 clasif_tipo_dato <- function(x, metodo = "simple") {
@@ -941,8 +1012,8 @@ dep_id <- function(patron, ...) {
 #' Convertir valores del SIA en numéricos
 #'
 #' Agrega una columna,llamada \code{valor}, de clase numeric, a una tabla con
-#' datos del SIA,  con los valores originales convertidos a numéricos. Los
-#' requisitos se exponen en detalles.
+#' datos del SIA,  con los valores originales (`valor_minimo_str`) convertidos a
+#' numéricos. Los requisitos se exponen en detalles.
 #'
 #' @param .data `data.frame` con datos provenientes de la base de datos del SIA
 #'   (infambientalbd), con al menos tres columnas: `valor_minimo_str`,

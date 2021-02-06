@@ -24,8 +24,8 @@ regulares. Ver detalles.
 }
 \description{
 Agrega una columna,llamada \code{valor}, de clase numeric, a una tabla con
-datos del SIA,  con los valores originales convertidos a numéricos. Los
-requisitos se exponen en detalles.
+datos del SIA,  con los valores originales (\code{valor_minimo_str}) convertidos a
+numéricos. Los requisitos se exponen en detalles.
 }
 \details{
 Esta función se creó en el contexto de analizar datos numéricos para

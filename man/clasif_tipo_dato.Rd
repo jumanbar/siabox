@@ -7,7 +7,8 @@
 clasif_tipo_dato(x, metodo = "simple")
 }
 \arguments{
-\item{x}{Character. Específicamente, espera los valores de la columna
+\item{x}{Character. En principio puede ser cualquier vector de tipo
+character, pero está pensado específicamente para los valores de la columna
 \code{valor_minimo_str} de la tabla \code{datos_muestra_parametros} de la
 base de datos infambientalbd (SIA).}
 
@@ -51,7 +52,7 @@ Detectado, respectivamente).
 \examples{
 x <- c(" 32,87 ", "2.14", "5e-3", "<ld", ">LC", "ld<x<LC", " < 10", "L.O.Q",
        "ND", "L.O, D ", "LC>X>LD")
-clasif_tipo_dato(x)
+clasif_tipo_dato(x) \%>\% as.data.frame()
 clasif_tipo_dato(x, "informe")
 clasif_tipo_dato(x, "")
 }

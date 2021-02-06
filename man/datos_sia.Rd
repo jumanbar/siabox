@@ -91,11 +91,9 @@ detección del parámetro en cada muestra.}
 \item{limite_cuantificacion}{Texto con el valor ingresado para el límite de
 cuantificación del parámetro en cada muestra.}
 
-\item{valor}{Valor ingresado para cada parámetro. Si el método elegido es
-\code{sin_cambios}, la columna será idéntica a ´valor_minimo_str´ (y, por lo
-tanto, texto). En caso contrario, será una columna de valores numéricos,
-transformados de a partir de \code{valor_minimo_str} y de forma acorde a lo
-especificado en "Método".}
+\item{valor}{numeric. Valor ingresado para cada parámetro, obtenido a
+partir del uso de la función \code{link{valores_numericos}} con la opción
+\code{metodo = "informe"}.}
 
 \item{id_tipo_dato}{Es un número asignado a cada valor. Se trata de una
 clasificación de cada dato según siete categorías (ver
@@ -138,12 +136,17 @@ cp <- codigos_param \%>\%
 
 con <- con_sia()
 
-datos_sia <- consulta_muestras(con) \%>\% valores_numericos(metodo = "informe",
-filtrar_no_num = TRUE) \%>\% dplyr::left_join(cp, by = "id_parametro") \%>\%
-dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo), nombre_clave,
-codigo_nuevo), anio = as.integer(anio), mes = as.integer(mes) ) \%>\%
-dplyr::left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") \%>\%
-dplyr::select(-id_estado)
+datos_sia <-
+  consulta_muestras(con) \%>\%
+  valores_numericos(metodo = "informe", filtrar_no_num = TRUE) \%>\%
+  dplyr::left_join(cp, by = "id_parametro") \%>\%
+  dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo),
+                                       nombre_clave,
+                                       codigo_nuevo),
+                anio = as.integer(anio),
+                mes = as.integer(mes)) \%>\%
+  dplyr::left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") \%>\%
+  dplyr::select(-id_estado)
 
 save(datos_sia, file = "data/datos_sia.rda")
 

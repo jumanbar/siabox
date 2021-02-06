@@ -1,3 +1,10 @@
+# README ----
+#
+# Funciones extras que pueden ser útiles pero no son fundamentales. En
+# principio, mi idea es no exportarlas con el resto del paquete.
+
+# . . . . . . . . .  . . . . .  .  . . . . . . . . -----
+
 #' Determinar cuáles son no numéricos
 #'
 #' Determina si un valor es no numérico. Excluye valores escritos con notación

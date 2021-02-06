@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 Este paquete contiene funciones y datos utilizados para trabajar con las bases datos del SIA. De momento abarca muchas tareas, tales como las que se usan en las aplicaciónes Shiny (vSIA, hSIA e iSIA), o funciones para hacer gráficas que sirven para hacer informes.
 
-Incluye además un grupo no menor de tablas, incluyendo varias de la base de datos INFAMBIENTALBD del SIA.
+Tiene además un grupo no menor de tablas, incluyendo varias de la base de datos INFAMBIENTALBD del SIA.
 
 ## Tablas de infambiental (base de datos)
 
@@ -76,4 +76,21 @@ library(manoSIAR)
 iet(c(25, 50, 75, 250))
 plot(iet(1:300), ylab = "IET", xlab = "PT (ug/L)", pch = 20)
 ```
+
+
+- - -
+
+## Para desearrolladores
+
+> (Sección que, al menos en parte, escribo para refrescar mi propia memoria.)
+
+Este paquete se creó siguiendo de forma aproximada los consejos del libro [R Packages](https://r-pkgs.org/index.html) de Hadley Wickham. El libro entero es importante para entender el desarrollo de paquetes (o la documentación original de CRAN), pero para referencia rápida de quien ya sabe la teoría y sólo tiene que recordar el flujo, ir directamente al capítulo 5: [Fundamental development workflows](https://r-pkgs.org/workflows101.html).
+
+Algunas notas:
+
+- En funciones no usar `require` o `library`, sino el operador `::`. Ejemplo: `dplyr::filter`. Eso evita afectar el ambiente de trabajo del usuario. La excepción es `ggplot2`, porque se vuelve muy engorroso si no.
+
+- La función `devtools::load_all()` (Ctrl+Shift+L) sirve para "cargar" el paquete en la sesión, incluyendo funciones, viñetas, y otros códigos. Conviene correrlo cada vez que cambiamos alguna función y queremos probarla, por ejemplo.
+
+- La función `devtools::document()` (Ctrl+Shift+D) sirve para actualizar los archivos de documentación.
 
