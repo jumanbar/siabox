@@ -30,8 +30,10 @@ Se calcula NH3 a partir de NH4 según \href{ceqg-rcqe.ccme.ca/en/index.html}{Can
 }
 \section{Functions}{
 \itemize{
-\item \code{amoniaco_libre_add}: Agrega el parámetro Amoníaco Libre a una tabla
-"alta"
+\item \code{amoniaco_libre}: Calcula valores de amoníaco libre a partir de
+temperatura, pH y NH4
+
+\item \code{amoniaco_libre_add}: Agrega el parámetro a una data.frame larga
 }}
 
 \examples{

@@ -29,11 +29,11 @@ funciones para crear gráficos, tablas, etc...
 t_eti <- t_eti_add()
 plot(0, 0, xlab = dplyr::filter(t_eti, id_parametro == 2005)[[2]])
 
-# Modificando un parÃ¡metro existente:
+# Modificando un parámetro existente:
 t_eti <- t_eti_add(2005L, expression('AlcT (mg CaCO' [3] * ' /L)'))
 plot(0, 0, xlab = dplyr::filter(t_eti, id_parametro == 2005)[[2]])
 
-# Modificando un parÃ¡metro existente, agregando uno nuevo y mezclando
+# Modificando un parámetro existente, agregando uno nuevo y mezclando
 # etiquetas del tipo expression y character:
 t_eti <- t_eti_add(
   c(2005L, 9999L),

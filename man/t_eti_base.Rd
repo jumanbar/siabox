@@ -29,7 +29,7 @@ basándose en las tablas del SIA (infambientalbd).
 Fecha de creación: 2020-10-29
 }
 \examples{
-# CÃ³digo de creaciÃ³n:
+# Código de creación:
 t_eti_base <-
   sia_parametro \%>\%
   dplyr::left_join(dplyr::select(codigos_param, id_parametro, codigo_nuevo),

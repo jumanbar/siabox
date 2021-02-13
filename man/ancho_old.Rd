@@ -31,9 +31,9 @@ Aplicar pivot_wider para datos provenientes de consulta_muestras, pero con
 ciertas precauciones...
 }
 \examples{
-# CÃ³mo usar ancho en lugar de ancho_old:
+# Cómo usar ancho en lugar de ancho_old:
 datos_sia \%>\%
-  # Primero filtrar para tener sÃ³lo 2 parÃ¡metros:
+  # Primero filtrar para tener sólo 2 parámetros:
   dplyr::filter(id_programa == 4, id_parametro \%in\% c(2017, 2021)) \%>\%
   ancho \%>\%
   select(matches("^SatO |^OD ")) \%>\%

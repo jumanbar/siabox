@@ -112,14 +112,14 @@ d <- datos_sia \%>\%
   filtrar_datos(datos_sia, id_programa = 10L,
                 rango_fechas = 2019, id_parametro = p)
 
-cebo <- dplyr::filter(d, nombre_subcuenca_informes == "CebollatÃ­")
+cebo <- dplyr::filter(d, nombre_subcuenca_informes == "Cebollatí")
 
-g_mes_pto(cebo, id_parametro = 2009, ylab = 'Cond (Î¼S/cm)')
-g_mes_pto(cebo, nombre_clave = 'Conduc', ylab = 'Cond (Î¼S/cm)')
+g_mes_pto(cebo, id_parametro = 2009, ylab = 'Cond (μS/cm)')
+g_mes_pto(cebo, nombre_clave = 'Conduc', ylab = 'Cond (μS/cm)')
 g_mes_pto_all(cebo, id_parametro = p)
 g_mes_pto_all(cebo, id_parametro = 2098L)
-g_mes_pto_all(cebo, id_parametro = 2008L) # VacÃ­o
-g_mes_pto_all(cebo, id_parametro = c(p, 2008L)) # VacÃ­o
+g_mes_pto_all(cebo, id_parametro = 2008L) # Vacío
+g_mes_pto_all(cebo, id_parametro = c(p, 2008L)) # Vacío
 g_cue_box(d, nombre_clave = "PT")
 
 e <- datos_sia \%>\%

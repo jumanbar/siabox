@@ -39,7 +39,7 @@ reglas$od_sat_max
 d <- datos_sia \%>\%
   dplyr::filter(id_matriz == 6L, id_parametro \%in\% c(2017L, 2021L)) \%>\%
   ancho \%>\%
-  # El orden de los parÃ¡metros es importante!:
+  # El orden de los parámetros es importante!:
   dplyr::select(tidyselect::starts_with("OD "),
                 tidyselect::starts_with("SatO "))
 

@@ -18,7 +18,7 @@
 #'
 #' \deqn{ IET = 10 \times (6-\frac{0.42 - 0.36 \times ln(\overline{PT% (\mu g/L)})}{ln(2)}) - 20}{% IET = 10 (6 - (.42 - .36 log(PT \mu g/L)) / log(2)) - 20}
 #'
-#' @param x numeric: valores de concentración de fósforo total (id_parametro =
+#' @param PT numeric: valores de concentración de fósforo total (id_parametro =
 #'   2090), en microgramos por litro (`µg P/L`; id_unidad = 1054). Tabla con
 #'   valores de IET por codigo_pto
 #'
@@ -51,8 +51,8 @@
 #' iet_tabla(d, anio) %>%
 #'   dplyr::group_by(anio) %>%
 #'   dplyr::summarise(n = sum(!is.na(IET)), IET = mean(IET, na.rm = TRUE))
-iet <- function(x) {
-  10 * (6 - (0.42 - 0.36 * log(x)) / log(2)) - 20
+iet <- function(PT) {
+  10 * (6 - (0.42 - 0.36 * log(PT)) / log(2)) - 20
 }
 
 #' @describeIn iet Utiliza \code{iet} para calcular el Índice de Estado
@@ -84,7 +84,12 @@ iet_tabla <- function(.data, ...) {
 
 #' Cálculo de Amoníaco Libre (NH3L)
 #'
-#' Se calcula NH3 a partir de NH4 según [Canadian Water Quality Guidelines for the Protection of Aquatic Life](ceqg-rcqe.ccme.ca/en/index.html) ([ver Ammonia](http://ceqg-rcqe.ccme.ca/download/en/141))
+#' Se calcula NH3 a partir de NH4 según [Canadian Water Quality Guidelines for
+#' the Protection of Aquatic Life](ceqg-rcqe.ccme.ca/en/index.html) ([ver
+#' Ammonia](http://ceqg-rcqe.ccme.ca/download/en/141))
+#'
+#' @describeIn amoniaco_libre Calcula valores de amoníaco libre a partir de
+#'   temperatura, pH y NH4
 #'
 #' @param NH4 numeric. Nitrógeno amoniacal (id_parametro = 2090) en unidades de
 #'   `mg NH4-N/L` (id_unidad = 32).
@@ -122,9 +127,9 @@ amoniaco_libre <- function(NH4, pH, Temp) {
   1000 * NH4 / (1 + 10 ^ (-pH + (0.0901821 + 2729.92 / (Temp + 273.15))))
 }
 
-#'
-#' @describeIn amoniaco_libre Agrega el parámetro Amoníaco Libre a una tabla
-#'   "alta"
+#' @describeIn amoniaco_libre Agrega el parámetro a una data.frame larga
+#' 
+#' @export
 amoniaco_libre_add <- function(.data) {
 
   # Parámetros necesarios:

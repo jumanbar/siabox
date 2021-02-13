@@ -17,5 +17,5 @@ dieresis, etc, son sustituidos por su version ASCII.
 Convertir texto en ASCII
 }
 \examples{
-toascii(c("sabaÃ±Ã³n!", "ungÃ¼ento", "nÃ¢o Ã¨ graÃ§a"))
+toascii(c("sabañón!", "ungüento", "nâo è graça"))
 }

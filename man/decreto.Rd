@@ -124,7 +124,7 @@ se aclare en la normativa o exista una convención al respecto.
 }
 \examples{
 # Al momento se usan solamente los casos en los que id_metodo == 1, por lo
-# que tÃ­picamente al inicio de scripts se agregan estas lÃ­neas:
+# que típicamente al inicio de scripts se agregan estas líneas:
 decreto <-
   dplyr::mutate(decreto, valor = valor * coef_conversion) \%>\%
   dplyr::filter(id_parametro != 2111L | id_metodo == 1L)

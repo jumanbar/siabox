@@ -5,12 +5,12 @@
 \alias{iet_tabla}
 \title{Índice de Estado Trófico}
 \usage{
-iet(x)
+iet(PT)
 
 iet_tabla(.data, ...)
 }
 \arguments{
-\item{x}{numeric: valores de concentración de fósforo total (id_parametro =
+\item{PT}{numeric: valores de concentración de fósforo total (id_parametro =
 2090), en microgramos por litro (\verb{µg P/L}; id_unidad = 1054). Tabla con
 valores de IET por codigo_pto}
 

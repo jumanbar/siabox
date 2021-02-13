@@ -59,6 +59,8 @@
 #' @param .data Tabla de datos obtenida con \code{\link{consulta_muestras}},
 #'   posiblemente modificada con valores_numericos y con columnas agregadas por
 #'   \code{\link[dplyr]{left_join}}.
+#'   
+#' @param unidaes TRUE o FALSE. Determina si se agregan las unidades a las columnas de los parámetros (ej.: 'SatO (%)' en lugar de 'SatO')
 #'
 #' @details Espera que existan las columnas 'valor' y 'param'. En caso de no
 #'   encontrarlas las creará. La primera contiene los valores de los parámetros
@@ -93,9 +95,9 @@
 #'   # Primero filtrar para tener sólo 2 parámetros:
 #'   dplyr::filter(id_programa == 4, id_parametro %in% c(2017, 2021)) %>%
 #'   ancho %>%
-#'   dplyr::select(tidyselect::matches("^SatO$|^OD$")) %>%
+#'   dplyr::select(SatO, OD) %>%
 #'   plot
-ancho <- function(.data) {
+ancho <- function(.data, unidades = FALSE) {
 
   matrices <- unique(.data$id_matriz)
   if (length(matrices) > 1) {
@@ -111,9 +113,15 @@ ancho <- function(.data) {
 
   if (!any(names(.data) == 'param')) {
     warning('Se creó automáticamente la columna "param".')
-    .data$param <- if (any(names(.data) == 'codigo_nuevo'))
-      paste0(.data$codigo_nuevo, ' (', .data$uni_nombre, ')') else
-        paste0(.data$nombre_clave, ' (', .data$uni_nombre, ')')
+    if (unidades) {
+      .data$param <- if (any(names(.data) == 'codigo_nuevo'))
+        paste0(.data$codigo_nuevo, ' (', .data$uni_nombre, ')') else
+          paste0(.data$nombre_clave, ' (', .data$uni_nombre, ')')  
+    } else {
+      .data$param <- if (any(names(.data) == 'codigo_nuevo'))
+        .data$codigo_nuevo else s.data$nombre_clave
+    }
+    
   }
 
   # Si están, eliminar estas columnas innecesearias (para compatibilidad con
