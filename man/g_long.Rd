@@ -24,7 +24,7 @@ g_long(
   horiz
 )
 
-g_long_files(.data, anio, ventana_anios, tabla_horiz, path)
+g_long_files(.data, anio, ventana_anios = 5L, tabla_horiz, path)
 }
 \arguments{
 \item{.data}{data.frame. Datos del SIA (ver \code{\link{datos_sia}} y
@@ -71,11 +71,14 @@ manera.
 \itemize{
 \item \code{d_long}: Funcion que (internamente) prepara los datos para \code{g_long}
 
+\item \code{g_long}: Grafica valores anuales longitudinales
+
 \item \code{g_long_files}: Guarda gráficos de \code{g_long} en archivos
 }}
 
 \examples{
-d <- filtrar_datos(datos_sia, id_programa = 5, rango_fechas = c(2012, 2019),
+d <- filtrar_datos(datos_sia, id_programa = 5,
+                   rango_fechas = c("2012-01-01", "2019-12-31"),
                    id_parametro = c(2032, 2009, 2017, 2018, 2097:2098, 2105),
                    tipo_punto_id = 1)
 h <- dplyr::filter(decreto, clase == "1", !is.na(valor))

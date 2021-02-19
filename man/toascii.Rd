@@ -17,5 +17,5 @@ dieresis, etc, son sustituidos por su version ASCII.
 Convertir texto en ASCII
 }
 \examples{
-toascii(c("sabañón!", "ungüento", "nâo è graça"))
+manoSIAR:::toascii(c("sabañón!", "ungüento", "nâo è graça"))
 }

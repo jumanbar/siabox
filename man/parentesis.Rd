@@ -24,9 +24,9 @@ Crea un texto con la secuencia de elementos entre paréntesis y separados por
 comas.
 }
 \examples{
-parentesis(3147:3152)
-parentesis(3147:3152, "-<<<- |", "| ->>>-")
-parentesis(3147:3152, comillas = TRUE)
-parentesis(c("gato", "perro"))
-parentesis(c("gato", "perro"), comillas = TRUE)
+manoSIAR:::parentesis(3147:3152)
+manoSIAR:::parentesis(3147:3152, "-<<<- |", "| ->>>-")
+manoSIAR:::parentesis(3147:3152, comillas = TRUE)
+manoSIAR:::parentesis(c("gato", "perro"))
+manoSIAR:::parentesis(c("gato", "perro"), comillas = TRUE)
 }

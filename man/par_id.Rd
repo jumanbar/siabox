@@ -37,7 +37,7 @@ columnas \code{parametro} y \code{nombre_clave} de \code{\link{sia_parametro}}}
 \description{
 Buscadores de id para las varias tablas importadas del SIA, usando un texto
 (un google de id_parametros). El texto o patrón puede ser una expresión
-regular (la cual será evaluada por \code{\link[bae]{agrepl}}).
+regular (la cual será evaluada por \code{\link[base]{agrepl}}).
 }
 \section{Functions}{
 \itemize{

@@ -17,7 +17,7 @@
 #'
 #' @examples
 #' v <- c("1.347e4", "<LC", "<78", "14.447", "7", "1,3E+02")
-#' det_nonum(v)
+#' manoSIAR:::det_nonum(v)
 det_nonum <- function(v) {
   cientif <- grepl("^[[:digit:]]+[,\\.]*[[:digit:]]*([Ee][+-]*[[:digit:]]+)*$",
                    v, ignore.case = TRUE)
@@ -34,14 +34,18 @@ det_nonum <- function(v) {
 #' defecto).
 #'
 #' @param x Vector atomico para imprimir.
+#'
 #' @param conector Caracter para conectar el ultimo elemento de la lista
 #'   (tipicamente 'y', '&', 'and', etc...)
+#'
+#' @param comillas Determina si se deben agregar comillas a los elementos de
+#'   \code{x}
 #'
 #' @return
 #'
 #' @examples
-#' cat("Numeros:", colapsar_secuencia(4:8), "\n")
-#' cat("Numeros:", colapsar_secuencia(4:8, comillas = TRUE), "\n")
+#' cat("Numeros:", manoSIAR:::colapsar_secuencia(4:8), "\n")
+#' cat("Numeros:", manoSIAR:::colapsar_secuencia(4:8, comillas = TRUE), "\n")
 colapsar_secuencia <- function(x, conector = "y", comillas = FALSE) {
   z <- ifelse(comillas, "'", "")
   if (length(x) == 0) {
@@ -99,11 +103,11 @@ con_sia <- function() {
 #' @return
 #'
 #' @examples
-#' limpia_num("2.3")
-#' limpia_num("2..3")
-#' limpia_num("2,3")
-#' limpia_num("2,,,,3")
-#' limpia_num("   2,,,, 3   ")
+#' manoSIAR:::limpia_num("2.3")
+#' manoSIAR:::limpia_num("2..3")
+#' manoSIAR:::limpia_num("2,3")
+#' manoSIAR:::limpia_num("2,,,,3")
+#' manoSIAR:::limpia_num("   2,,,, 3   ")
 limpia_num <- function(x) {
   out <- x %>%
     # stringr::str_trim() %>%
@@ -126,11 +130,11 @@ limpia_num <- function(x) {
 #' @return
 #'
 #' @examples
-#' parentesis(3147:3152)
-#' parentesis(3147:3152, "-<<<- |", "| ->>>-")
-#' parentesis(3147:3152, comillas = TRUE)
-#' parentesis(c("gato", "perro"))
-#' parentesis(c("gato", "perro"), comillas = TRUE)
+#' manoSIAR:::parentesis(3147:3152)
+#' manoSIAR:::parentesis(3147:3152, "-<<<- |", "| ->>>-")
+#' manoSIAR:::parentesis(3147:3152, comillas = TRUE)
+#' manoSIAR:::parentesis(c("gato", "perro"))
+#' manoSIAR:::parentesis(c("gato", "perro"), comillas = TRUE)
 parentesis <- function(v, ini = "(", fin = ")", comillas = FALSE) {
   if (comillas)
     v <- paste0("'", v, "'")
@@ -172,59 +176,21 @@ set_utf8 <- function(x) {
 #'         dieresis, etc, son sustituidos por su version ASCII.
 #'
 #' @examples
-#' toascii(c("sabañón!", "ungüento", "nâo è graça"))
+#' manoSIAR:::toascii(c("sabañón!", "ungüento", "nâo è graça"))
 toascii <- function(texto) {
   stringi::stri_trans_general(texto, "Latin-ASCII")
 }
 
-#' Summary de una columna en formato tabla
+
+#' Obtener unicode escapes
 #'
-#' Función alternativa a \code{\link[base]{summary}}, pensada para trabajar
-#' fluidamente con tablas de datos y el tidyverse.
+#' @param x Caracter a convertir a escape de unicode
 #'
-#' @param .data Tabla (\code{\link[base]{data.frame}}) con datos.
-#' @param columna Columna numerica de \code{.data}, escrita sin comillas.
-#'
-#' @return Devuelve un summary de los valores de la columna en cuestion,
-#'   ordenado de forma tal que cada estadistico es una columna. Los estadisticos
-#'   tomados son: n (numero de valores), Min (minimo), '1er Cu' (primer
-#'   cuartil), Media (promedio), Mediana (i.e.: segundo cuartil), '3er Cu'
-#'   (tercer cuartil) y Max (maximo).
-#'
-#'   En caso de que `.data` sea de clase \code{\link[dplyr]{grouped_df}},
-#'   devuelve una fila por cada grupo de `.data` con los estadisticos
-#'   correspondientes.
-#' @export
+#' @return Código unicode con escape.
 #'
 #' @examples
-#' tsummary(tibble(x = c(3, 3, 5, 2.2, 1, 3.4, 7.6)), x)
-#' datos_sia %>% tsummary(valor)
-#' datos_sia %>% dplyr::group_by(id_parametro) %>% tsummary(valor)
-#' # Puede demorar unos segundos:
-#' datos_sia %>%
-#'   dplyr::filter(id_programa %in% c(4L, 7L)) %>%
-#'   dplyr::group_by(id_parametro, id_programa, id_estacion) %>%
-#'   tsummary(valor) %>%
-#'   dplyr::left_join(sia_estacion[c(1, 8)], by = c("id_estacion" = "id")) %>%
-#'   dplyr::left_join(sia_parametro)
-tsummary <- function(.data, columna) {
-  # grupo <- quos(...)
-  columna <- dplyr::enquo(columna)
-  .data %>%
-    # select(!!!grupo,!!columna) %>%
-    # dplyr::filter(!is.na(!!columna)) %>%
-    # group_by(!!!grupo) %>%
-    dplyr::summarise(
-      n = dplyr::n(),
-      Min = min(!!columna, na.rm = TRUE),
-      `1er Cu` = quantile(!!columna, na.rm = TRUE, probs = .25),
-      Media = mean(!!columna, na.rm = TRUE) %>% round(ifelse(. < 1, 5, 3)),
-      Mediana = median(!!columna, na.rm = TRUE),
-      `3er Cu` = quantile(!!columna, na.rm = TRUE, probs = .75),
-      Max = max(!!columna, na.rm = TRUE)
-      # NAs = sum(is.na(!!columna))
-    ) %>%
-    dplyr::filter(!is.na(Mediana))
+#' manoSIAR:::unicode("é")
+unicode <- function(x) {
+  stringi::stri_escape_unicode(x)
 }
-# tsummary(tnum, Conduc)
-# tnum %>% group_by(Programa) %>% tsummary(Conduc)
+

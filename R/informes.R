@@ -18,6 +18,8 @@
 #'
 #' \deqn{ IET = 10 \times (6-\frac{0.42 - 0.36 \times ln(\overline{PT% (\mu g/L)})}{ln(2)}) - 20}{% IET = 10 (6 - (.42 - .36 log(PT \mu g/L)) / log(2)) - 20}
 #'
+#' @describeIn iet Cálculo del Índice de Estado Trófico a partir de PT
+#'
 #' @param PT numeric: valores de concentración de fósforo total (id_parametro =
 #'   2090), en microgramos por litro (`µg P/L`; id_unidad = 1054). Tabla con
 #'   valores de IET por codigo_pto
@@ -57,6 +59,8 @@ iet <- function(PT) {
 
 #' @describeIn iet Utiliza \code{iet} para calcular el Índice de Estado
 #'   Trófico por codigo_pto y presentarlo en formato de data.frame
+#'
+#' @export
 iet_tabla <- function(.data, ...) {
   grupo <- quos(...)
   out <-
@@ -71,12 +75,12 @@ iet_tabla <- function(.data, ...) {
     dplyr::summarise(IET = valor %>% media_geom %>% iet %>% round(1)) %>%
     # Clasificación de cada estación según IET:
     dplyr::mutate(categ = dplyr::case_when(
-      IET <= 47 ~ "Ultraoligotrófico",
-      47 < IET & IET <= 52 ~ "Oligotrófico",
-      52 < IET & IET <= 59 ~ "Mesotrófico",
-      59 < IET & IET <= 63 ~ "Eutrófico",
-      63 < IET & IET <= 67 ~ "Supereutrófico",
-      67 < IET             ~ "Hipereutrófico"
+      IET <= 47 ~ "Ultraoligotr\u00f3fico",
+      47 < IET & IET <= 52 ~ "Oligotr\u00f3fico",
+      52 < IET & IET <= 59 ~ "Mesotr\u00f3fico",
+      59 < IET & IET <= 63 ~ "Eutr\u00f3fico",
+      63 < IET & IET <= 67 ~ "Supereutr\u00f3fico",
+      67 < IET             ~ "Hipereutr\u00f3fico"
     )) %>%
     dplyr::ungroup()
   return(out)
@@ -114,6 +118,7 @@ iet_tabla <- function(.data, ...) {
 #'                 Tem = c(12.6, 14.9, 12.8))
 #' dplyr::mutate(d, NH3L = amoniaco_libre(NH4, pH, Tem))
 #'
+#' library(magrittr)
 #' d <-
 #'   datos_sia %>%
 #'   filtrar_datos(id_programa = 10L,
@@ -128,7 +133,7 @@ amoniaco_libre <- function(NH4, pH, Temp) {
 }
 
 #' @describeIn amoniaco_libre Agrega el parámetro a una data.frame larga
-#' 
+#'
 #' @export
 amoniaco_libre_add <- function(.data) {
 
@@ -136,7 +141,7 @@ amoniaco_libre_add <- function(.data) {
   parnec <- c(2032L, 2018L, 2090L)
 
   if (!all(parnec %in% .data$id_parametro))
-    stop("Parámetro(s) ausente(s). Se necesitan los id_parametros: ",
+    stop("Par\u00e1metro(s) ausente(s). Se necesitan los id_parametros: ",
          colapsar_secuencia(parnec), " (Temperatura, pH y NH4)")
 
   # Para agregar el parámetro NH3L, a la tabla que está en formato "largo", hace
@@ -164,7 +169,7 @@ amoniaco_libre_add <- function(.data) {
       param = "NH3L",
       id_tipo_dato = 7L,
       tipo_dato = "OTRO",
-      grupo = "Parámetros Inorgánicos no Metálicos",
+      grupo = "Par\u00e1metros Inorg\u00e1nicos no Met\u00e1licos",
       codigo_nuevo = "NH3L"
     ) %>%
     # 3. Eliminar las columnas de pH, Temperatura y NH4:
@@ -234,6 +239,56 @@ media_geom <- function(x) {
 raiz <- function(x, n) {
   #else: x negativo y n par
   ifelse(x > 0 | n %% 2 == 1, sign(x) * abs(x) ^ (1 / n), NaN)
+}
+
+#' Summary de una columna en formato tabla
+#'
+#' Función alternativa a \code{\link[base]{summary}}, pensada para trabajar
+#' fluidamente con tablas de datos y el tidyverse.
+#'
+#' @param .data Tabla (\code{\link[base]{data.frame}}) con datos.
+#' @param columna Columna numerica de \code{.data}, escrita sin comillas.
+#'
+#' @return Devuelve un summary de los valores de la columna en cuestion,
+#'   ordenado de forma tal que cada estadistico es una columna. Los estadisticos
+#'   tomados son: n (numero de valores), Min (minimo), '1er Cu' (primer
+#'   cuartil), Media (promedio), Mediana (i.e.: segundo cuartil), '3er Cu'
+#'   (tercer cuartil) y Max (maximo).
+#'
+#'   En caso de que `.data` sea de clase \code{\link[dplyr]{grouped_df}},
+#'   devuelve una fila por cada grupo de `.data` con los estadisticos
+#'   correspondientes.
+#' @export
+#'
+#' @examples
+#' tsummary(tibble::tibble(x = c(3, 3, 5, 2.2, 1, 3.4, 7.6)), x)
+#' datos_sia %>% tsummary(valor)
+#' datos_sia %>% dplyr::group_by(id_parametro) %>% tsummary(valor)
+#' # Puede demorar unos segundos:
+#' datos_sia %>%
+#'   dplyr::filter(id_programa %in% c(4L, 7L)) %>%
+#'   dplyr::group_by(id_parametro, id_programa, id_estacion) %>%
+#'   tsummary(valor) %>%
+#'   dplyr::left_join(sia_estacion[c(1, 8)], by = c("id_estacion" = "id")) %>%
+#'   dplyr::left_join(sia_parametro)
+tsummary <- function(.data, columna) {
+  # grupo <- quos(...)
+  columna <- dplyr::enquo(columna)
+  .data %>%
+    # select(!!!grupo,!!columna) %>%
+    # dplyr::filter(!is.na(!!columna)) %>%
+    # group_by(!!!grupo) %>%
+    dplyr::summarise(
+      n = dplyr::n(),
+      Min = min(!!columna, na.rm = TRUE),
+      `1er Cu` = stats::quantile(!!columna, na.rm = TRUE, probs = .25),
+      Media = mean(!!columna, na.rm = TRUE) %>% round(ifelse(. < 1, 5, 3)),
+      Mediana = stats::median(!!columna, na.rm = TRUE),
+      `3er Cu` = stats::quantile(!!columna, na.rm = TRUE, probs = .75),
+      Max = max(!!columna, na.rm = TRUE)
+      # NAs = sum(is.na(!!columna))
+    ) %>%
+    dplyr::filter(!is.na(Mediana))
 }
 
 # GAFICOS ----
@@ -323,16 +378,20 @@ t_eti_add <- function(id_parametro = NULL, etiqueta) {
 #'
 #' @param t_eti data.frame. Tabla generada con \code{\link{t_eti_add}}
 #'
+#' @import ggplot2
+#'
 #' @return
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' e <- eti(2101, tibble::tibble(
 #'   id_parametro = 2101,
 #'   etiqueta = expression('NO'[2]*' (mg NO'[2] * '-N/L)')
 #' ))
 #' ggplot() + geom_blank() + xlab(eti(2101))
 #' ggplot() + geom_blank() + xlab(e)
+#' }
 eti <- function(id_parametro, t_eti) {
 
   if (missing(t_eti)) {
@@ -343,7 +402,7 @@ eti <- function(id_parametro, t_eti) {
   w <- which(t_eti$id_parametro == id_parametro[[1]])
   if (length(w))
     return(t_eti$etiqueta[[w]]) else
-      stop("No se encontró el parámetro ", "(id = ", id_parametro,
+      stop("No se encontr\u00f3 el par\u00e1metro ", "(id = ", id_parametro,
            ") en la tabla t_eti")
 }
 
@@ -358,10 +417,11 @@ eti <- function(id_parametro, t_eti) {
 #' generados con `[..funcion..]` para el total de parámetros encontrados en
 #' `id_parametro`.
 #'
-#'
 #' `g_mes_pto_all` en escencia llama a \code{\link{g_mes_pto}} tantas veces como
 #' id de parámetros en `id_parametro`, realizando una figura única que combina
 #' los gráficos de los parámetros individuales. , mientras que
+#'
+#' @describeIn g_mes_pto grafica los valores de un parámetro por mes
 #'
 #' @param .data data.frame. Datos del SIA (ver \code{\link{datos_sia}} y
 #'   ejemplos)
@@ -398,8 +458,9 @@ eti <- function(id_parametro, t_eti) {
 #' p <- c(PT=2098, NT=2102, ST=2028, Conduc=2009)
 #'
 #' d <- datos_sia %>%
-#'   filtrar_datos(datos_sia, id_programa = 10L,
-#'                 rango_fechas = 2019, id_parametro = p)
+#'   filtrar_datos(id_programa = 10L,
+#'                 rango_fechas = c("2019-01-01", "2019-12-31"), 
+#'                 id_parametro = p)
 #'
 #' cebo <- dplyr::filter(d, nombre_subcuenca_informes == "Cebollatí")
 #'
@@ -417,7 +478,7 @@ eti <- function(id_parametro, t_eti) {
 #'                 id_parametro = p)
 #' g_est_bar(e, nombre_clave = "PT")
 #' g_est_bar_all(e, p)
-#' g_cue_box(e, p)
+#' g_cue_box(e, p[1])
 g_mes_pto <- function(.data,
                       id_parametro,
                       nombre_clave,
@@ -497,6 +558,8 @@ g_mes_pto <- function(.data,
 
 #' @describeIn g_mes_pto Varios gráficos de valores de parámetros por mes en una
 #'   misma figura, usando `g_mes_pto`.
+#'
+#' @export
 g_mes_pto_all <- function(.data, id_parametro, t_eti, ...) {
 
   if (missing(t_eti)) {
@@ -512,7 +575,7 @@ g_mes_pto_all <- function(.data, id_parametro, t_eti, ...) {
   lista[[i]] <-
     lista[[i]] +
     theme_update(legend.position = "bottom") +
-    guides(colour = guide_legend("Estación", title.position = 'left',
+    guides(colour = guide_legend("Estaci\u00f3n", title.position = 'left',
                                  direction = "horizontal",
                                  label.hjust = .5,
                                  label.vjust = .5,
@@ -527,6 +590,8 @@ g_mes_pto_all <- function(.data, id_parametro, t_eti, ...) {
 }
 
 #' @describeIn g_mes_pto Prepara datos para presentar modas y desvíos
+#'
+#' @export
 d_est_bar <- function(.data,
                       id_parametro,
                       ...,
@@ -556,8 +621,10 @@ d_est_bar <- function(.data,
   return(out)
 }
 
-#' @describeIn g_mes_pto Muestra promedios y desvíos estándares de un parámetro para
-#'   las estaciones encontradas en `.data`
+#' @describeIn g_mes_pto Muestra promedios y desvíos estándares de un parámetro
+#'   para las estaciones encontradas en `.data`
+#'
+#' @export
 g_est_bar <- function(.data,
                       id_parametro,
                       nombre_clave,
@@ -607,6 +674,8 @@ g_est_bar <- function(.data,
 
 #' @describeIn g_mes_pto Varios gráficos de promedios y desvíos estándares para
 #'   parámetros por estación, en una misma figura, usando `g_est_bar`
+#'
+#' @export
 g_est_bar_all <- function(.data, id_parametro, t_eti, ...) {
 
   lista <- vector(mode = "list", length = length(id_parametro))
@@ -621,8 +690,9 @@ g_est_bar_all <- function(.data, id_parametro, t_eti, ...) {
 
 
 
-#' @describeIn g_mes_pto Gráfico de cajas (boxplot) para comparación de valores de
-#'   un parámetro entre cuencas
+#' @describeIn g_mes_pto Gráfico de cajas (boxplot) para comparación de valores
+#'   de un parámetro entre cuencas
+#' @export
 g_cue_box <- function(.data,
                        id_parametro,
                        nombre_clave,
@@ -659,7 +729,8 @@ g_cue_box <- function(.data,
 
   out <- if (all(is.na(.data$nombre_subcuenca_informes))) {
     warning("Usando sub_cue_nombre en lugar de nombre_subcuenca_informes ",
-            "debido a que no se encontraron valores válidos para la última")
+            "debido a que no se encontraron valores v\u00e1lidos para la",
+            "\u00faltima")
     out + aes(sub_cue_nombre, valor)
   } else out + aes(nombre_subcuenca_informes, valor)
 
@@ -671,7 +742,8 @@ g_cue_box <- function(.data,
 
 #' Gráfico de IET
 #'
-#' @param .data
+#' @param .data Tabla de datos con columnas codigo_pto (nombres de estaciones) e
+#'   IET (índice de estado trófico)
 #'
 #' @return
 #' @export
@@ -698,8 +770,9 @@ g_iet <- function(.data) {
              fill = 'red',
              alpha = .5) +
     annotate('text', x = 7.5, y = c(46.5, 51.5, 58.5, 62.5, 66.5, 69.5),
-             label = c('Ultraoligotrófico', 'Oligotrófico', 'Mesotrófico',
-                       'Eutrófico', 'Supereutrófico', 'Hipereutrófico'),
+             label = c('Ultraoligotr\u00f3fico', 'Oligotr\u00f3fico',
+                       'Mesotr\u00f3fico', 'Eutr\u00f3fico',
+                       'Supereutr\u00f3fico', 'Hipereutr\u00f3fico'),
              alpha = 0.6) +
     geom_segment(aes(x=codigo_pto, xend=codigo_pto, y=0, yend=IET)) +
     geom_point(size=1.5, with=0.1) +
@@ -714,6 +787,8 @@ g_iet <- function(.data) {
 # + Graficos sueltos ----
 
 #' @describeIn g_long Funcion que (internamente) prepara los datos para `g_long`
+#'
+#' @export
 d_long <- function(.data,
                    id_parametro,
                    anio,
@@ -759,7 +834,7 @@ d_long <- function(.data,
     dplyr::summarise(valor = mean(valor)) %>%
     dplyr::mutate(peri = as.character(!!anio),
                   mes = -1) %>%
-    ungroup()
+    dplyr::ungroup()
 
   out <- dplyr::bind_rows(dplyr::mutate(d_anio, peri = as.character(peri)),
                           d_anio_prom)
@@ -808,6 +883,8 @@ d_long <- function(.data,
 #' \code{\link{filtrar_datos}} tiene facilidades para preparar datos de esta
 #' manera.
 #'
+#' @describeIn g_long Grafica valores anuales longitudinales
+#'
 #' @param .data data.frame. Datos del SIA (ver \code{\link{datos_sia}} y
 #'   ejemplos)
 #' @param id_parametro integer. Id de uno/escalar (`g_mes_pto`) o varios
@@ -831,7 +908,8 @@ d_long <- function(.data,
 #' @export
 #'
 #' @examples
-#' d <- filtrar_datos(datos_sia, id_programa = 5, rango_fechas = c(2012, 2019),
+#' d <- filtrar_datos(datos_sia, id_programa = 5,
+#'                    rango_fechas = c("2012-01-01", "2019-12-31"),
 #'                    id_parametro = c(2032, 2009, 2017, 2018, 2097:2098, 2105),
 #'                    tipo_punto_id = 1)
 #' h <- dplyr::filter(decreto, clase == "1", !is.na(valor))
@@ -926,7 +1004,7 @@ g_long <- function(.data,
     # geom_line(data = d_anio_prom, aes(codigo_pto, valor, group = peri),
     #           color = "#000000", linetype = "dashed") +
     # guides(color = guide_legend(title = NULL)) +
-    xlab("Estación") +
+    xlab("Estaci\u00f3n") +
     ylab(eti(id_parametro)) +
     theme_bw() +
     theme(legend.position = "bottom")
@@ -965,7 +1043,9 @@ g_long <- function(.data,
 }
 
 #' @describeIn g_long Guarda gráficos de `g_long` en archivos
-g_long_files <- function(.data, anio, ventana_anios, tabla_horiz, path) {
+#'
+#' @export
+g_long_files <- function(.data, anio, ventana_anios = 5L, tabla_horiz, path) {
 
   directorio <- if (missing(path)) tempdir() else path
 
@@ -975,7 +1055,7 @@ g_long_files <- function(.data, anio, ventana_anios, tabla_horiz, path) {
     if (!is.null(ses)) {
       # Para el shiny:
       out <- shiny::withProgress(
-        message = "Preparando gráficas...", value = 0, min = 0, max = 1,
+        message = "Preparando gr\u00e1ficas...", value = 0, min = 0, max = 1,
         session = ses, expr = g_long_files_loop(.data, anio, ventana_anios,
                                                 tabla_horiz, directorio,
                                                 pbar = TRUE)
@@ -994,7 +1074,8 @@ g_long_files <- function(.data, anio, ventana_anios, tabla_horiz, path) {
 
 #' Helper para \code{\link{g_long_files}}
 #'
-#' @param directorio character. Ruta al directorio donde se guardarán las imágenes
+#' @param directorio character. Ruta al directorio donde se guardarán las
+#'   imágenes
 #' @param pbar logical. Define si se usa la capacidad de shiny de mostrar una
 #'   barra de progreso
 #' @inheritParams g_long_files

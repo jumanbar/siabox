@@ -1,0 +1,42 @@
+sia_unidad <-
+  structure(list(id = c(
+    15L, 16L, 17L, 18L, 20L, 39L, 23L, 26L,
+    29L, 30L, 34L, 35L, 38L, 40L, 41L, 1001L, 1002L, 1003L, 10L,
+    1014L, 1013L, 1005L, 1006L, 1007L, 1016L, 1017L, 1008L, 2L, 8L,
+    9L, 11L, 1009L, 1015L, 1019L, 1021L, 1022L, 1023L, 1025L, 1033L,
+    1035L, 1036L, 1037L, 1039L, 1041L, 1043L, 1044L, 1045L, 1046L,
+    1047L, 1048L, 1049L, 1050L, 31L, 1051L, 1052L, 1053L, 1054L,
+    33L, 1029L, 32L, 1055L, 37L, 1038L, 1056L, 1010L, 1057L, 1042L,
+    1027L, 1026L, 1028L, 1058L, 25L, 1020L, 1018L, 1024L, 1030L,
+    1031L, 1032L, 1034L, 28L, 1040L, 36L, 1059L, 1060L, 27L, 24L,
+    22L, 21L, 13L, 7L, 6L, 5L, 4L, 3L, 1L, 1061L, 1062L, 1063L, 1064L,
+    1065L, 1066L, 1067L, 1068L, 1069L, 1070L, 1071L, 1072L, 1073L,
+    1074L, 1004L, 1075L, 1076L, 1077L, 1078L, 1079L),
+    uni_nombre = c(
+      "CF/100ml", "ms/cm", "kg/m2/h", "\u00baC", "m2", "DATO MIGRADO", "TNU",
+      "g", "mg O2/L", "mg LAS/L\n", "\u00b5g PO4-P/L", "\u00b5g NO2-N/L",
+      "mg SiO2/L", "L", "Heolicos", "Kw.h", "m3", "ton", "Kg/d", "NO APLICA",
+      "OTRO", "mg/Nm3", "mg H2S/Nm3", "mg HCl/ Nm3", "mg/m3", "mg H2SO4/Nm3",
+      "mg NO2/Nm3", "m3/h", "ppm", "ppb", "Kw", "mg/g", "GigaW.h",
+      "%", "\u00b5g/g", "\u00b5S/cm", "cm", "m", "mg Si/l", "mg/g",
+      "ng WHO-TEQs/g", "ng/g", "pg WHO-TEQs/g", "pg/g", "psu", "sin unid",
+      "unidad de color", "HP", "mmhg", "atm", "\u00b5S/cm", "mV",
+      "\u00b5g/m3", "NTU", "\u00b5g NH3-N/L", "mg PO4-P/Kg", "\u00b5g P/L",
+      "mg NO3-N/L", "mg N/L", "mg NH4-N/L", "mg NO2-N/L", "NMP/100mL",
+      "ng/L", "\u00b5g/Kg", "mg/Kg", "ng/Kg", "pg/L", "mg Cl/g", "mg CaCO3/L",
+      "mg Cl/L", "mg C/Kg", "g/L", "\u00b5g N-NH3/L", "Kg/ton H2SO4, 100%",
+      "Km/h", "mg N-NO2/L", "mg P/L", "mg P-PO4/L", "mg SO4/L", "ml/L",
+      "pg WHO-TEQs/L", "ufc/100ml", "nudo", "L/m", "\u00b5g/L", "Kg/L", "ha",
+      "Km2", "Kg", "mg/L", "L/d", "L/h", "L/s", "m3/d", "m3/s", "mm", "hPa",
+      "m/s", "W/m2", "g/g peso seco", "mg", "ml", "mg Cd+Tl/Nm3", "mg Hg/Nm3",
+      "SbAsPbCrCoCuMnV/Nm3", "ng EQT/Nm3", "Porcentaje(%)",
+      "mg C/Nm3", "mg HCN/Nm3", "m3 FOE", "mg N/Kg", "mg P/Kg", "org/ml",
+      "cel.eq/ml", "Presencia(P)-Aus.(A)"),
+    uni_factor_conversion = c(
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+  ), row.names = c(NA, -115L), class = c("tbl_df", "tbl", "data.frame"))
+save(sia_unidad, file="data/sia_unidad.rda")

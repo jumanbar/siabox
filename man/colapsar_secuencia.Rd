@@ -11,6 +11,9 @@ colapsar_secuencia(x, conector = "y", comillas = FALSE)
 
 \item{conector}{Caracter para conectar el ultimo elemento de la lista
 (tipicamente 'y', '&', 'and', etc...)}
+
+\item{comillas}{Determina si se deben agregar comillas a los elementos de
+\code{x}}
 }
 \value{
 
@@ -21,6 +24,6 @@ excepción del último elemento que es separado con un conector ("y", por
 defecto).
 }
 \examples{
-cat("Numeros:", colapsar_secuencia(4:8), "\n")
-cat("Numeros:", colapsar_secuencia(4:8, comillas = TRUE), "\n")
+cat("Numeros:", manoSIAR:::colapsar_secuencia(4:8), "\n")
+cat("Numeros:", manoSIAR:::colapsar_secuencia(4:8, comillas = TRUE), "\n")
 }

@@ -24,12 +24,14 @@ Si no se provee una tabla \code{t_eti}, la función usará \code{t_eti_add()}
 como tabla de referencia.
 }
 \examples{
+\dontrun{
 e <- eti(2101, tibble::tibble(
   id_parametro = 2101,
   etiqueta = expression('NO'[2]*' (mg NO'[2] * '-N/L)')
 ))
 ggplot() + geom_blank() + xlab(eti(2101))
 ggplot() + geom_blank() + xlab(e)
+}
 }
 \seealso{
 \code{\link{t_eti_add}}

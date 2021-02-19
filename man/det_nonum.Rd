@@ -19,5 +19,5 @@ científica.
 }
 \examples{
 v <- c("1.347e4", "<LC", "<78", "14.447", "7", "1,3E+02")
-det_nonum(v)
+manoSIAR:::det_nonum(v)
 }

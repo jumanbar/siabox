@@ -39,6 +39,8 @@ Cálculo:
 }
 \section{Functions}{
 \itemize{
+\item \code{iet}: Cálculo del Índice de Estado Trófico a partir de PT
+
 \item \code{iet_tabla}: Utiliza \code{iet} para calcular el Índice de Estado
 Trófico por codigo_pto y presentarlo en formato de data.frame
 }}

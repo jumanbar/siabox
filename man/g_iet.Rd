@@ -7,7 +7,8 @@
 g_iet(.data)
 }
 \arguments{
-\item{.data}{}
+\item{.data}{Tabla de datos con columnas codigo_pto (nombres de estaciones) e
+IET (índice de estado trófico)}
 }
 \value{
 

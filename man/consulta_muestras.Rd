@@ -47,6 +47,17 @@ punto (1. SUPERFICIE, 2. FONDO).}
 \item{id_parametro}{integer. Vector con números id de parámetros. Si es
 \code{NULL} (valor por defecto), selecciona todos los parámetros.}
 
+\item{id_institucion}{integer. Vector con números id de instituciones. Si es
+\code{NULL} (valor por defecto), selecciona todas las instituciones.}
+
+\item{usuario}{character. Vector con nombres de usuarios encontrados en los
+datos. Ej.: 'jmartinez'.}
+
+\item{anios}{integer. Vector con los años para los que se quiere filtrar el
+conjunto de datos. Ej.: 2017:2019.}
+
+\item{meses}{integer. Vector con los números de meses para los que se quiere       filtrar el conjunto de datos. Ej.: 6:12.}
+
 \item{fecha_ini}{\code{character}. Fecha en formato \code{AAAA-MM-DD}.}
 
 \item{fecha_fin}{\code{character}. Fecha en formato \code{AAAA-MM-DD}.}
@@ -161,6 +172,7 @@ En caso de que lo anterior no sea suficiente para desambigüar, se usa el id
 más reciente de la tabla \code{datos_muestra_parametros} y se descarta el resto.
 }
 \examples{
+\dontrun{
 # Conexión con la base de datos:
 drv <- DBI::dbDriver("PostgreSQL")
 con <- DBI::dbConnect(drv, dbname = "infambientalbd",
@@ -181,9 +193,11 @@ consulta_muestras(con, id_programa = 1L,
                   id_parametro = c(2009L, 2020L),
                   fecha_ini = "2017-10-31", fecha_fin = "2019-10-31")
 }
+}
 \seealso{
 \code{\link{sia_datos_muestra_parametros}},
 \code{\link{sia_muestra}}, \code{\link{clasif_tipo_dato}},
-\code{\link{valores}}, \code{\link{sia_datos_muestra_parametros}},
+\code{\link{valores_numericos}},
+\code{\link{sia_datos_muestra_parametros}},
 \code{\link{sia_datos_muestra_parametros}}
 }

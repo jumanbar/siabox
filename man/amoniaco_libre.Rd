@@ -44,6 +44,7 @@ d <- data.frame(NH4 = c(0.021, 0.046, 0.04),
                 Tem = c(12.6, 14.9, 12.8))
 dplyr::mutate(d, NH3L = amoniaco_libre(NH4, pH, Tem))
 
+library(magrittr)
 d <-
   datos_sia \%>\%
   filtrar_datos(id_programa = 10L,

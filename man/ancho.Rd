@@ -11,7 +11,7 @@ ancho(.data, unidades = FALSE)
 posiblemente modificada con valores_numericos y con columnas agregadas por
 \code{\link[dplyr]{left_join}}.}
 
-\item{unidaes}{TRUE o FALSE. Determina si se agregan las unidades a las columnas de los parámetros (ej.: 'SatO (\%)' en lugar de 'SatO')}
+\item{unidades}{TRUE o FALSE. Determina si se agregan las unidades a las columnas de los parámetros (ej.: 'SatO (\%)' en lugar de 'SatO')}
 }
 \value{
 

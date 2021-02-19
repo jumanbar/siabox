@@ -90,27 +90,30 @@ correspondientes a los valores límites aceptados para la clase 1 de aguas
 }
 \section{Functions}{
 \itemize{
+\item \code{g_mes_pto}: grafica los valores de un parámetro por mes
+
 \item \code{g_mes_pto_all}: Varios gráficos de valores de parámetros por mes en una
 misma figura, usando \code{g_mes_pto}.
 
 \item \code{d_est_bar}: Prepara datos para presentar modas y desvíos
 
-\item \code{g_est_bar}: Muestra promedios y desvíos estándares de un parámetro para
-las estaciones encontradas en \code{.data}
+\item \code{g_est_bar}: Muestra promedios y desvíos estándares de un parámetro
+para las estaciones encontradas en \code{.data}
 
 \item \code{g_est_bar_all}: Varios gráficos de promedios y desvíos estándares para
 parámetros por estación, en una misma figura, usando \code{g_est_bar}
 
-\item \code{g_cue_box}: Gráfico de cajas (boxplot) para comparación de valores de
-un parámetro entre cuencas
+\item \code{g_cue_box}: Gráfico de cajas (boxplot) para comparación de valores
+de un parámetro entre cuencas
 }}
 
 \examples{
 p <- c(PT=2098, NT=2102, ST=2028, Conduc=2009)
 
 d <- datos_sia \%>\%
-  filtrar_datos(datos_sia, id_programa = 10L,
-                rango_fechas = 2019, id_parametro = p)
+  filtrar_datos(id_programa = 10L,
+                rango_fechas = c("2019-01-01", "2019-12-31"), 
+                id_parametro = p)
 
 cebo <- dplyr::filter(d, nombre_subcuenca_informes == "Cebollatí")
 
@@ -128,7 +131,7 @@ e <- datos_sia \%>\%
                 id_parametro = p)
 g_est_bar(e, nombre_clave = "PT")
 g_est_bar_all(e, p)
-g_cue_box(e, p)
+g_cue_box(e, p[1])
 }
 \seealso{
 \code{\link{t_eti_base}}

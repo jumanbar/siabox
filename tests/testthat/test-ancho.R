@@ -3,35 +3,37 @@ x <-
   dplyr::group_by(id_programa) %>%
   dplyr::sample_n(4) %>%
   dplyr::ungroup() %>%
-  dplyr::filter(id_programa %in% c(4L, 31L))
-test_that("Error si hay más de un id_matriz", {
-  testthat::expect_error(ancho(x),
-                         "^Los datos tienen más de un valor de id_matriz")
-})
+  dplyr::filter(id_programa == 4L)
+# test_that("Error si hay más de un id_matriz", {
+#   testthat::expect_error(ancho(x),  
+#                          "^Los datos tienen más de un valor de id_matriz")
+# })
 
 x <- x %>%
-  dplyr::filter(id_matriz == 6L) %>%
   dplyr::mutate(param = nombre_clave)
 test_that("Columnas de sobra", {
-
-  testthat::expect_warning(ancho(x),
-                           'Se eliminan automáticamente las columnas')
+  testthat::expect_warning(
+    ancho(x),
+    'Se eliminan automáticamente las columnas'
+    )
 })
 
 x <- dplyr::select(x, -param, -parametro, -id_tipo_dato,
-                   -tipo_dato, -grupo, -codigo_nuevo)
-test_that("Sin columna param", {
+                   -grupo, -codigo_nuevo)
 
-  testthat::expect_warning(ancho(x),
-                           'Se creó automáticamente la columna "param"')
+test_that("Sin columna param", {
+  testthat::expect_warning(
+    ancho(x), 'Se creó automáticamente la columna "param"'
+    )
 })
 
 x <- dplyr::mutate(x, param = nombre_clave) %>%
   dplyr::select(-valor)
-test_that("Sin columna valor", {
 
-  testthat::expect_warning(ancho(x),
-                           'Se creó automáticamente la columna\\: valor')
+test_that("Sin columna valor", {
+  testthat::expect_warning(
+    ancho(x), 'Se creó automáticamente la columna\\: valor = valor_minimo_str'
+    )
 })
 
 # x$valor <- x$valor_minimo_str

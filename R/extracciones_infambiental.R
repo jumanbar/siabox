@@ -59,8 +59,8 @@
 #' @param .data Tabla de datos obtenida con \code{\link{consulta_muestras}},
 #'   posiblemente modificada con valores_numericos y con columnas agregadas por
 #'   \code{\link[dplyr]{left_join}}.
-#'   
-#' @param unidaes TRUE o FALSE. Determina si se agregan las unidades a las columnas de los parámetros (ej.: 'SatO (%)' en lugar de 'SatO')
+#'
+#' @param unidades TRUE o FALSE. Determina si se agregan las unidades a las columnas de los parámetros (ej.: 'SatO (%)' en lugar de 'SatO')
 #'
 #' @details Espera que existan las columnas 'valor' y 'param'. En caso de no
 #'   encontrarlas las creará. La primera contiene los valores de los parámetros
@@ -101,27 +101,28 @@ ancho <- function(.data, unidades = FALSE) {
 
   matrices <- unique(.data$id_matriz)
   if (length(matrices) > 1) {
-    stop('Los datos tienen más de un valor de id_matriz: ',
+    stop('Los datos tienen m\u00e1s de un valor de id_matriz: ',
          colapsar_secuencia(matrices),
          '. Sugerencia: filtrar datos con dplyr::filter o "["')
   }
 
   if (!any(names(.data) == 'valor')) {
-    warning('Se creó automáticamente la columna: valor = valor_minimo_str.')
+    warning('Se cre\u00f3 autom\u00e1ticamente la columna: ',
+            'valor = valor_minimo_str.')
     .data$valor <- .data$valor_minimo_str
   }
 
   if (!any(names(.data) == 'param')) {
-    warning('Se creó automáticamente la columna "param".')
+    warning('Se cre\u00f3 autom\u00e1ticamente la columna "param".')
     if (unidades) {
       .data$param <- if (any(names(.data) == 'codigo_nuevo'))
         paste0(.data$codigo_nuevo, ' (', .data$uni_nombre, ')') else
-          paste0(.data$nombre_clave, ' (', .data$uni_nombre, ')')  
+          paste0(.data$nombre_clave, ' (', .data$uni_nombre, ')')
     } else {
       .data$param <- if (any(names(.data) == 'codigo_nuevo'))
-        .data$codigo_nuevo else s.data$nombre_clave
+        .data$codigo_nuevo else .data$nombre_clave
     }
-    
+
   }
 
   # Si están, eliminar estas columnas innecesearias (para compatibilidad con
@@ -129,7 +130,7 @@ ancho <- function(.data, unidades = FALSE) {
   w <- grep('^codigo_nuevo$|^parametro$|^grupo$|tipo_dato$', names(.data),
             ignore.case = TRUE)
   if (length(w)) {
-    warning('Se eliminan automáticamente las columnas: ',
+    warning('Se eliminan autom\u00e1ticamente las columnas: ',
             colapsar_secuencia(names(.data)[w]))
     .data <- .data[-w]
   }
@@ -176,99 +177,6 @@ ancho <- function(.data, unidades = FALSE) {
                        stringr::str_replace_all('(L[CD])_(.*)', '\\2_\\1'))
 
   return(out)
-}
-
-#' Formato ancho para 2 parámetros
-#'
-#' **OBSOLETA** (aunque se sigue usando de momento). Usar en cambio
-#' \code{\link{ancho}}, habiendo previamente filtrado los datos a 2 parámetros.
-#'
-#' Aplicar pivot_wider para datos provenientes de consulta_muestras, pero con
-#' ciertas precauciones...
-#'
-#' @param .data data.frame: Datos como vienen del SIA
-#' @param id_x integer: id_parametro "X". Ejemplo: 2098 (PT)
-#' @param id_y integer: id_parametro "Y". Ejemplo: 2097 (PO4)
-#' @param par_x integer: id_parametro "X". Ejemplo: 2098 (PT)
-#' @param par_y integer: id_parametro "Y". Ejemplo: 2097 (PO4)
-#' @param e_sel logical: corresponde considerar la columna est_sel
-#'
-#' @return data.frame ancha.
-#' @export
-#'
-#' @examples
-#' # Cómo usar ancho en lugar de ancho_old:
-#' datos_sia %>%
-#'   # Primero filtrar para tener sólo 2 parámetros:
-#'   dplyr::filter(id_programa == 4, id_parametro %in% c(2017, 2021)) %>%
-#'   ancho %>%
-#'   select(matches("^SatO |^OD ")) %>%
-#'   plot
-ancho_old <- function(.data, id_x, id_y,
-                      par_x = NULL, par_y  = NULL,
-                      e_sel = TRUE) {
-
-  repes <- .data %>%
-    dplyr::count(id_muestra, id_parametro) %>%
-    dplyr::filter(n > 1)
-
-  if (is.null(par_x)) {
-    par_x <- sia_parametro %>%
-      dplyr::filter(id_parametro == id_x) %>%
-      dplyr::pull(nombre_clave)
-  }
-
-  if (is.null(par_y)) {
-    par_y <- sia_parametro %>%
-      dplyr::filter(id_parametro == id_y) %>%
-      dplyr::pull(nombre_clave)
-  }
-
-  # A continuación: si es que hay repetidos, quedarme sólo con los que
-  # figuran como aprobados...
-  # Esto tal vez lo debería hacer con todas las muestras, no?
-  for (i in 1:nrow(repes)) {
-    w <- which(
-      .data$id_muestra == repes$id_muestra[i] &
-        .data$id_parametro == repes$id_parametro[i]
-    )
-
-    # id_estado = 1: pendiente
-    # id_estado = 2: original
-    # id_estado = 3: aprobado
-    w_aprob <- which(.data$id_estado[w] == 3)
-
-    if (length(w_aprob)) {
-      fila <- .data[w,][w_aprob,]
-      .data <- .data[-w,]
-      .data <- rbind(.data, fila)
-    }
-  }
-
-  .data_x <- .data %>%
-    dplyr::filter(id_parametro == id_x) %>%
-    dplyr::rename(!!dplyr::sym(par_x) := valor) %>%
-    dplyr::select(-id_estado, -nombre_clave, -id_parametro, -observaciones,
-                  -valor_minimo_str, -limite_deteccion, -limite_cuantificacion)
-
-  .data_y <- .data %>%
-    dplyr::filter(id_parametro == id_y) %>%
-    dplyr::rename(!!sym(par_y) := valor) %>%
-    dplyr::select(-id_estado, -nombre_clave, -id_parametro, -observaciones,
-                  -valor_minimo_str, -limite_deteccion, -limite_cuantificacion)
-
-  v_by <- c("id_muestra", "nombre_programa", "id_programa",
-            "codigo_pto", "id_estacion", "id_depto", "departamento",
-            "id_institucion", "institucion", "usuario", "anio", "mes",
-            "anio_mes", "fecha_muestra", "fecha_hora")
-
-  if (e_sel) v_by <- c(v_by, "est_sel")
-
-  .data_final <-
-    dplyr::full_join(.data_x, .data_y, by = v_by) %>%
-    dplyr::arrange(id_muestra, fecha_hora)
-
-  return(.data_final)
 }
 
 #' Asignar categorías a los datos SIA
@@ -392,6 +300,13 @@ clasif_tipo_dato <- function(x, metodo = "simple") {
 #'   (valor por defecto), selecciona todos los departamentos.
 #' @param id_parametro integer. Vector con números id de parámetros. Si es
 #'   `NULL` (valor por defecto), selecciona todos los parámetros.
+#' @param id_institucion integer. Vector con números id de instituciones. Si es
+#'   `NULL` (valor por defecto), selecciona todas las instituciones.
+#' @param usuario character. Vector con nombres de usuarios encontrados en los
+#'   datos. Ej.: 'jmartinez'.
+#' @param anios integer. Vector con los años para los que se quiere filtrar el
+#'   conjunto de datos. Ej.: 2017:2019.
+#' @param meses integer. Vector con los números de meses para los que se quiere       filtrar el conjunto de datos. Ej.: 6:12.
 #' @param fecha_ini `character`. Fecha en formato `AAAA-MM-DD`.
 #' @param fecha_fin `character`. Fecha en formato `AAAA-MM-DD`.
 #'
@@ -500,11 +415,13 @@ clasif_tipo_dato <- function(x, metodo = "simple") {
 #'
 #' @seealso \code{\link{sia_datos_muestra_parametros}},
 #'   \code{\link{sia_muestra}}, \code{\link{clasif_tipo_dato}},
-#'   \code{\link{valores}}, \code{\link{sia_datos_muestra_parametros}},
+#'   \code{\link{valores_numericos}},
+#'   \code{\link{sia_datos_muestra_parametros}},
 #'   \code{\link{sia_datos_muestra_parametros}}
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Conexión con la base de datos:
 #' drv <- DBI::dbDriver("PostgreSQL")
 #' con <- DBI::dbConnect(drv, dbname = "infambientalbd",
@@ -524,6 +441,7 @@ clasif_tipo_dato <- function(x, metodo = "simple") {
 #'                   id_estacion = c(100054L, 100061L, 100063L, 100172L),
 #'                   id_parametro = c(2009L, 2020L),
 #'                   fecha_ini = "2017-10-31", fecha_fin = "2019-10-31")
+#' }
 consulta_muestras <- function(con, id_matriz = 6L,
                               id_programa = NULL,
                               id_cuenca = NULL,
@@ -596,7 +514,7 @@ consulta_muestras <- function(con, id_matriz = 6L,
 
   consulta_sql <- c(
     "select
-    dmp.id,
+    dmp.id as id_dato,
     dmp.id_muestra,
     m.nro_muestra,
     dmp.id_estado,
@@ -622,7 +540,7 @@ consulta_muestras <- function(con, id_matriz = 6L,
     m.fecha_muestra,
     cast(m.fecha_muestra as char(12)) || ' ' || ",
     "cast(m.hora_muestra as char(12)) as fecha_hora,
-    m.observaciones,
+    dmp.observacion || '. ' || m.observaciones as observaciones,
     pu.id_matriz,
     p.id_parametro,
     p.parametro,
@@ -643,7 +561,7 @@ consulta_muestras <- function(con, id_matriz = 6L,
     left join departamento d on e.departamento = d.id
     left join programa pr on e.prog_monitoreo = pr.id_programa
     left join param_unidad pu on p.id_parametro = pu.id_parametro
-    and pu.id_matriz = e.matriz_estacion
+    and e.matriz_estacion = pu.id_matriz
     left join unidad u on pu.id_unidad_medida = u.id",
     " where ", condiciones, ";"
   )
@@ -705,13 +623,13 @@ consulta_muestras <- function(con, id_matriz = 6L,
         out$id_muestra == repes$id_muestra[i] &
           out$id_parametro == repes$id_parametro[i]
       )
-      w_ultimo <- which.max(out$id[w])
+      w_ultimo <- which.max(out$id_dato[w])
 
       out <- out[-w[-w_ultimo],]
     }
   }
 
-  out <- dplyr::select(out, -id)
+  out <- dplyr::select(out, -id_dato)
 
   return(out)
 }
@@ -762,12 +680,13 @@ filtrar_datos <- function(.data,
                           tipo_punto_id = NULL) {
 
   if (missing(id_programa))
-    stop("id_programa espera un único número entero positivo.")
+    stop("id_programa espera un \u00fanico n\u00famero entero positivo.")
 
   if (length(id_programa) > 1) {
     id_programa <- id_programa[[1]]
-    warning("id_programa espera un único número entero positivo, por lo que ",
-            "se usó solamente el primer elemento: ", id_programa)
+    warning("id_programa espera un \u00fanico n\u00famero entero positivo,",
+            " por lo que se us\u00f3 solamente el primer elemento: ",
+            id_programa)
   }
 
   id_programa <- abs(as.integer(id_programa))
@@ -805,14 +724,14 @@ filtrar_datos <- function(.data,
 
   } else if (all(grepl("^[12][0-9]{3}$", rango_fechas))) {
     rango_fechas <- paste0(rango_fechas, c("-01-01", "-12-31"))
-    warning("rango_fechas se modificó. Filtrando desde ",
+    warning("rango_fechas se modific\u00f3. Filtrando desde ",
             rango_fechas[1], " a ", rango_fechas[2])
   }
 
   if (is.null(id_parametro)) {
     id_parametro <- sia_parametro$id_parametro
     warning("id_parametro no especificado, se seleccionan ",
-            "todos los parámetros por defecto")
+            "todos los par\u00e1metros por defecto")
   }
 
   if (is.null(id_estacion)) {
@@ -857,7 +776,8 @@ filtrar_datos <- function(.data,
 
   if (is.null(orden_est)) {
     orden_est <- stringr::str_sort(esperados, numeric = TRUE)
-    warning("orden_est no especificado. Se usa orden alfabético & numérico: ",
+    warning("orden_est no especificado. Se usa orden ',
+            'alfab\u00e9tico & num\u00e9rico: ",
             colapsar_secuencia(orden_est))
   } else {
     w <- esperados %in% orden_est
@@ -913,7 +833,7 @@ unipar <- function(id_parametro, id_matriz = 6L, nombre_clave) {
 #'
 #' Buscadores de id para las varias tablas importadas del SIA, usando un texto
 #' (un google de id_parametros). El texto o patrón puede ser una expresión
-#' regular (la cual será evaluada por \code{\link[bae]{agrepl}}).
+#' regular (la cual será evaluada por \code{\link[base]{agrepl}}).
 #'
 #' @param patron character. Patrón (expresión regular tipo
 #'   \code{\link[base]{regex}}).
@@ -957,6 +877,8 @@ par_id <- function(patron, ...) {
 
 #' @describeIn par_id Busca programas en \code{\link{sia_programa}} en base al
 #'   campo `nombre_programa` de dicha tabla.
+#'
+#' @export
 pro_id <- function(patron, ...) {
   dplyr::filter(sia_programa, agrepl(toascii(patron),
                                      toascii(nombre_programa),
@@ -966,6 +888,8 @@ pro_id <- function(patron, ...) {
 
 #' @describeIn par_id Busca estaciones en \code{\link{sia_estacion}} en base a
 #'   los campos `codigo_pto` y `estacion` de dicha tabla.
+#'
+#' @export
 est_id <- function(patron, ...) {
   patron <- toascii(patron)
 
@@ -983,6 +907,8 @@ est_id <- function(patron, ...) {
 
 #' @describeIn par_id Busca matrices en \code{\link{sia_matriz}} en base al
 #'   campo `nombre` de dicha tabla.
+#'
+#' @export
 mat_id <- function(patron, ...) {
   dplyr::filter(sia_matriz, agrepl(toascii(patron),
                                    toascii(nombre),
@@ -992,6 +918,7 @@ mat_id <- function(patron, ...) {
 
 #' @describeIn par_id Busca unidades en \code{\link{sia_unidad}} en base al
 #'   campo `uni_nombre` de dicha tabla.
+#' @export
 uni_id <- function(patron, ...) {
   dplyr::filter(sia_unidad, agrepl(toascii(patron),
                                    toascii(uni_nombre),
@@ -1001,6 +928,7 @@ uni_id <- function(patron, ...) {
 
 #' @describeIn par_id Busca instituciones en \code{\link{sia_institucion}} en
 #'   base al campo `nombre` de dicha tabla.
+#' @export
 ins_id <- function(patron, ...) {
   dplyr::filter(sia_institucion, agrepl(toascii(patron),
                                  toascii(nombre),
@@ -1010,6 +938,7 @@ ins_id <- function(patron, ...) {
 
 #' @describeIn par_id Busca departamentos en \code{\link{sia_departamento}} en
 #'   base al campo `dep_nombre` de dicha tabla.
+#' @export
 dep_id <- function(patron, ...) {
   dplyr::filter(sia_departamento, agrepl(toascii(patron),
                                          toascii(dep_nombre),
@@ -1034,6 +963,8 @@ dep_id <- function(patron, ...) {
 #' @return `tibble` con datos originales y una columna numérica extra, `valor`,
 #'   cuyos valores son el resultado de sustitución realizadas con expresiones
 #'   regulares. Ver detalles.
+#'
+#' @export
 #'
 #' @details Esta función se creó en el contexto de analizar datos numéricos para
 #'   validación, pero puede usarse potencialmente para otras tareas, tales como
@@ -1210,8 +1141,8 @@ valores_numericos <- function(.data,
   }
 
   out$valor <- if (metodo == "sin_cambios") {
-    warning('La opción "filtrar_no_num" es ignorada debido a que fue ',
-            'seleccionada la opción "sin_cambios"')
+    warning('La opci\u00f3n "filtrar_no_num" es ignorada debido a que fue ',
+            'seleccionada la opci\u00f3n "sin_cambios"')
     filtrar_no_num <- FALSE
     out$valor_minimo_str
   } else vnum

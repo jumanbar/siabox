@@ -600,15 +600,12 @@
 #' Código de creación de las tablas:
 #'
 #' ```
-#'
 #' cp <- codigos_param %>%
 #'   dplyr::filter(!is.na(id_parametro)) %>%
 #'   dplyr::select(grupo, codigo_nuevo, id_parametro)
-#'
-#' con <- con_sia()
-#'
+#' 
 #' datos_sia <-
-#'   consulta_muestras(con) %>%
+#'   consulta_muestras(con, id_matriz = 6L) %>%
 #'   valores_numericos(metodo = "informe", filtrar_no_num = TRUE) %>%
 #'   dplyr::left_join(cp, by = "id_parametro") %>%
 #'   dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo),
@@ -616,21 +613,27 @@
 #'                                        codigo_nuevo),
 #'                 anio = as.integer(anio),
 #'                 mes = as.integer(mes)) %>%
-#'   dplyr::left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") %>%
+#'   dplyr::left_join(
+#'     dplyr::select(cuencas_informes, nombre_subcuenca_informes, id_estacion),
+#'     by = "id_estacion") %>%
 #'   dplyr::select(-id_estado)
-#'
+#' 
 #' save(datos_sia, file = "data/datos_sia.rda")
-#'
-#' datos_sia_sed <- consulta_muestras(con, id_matriz = 11L) %>%
-#' valores_numericos(metodo = "informe", filtrar_no_num = TRUE) %>%
-#' dplyr::left_join(cp, by = "id_parametro") %>% dplyr::mutate(param =
-#' dplyr::if_else(is.na(codigo_nuevo), nombre_clave, codigo_nuevo), anio =
-#' as.integer(anio), mes = as.integer(mes) ) %>%
-#' dplyr::left_join(cuencas_informes[c(1, 3:4)], by = "id_estacion") %>%
-#' dplyr::select(-id_estado)
-#'
+#' 
+#' datos_sia_sed <- 
+#'   consulta_muestras(con, id_matriz = 11L) %>%
+#'   valores_numericos(metodo = "informe", filtrar_no_num = TRUE) %>%
+#'   dplyr::left_join(cp, by = "id_parametro") %>% 
+#'   dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo), 
+#'                                        nombre_clave, 
+#'                                        codigo_nuevo), 
+#'                 anio = as.integer(anio), mes = as.integer(mes)) %>%
+#'   dplyr::left_join(
+#'     dplyr::select(cuencas_informes, nombre_subcuenca_informes, id_estacion),
+#'     by = "id_estacion") %>%
+#'   dplyr::select(-id_estado)
+#' 
 #' save(datos_sia_sed, file = "data/datos_sia_sed.rda")
-#'
 #' ```
 #'
 #' @format Tabla con `r nrow(datos_sia)` filas y `r ncol(datos_sia)` columnas:
@@ -746,7 +749,7 @@
 #'   }
 #'
 #' @seealso \code{\link{tipos_de_dato}}, \code{\link{consulta_muestras}},
-#'   \code{\link{codigos_params}}
+#'   \code{\link{codigos_param}}
 #'
 #' @source \code{infambientalbd}
 #'
@@ -945,8 +948,7 @@
 #'   dplyr::filter(id_matriz == 6L, id_parametro %in% c(2017L, 2021L)) %>%
 #'   ancho %>%
 #'   # El orden de los parámetros es importante!:
-#'   dplyr::select(tidyselect::starts_with("OD "),
-#'                 tidyselect::starts_with("SatO "))
+#'   dplyr::select(OD, SatO)
 #'
 #' d$od_alto <- !reglas$od_sat_max$fun(d)
 #' d$od_bajo <- !reglas$od_sat_min$fun(d)

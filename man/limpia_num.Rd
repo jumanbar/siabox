@@ -18,9 +18,9 @@ repetidas y puntos repetidos por un único punto (indicador de decimales). Se
 basa en expresiones regulares y el paquete \code{stringr}.
 }
 \examples{
-limpia_num("2.3")
-limpia_num("2..3")
-limpia_num("2,3")
-limpia_num("2,,,,3")
-limpia_num("   2,,,, 3   ")
+manoSIAR:::limpia_num("2.3")
+manoSIAR:::limpia_num("2..3")
+manoSIAR:::limpia_num("2,3")
+manoSIAR:::limpia_num("2,,,,3")
+manoSIAR:::limpia_num("   2,,,, 3   ")
 }

@@ -25,7 +25,8 @@ cuestión. Es un lustro por defecto.}
 \item{tabla_horiz}{data.frame. Debe tener las columnas \code{id_parametro},
 \code{valor}, y \code{extremo} tal como en la tabla \code{\link{decreto}}}
 
-\item{directorio}{character. Ruta al directorio donde se guardarán las imágenes}
+\item{directorio}{character. Ruta al directorio donde se guardarán las
+imágenes}
 
 \item{pbar}{logical. Define si se usa la capacidad de shiny de mostrar una
 barra de progreso}
