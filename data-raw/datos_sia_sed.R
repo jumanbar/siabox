@@ -6,7 +6,7 @@ out <-
                    by = 'id_muestra') %>% 
   dplyr::left_join(sia_institucion,
                    by = 'id_institucion') %>% 
-  dplyr::inner_join(dplyr::filter(sia_estacion, matriz_estacion == 6L),
+  dplyr::inner_join(dplyr::filter(sia_estacion, matriz_estacion == 11L),
                     by = c('id_estacion' = 'id')) %>% 
   dplyr::left_join(sia_tipo_punto_estacion,
                    by = c('tipo_punto_id' = 'id')) %>% 
@@ -40,7 +40,7 @@ out <-
     nombre_clave, id_unidad = id_unidad_medida, uni_nombre, 
     valor_minimo_str, limite_deteccion, limite_cuantificacion
   )
-
+  
 # Quitar datos repetidos según id_estado (1. pendientes, 2. original, 
 # 3. aprobado):
 if (any(out$id_estado == 3)) {
@@ -140,12 +140,12 @@ out <- out %>%
 # rm(out)
 # 
 # # Conteo original:
-# > dplyr::count(out, id_matriz)
+# > dplyr::count(datos_sia_sed, id_matriz)
 # # A tibble: 2 x 2
 #   id_matriz      n
 #       <int>  <int>
 # 1         6 223112
 # 2        11   3898
 
-datos_sia <- out
-# save(datos_sia, file = 'data/datos_sia.rda')
+datos_sia_sed <- out
+# save(datos_sia_sed, file = 'data/datos_sia_sed.rda')

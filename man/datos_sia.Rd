@@ -7,7 +7,7 @@
 \alias{datos_sia_sed}
 \title{Datos extraídos del SIA.}
 \format{
-Tabla con 223109 filas y 39 columnas:
+Tabla con 223112 filas y 39 columnas:
 
 \describe{
 

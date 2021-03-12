@@ -193,4 +193,3 @@ toascii <- function(texto) {
 unicode <- function(x) {
   stringi::stri_escape_unicode(x)
 }
-

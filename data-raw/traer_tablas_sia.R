@@ -1,5 +1,5 @@
 # INFAMBIENTAL ----
-# 
+#
 # Para que no cambien los datos, sería necesario hacer esto desde mi computadora
 # perosnal. JMB.
 drv <- DBI::dbDriver("PostgreSQL")
@@ -9,10 +9,10 @@ con <- RPostgreSQL::dbConnect(drv, dbname = 'infambientalbd',
 # pw <- {
 #   "shiny_passwd"
 # }
-# 
+#
 # nodo <- Sys.info()["nodename"]
 # prueba <- grepl("DINAMA", nodo, ignore.case = TRUE)
-# 
+#
 # if (prueba) {
 #   con <- RPostgreSQL::dbConnect(drv, dbname = "infambientalbd",
 #                                 host = "172.20.0.34", port = 5432,
@@ -25,7 +25,7 @@ con <- RPostgreSQL::dbConnect(drv, dbname = 'infambientalbd',
 #     # dbExecute(con, "SET CLIENT_ENCODING TO 'WIN1252';")
 #     RPostgreSQL::dbExecute(con, "SET NAMES 'WIN1252';")
 #   }
-# 
+#
 # } else {
 #   # En caso de estar en una computadora sin conexión a la base de datos, se usa
 #   # un respaldo de las tablas importantes.
@@ -33,7 +33,7 @@ con <- RPostgreSQL::dbConnect(drv, dbname = 'infambientalbd',
 #   con <- RPostgreSQL::dbConnect(drv, dbname = 'infambientalbd',
 #                                 host = 'localhost', port = 5432, user = 'juan',
 #                                 password = 'shiny')
-# 
+#
 # }
 
 # @ sia_parametro ----
@@ -66,7 +66,7 @@ con <- RPostgreSQL::dbConnect(drv, dbname = 'infambientalbd',
 #
 # anti_join(db_param_unidad, sia_param_unidad) # 21 filas
 # anti_join(sia_param_unidad, db_param_unidad) # 10 filas
-# 
+#
 # sia_param_unidad <- dplyr::collect(dplyr::tbl(con, "param_unidad"))
 
 # @ sia_unidad ----
@@ -161,13 +161,13 @@ datos_sia <-
 save(datos_sia, file = "data/datos_sia.rda")
 
 # @ datos_sia_sed ----
-datos_sia_sed <- 
+datos_sia_sed <-
   consulta_muestras(con, id_matriz = 11L) %>%
   valores_numericos(metodo = "informe", filtrar_no_num = TRUE) %>%
-  dplyr::left_join(cp, by = "id_parametro") %>% 
-  dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo), 
+  dplyr::left_join(cp, by = "id_parametro") %>%
+  dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo),
                                        nombre_clave,
-                                       codigo_nuevo), 
+                                       codigo_nuevo),
                 anio = as.integer(anio), mes = as.integer(mes)) %>%
   dplyr::left_join(
     dplyr::select(cuencas_informes, nombre_subcuenca_informes, id_estacion),

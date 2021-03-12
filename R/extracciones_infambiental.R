@@ -586,6 +586,8 @@ consulta_muestras <- function(con, id_matriz = 6L,
     out <- dplyr::filter(out, mes %in% meses)
   }
 
+  # Quitar datos repetidos según id_estado (1. pendientes, 2. original, 
+  # 3. aprobado):
   if (any(out$id_estado == 3)) {
     repes <- out %>%
       dplyr::count(id_muestra, id_parametro) %>%
@@ -1043,7 +1045,9 @@ dep_id <- function(patron, ...) {
 #'   }
 #'
 #' @examples
+#' # Ejemplo con datos del programa Laguna Merin:
 #' d <- datos_sia %>%
+#'   dplyr::filter(id_programa == 10L) %>% 
 #'   dplyr::select(id_parametro, valor_minimo_str,
 #'                 limite_deteccion, limite_cuantificacion)
 #'
@@ -1058,6 +1062,7 @@ dep_id <- function(patron, ...) {
 #'     porcentaje_menor_lim = sum(id_tipo_dato %in% 2:4) / dplyr::n()
 #'     )
 #'
+#' # Ejemplo con datos del programa Santa Lucía:
 #' filtrar_datos(datos_sia, id_programa = 3) %>%
 #'   valores_numericos(metodo = "basico")
 valores_numericos <- function(.data,

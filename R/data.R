@@ -1,53 +1,31 @@
 ## INFAMBIENTALBD ----
 
-## . sia_muestra -----
+## . sia_cuenca ----
 
-#' Inventario de muestras de infambientalbd
+#' Lista de cuencas
 #'
-#' Esta tabla guarda los metadatos generales de cada muestra. Una muestra se
-#' corresponde con el muestreo en campo en un sitio en particular (estación) y
-#' una fecha determinada.
+#' La tabla de cuencas tiene `r nrow(sia_cuenca)` cuencas definidas, incluyendo 
+#' categorías extra (Falta Cuenca y Dato Migrado).
+#' 
+#' Fecha de extraccion: 2020-10-22
 #'
-#' Fecha de extraccion: 2020-10-29
-#'
-#' @format Tabla con `r nrow(sia_muestra)` filas y `r ncol(sia_muestra)`
-#'   columnas:
+#' @format Tabla con `r nrow(sia_cuenca)` filas y
+#'   `r ncol(sia_cuenca)` columnas:
 #'
 #'   \describe{
 #'
-#'   \item{id_muestra}{integer. Número único identificador de la muestra}
+#'   \item{id}{integer. Número asignado a la cuenca}
 #'
-#'   \item{id_institución}{integer. Identificador de la institución a la que
-#'   pertenece el usuario que cargó los datos en el SIA}
-#'
-#'   \item{periodo}{character. Texto en formato MES AÑO (ej.: JUNIO 2012). No
-#'   necesariamente se corresponde con fecha_muestra, ya que se trata de un
-#'   campo de identificación de la campaña de muestreo}
-#'
-#'   \item{fecha_muestra}{date. Fecha en que se tomó la muestra.}
-#'
-#'   \item{hora_muestra}{character. Hora en que se tomó la muestra (en el
-#'   campo).}
-#'
-#'   \item{usuario}{character. Usuario que ingresó los datos al SIA (no
-#'   necesariamente corresponde con quien/es lo colectaron en campo)}
-#'
-#'   \item{fecha_ingreso}{datetime. Fecha y hora en que se ingresó la muestra al
-#'   SIA.}
-#'
-#'   \item{observaciones}{character. Observaciones.}
-#'
-#'   \item{id_estacion}{integer. Identificador de la estación de monitoreo.}
-#'
-#'   \item{replica}{logical. ..completar..}
-#'
-#'   \item{nro_muestra}{integer. Número de muestra asignado por SILAD. No es
-#'   único para esta tabla (no confundir con id_muestra).}
+#'   \item{cue_nombre}{character. Nombre de la cuenca}
 #'
 #'   }
+#'   
+#' @examples 
+#' dplyr::left_join(dplyr::select(sia_sub_cuenca, id:sub_cue_cuenca_id),
+#'                  sia_cuenca, by = c('sub_cue_cuenca_id' = 'id'))
 #'
 #' @source \code{infambientalbd}
-"sia_muestra"
+"sia_cuenca"
 
 ## . sia_datos_muestra_parametros -----
 
@@ -255,6 +233,55 @@
 #' @source \code{infambientalbd}
 "sia_matriz"
 
+## . sia_muestra -----
+
+#' Inventario de muestras de infambientalbd
+#'
+#' Esta tabla guarda los metadatos generales de cada muestra. Una muestra se
+#' corresponde con el muestreo en campo en un sitio en particular (estación) y
+#' una fecha determinada.
+#'
+#' Fecha de extraccion: 2020-10-29
+#'
+#' @format Tabla con `r nrow(sia_muestra)` filas y `r ncol(sia_muestra)`
+#'   columnas:
+#'
+#'   \describe{
+#'
+#'   \item{id_muestra}{integer. Número único identificador de la muestra}
+#'
+#'   \item{id_institución}{integer. Identificador de la institución a la que
+#'   pertenece el usuario que cargó los datos en el SIA}
+#'
+#'   \item{periodo}{character. Texto en formato MES AÑO (ej.: JUNIO 2012). No
+#'   necesariamente se corresponde con fecha_muestra, ya que se trata de un
+#'   campo de identificación de la campaña de muestreo}
+#'
+#'   \item{fecha_muestra}{date. Fecha en que se tomó la muestra.}
+#'
+#'   \item{hora_muestra}{character. Hora en que se tomó la muestra (en el
+#'   campo).}
+#'
+#'   \item{usuario}{character. Usuario que ingresó los datos al SIA (no
+#'   necesariamente corresponde con quien/es lo colectaron en campo)}
+#'
+#'   \item{fecha_ingreso}{datetime. Fecha y hora en que se ingresó la muestra al
+#'   SIA.}
+#'
+#'   \item{observaciones}{character. Observaciones.}
+#'
+#'   \item{id_estacion}{integer. Identificador de la estación de monitoreo.}
+#'
+#'   \item{replica}{logical. ..completar..}
+#'
+#'   \item{nro_muestra}{integer. Número de muestra asignado por SILAD. No es
+#'   único para esta tabla (no confundir con id_muestra).}
+#'
+#'   }
+#'
+#' @source \code{infambientalbd}
+"sia_muestra"
+
 ## . sia_param_unidad ----
 
 #' Lista de correspondencias entre parámetros y unidades
@@ -378,6 +405,50 @@
 #'
 #' @source \code{infambientalbd}
 "sia_programa_parametro"
+
+## . sia_sub_cuenca ----
+
+#' Lista de subcuencas
+#'
+#' La tabla de subcuencas tiene `r nrow(sia_sub_cuenca)` cuencas definidas, 
+#' asociadas a las cuencas de \code{\link{sia_cuenca}} a través de la columna 
+#' \code{sub_cue_cuenca_id}.
+#' 
+#' Las columnas \code{sub_cue_curso}, \code{sub_cue_cod_sc} y 
+#' \code{cursos_de_agua} refieren a otras tablas de \code{infambientalbd} no 
+#' incluidas en el presente paquete.
+#' 
+#' Fecha de extraccion: 2020-10-22
+#'
+#' @format Tabla con `r nrow(sia_sub_cuenca)` filas y
+#'   `r ncol(sia_sub_cuenca)` columnas:
+#'
+#'   \describe{
+#'
+#'   \item{id}{integer. Número asignado a la subcuenca}
+#'
+#'   \item{sub_cue_nombre}{Nombre de la subcuenca}
+#'   
+#'   \item{sub_cue_cuenca_id}{integer. Id de la cuenca asociada, correspondiente
+#'     a la tabla \code{\link{sia_cuenca}}}
+#'   
+#'   \item{sub_cue_curso}{Columna asociada a otras tablas de 
+#'     \code{ifnambientalbd}}
+#'   
+#'   \item{sub_cue_cod_sc}{Columna asociada a otras tablas de 
+#'     \code{ifnambientalbd}}
+#'   
+#'   \item{cursos_de_agua}{Columna asociada a otras tablas de 
+#'     \code{ifnambientalbd}}
+#'
+#'   }
+#'
+#' @examples 
+#' dplyr::left_join(dplyr::select(sia_sub_cuenca, id:sub_cue_cuenca_id),
+#'                  sia_cuenca, by = c('sub_cue_cuenca_id' = 'id'))
+#'
+#' @source \code{infambientalbd}
+"sia_sub_cuenca"
 
 ## . sia_tipo_punto_estacion ----
 
