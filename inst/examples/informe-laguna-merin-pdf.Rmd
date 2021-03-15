@@ -6,11 +6,11 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
+# Este código define opciones generales para los "chunks" de código ejecutable
+# del documento. Las tres opciones elegidas evitan que se muestre el código R en
+# el documento final, así como distintos mensajes o advertencias que se puedan
+# generar directa o indirectamente.
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
-# NOTA: En los chunks de los gráficos, puede que figure la opción cache=TRUE. En
-# caso de trabajar con un informe nuevo, se recomienda pasar a cache=FALSE en
-# todos los casos, y sólo volver a cache=TRUE cuando se está completamente
-# segure de que se alcanzó el resultado deseado.
 ```
 
 ```{r externos, include=FALSE}
@@ -23,14 +23,15 @@ knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
 #
 # Sólo usar llamados a require o library:
 library(manoSIAR)
+library(tidyverse)
 library(patchwork)
 ```
 
 ```{r parametros}
 ## Grupos de parámetros: fisicoquímicos, nutrientes y seleccionados para hacer
 ## ciertas comparaciones:
-# 
-#Temperatura, OD, Conductividad, pH, Turbidez, ST:
+#
+# Temperatura, OD, Conductividad, pH, Turbidez, ST:
 ids_fq <- c(T=2032, OD=2017, Conduc=2009, pH=2018, Turbidez=2035, ST=2028)
 # NO2, PT, Fosfato (PO4), NH3L, NO3, NT:
 ids_nut <- c(NO2=2102, PT=2098, PO4=2097, NH3L=2091, NO3=2099, NT=2101)
@@ -49,66 +50,67 @@ ids_otr <- c(NH4 = 2090, Clo_a = 2000, ColifTrm_MF=2111)
 
 # d <- readRDS("extraccion_20210205.rds")
 
-# 2. Usar los datos ya incluidos en el paquete (datos_sia). Esta es una buena
-# opción para hacer pruebas generales de código, antes de usar datos
-# actualizados. Atención: la tabla datos_sia contiene una extracción de datos de
-# la base de datos INFAMBIENTAL (2020-11-04). Esta es la opción por defecto para
-# este archivo de ejemplo:
-d <- datos_sia %>% 
+# 2. Usar los datos ya incluidos en el paquete (datos_sia o datos_sia_sed). Esta
+# es una buena opción para hacer pruebas generales de código, antes de usar
+# datos actualizados, descargados desde el iSIA. La función filtrar_datos
+# realiza el mismo filtrado que ocurre en la interfaz del iSIA:
+d <- datos_sia %>%
   filtrar_datos(id_programa = 10L,
-                rango_fechas = 2019, 
-                id_parametro = c(ids_fq, ids_nut, ids_comp, ids_otr), 
+                id_matriz = 6L,
+                rango_fechas = c('2019-01-01', '2019-12-31'),
+                id_parametro = c(ids_fq, ids_nut, ids_comp, ids_otr),
                 tipo_punto_id = 1L)
 ```
 
 
 ```{r t_eti, include=FALSE}
 # La tabla t_eti se define aquí para ajustar el formato de las etiquetas que van
-# a aparecer en los ejes de los gráficos. Si no se especifican así las 
-# etiquetas, las funciones de manoSIAR usarán las columnas nombre_clave y 
+# a aparecer en los ejes de los gráficos. Si no se especifican así las
+# etiquetas, las funciones de manoSIAR usarán las columnas param y
 # uni_nombre (ver datos_sia) para hacer las etiquetas.
-t_eti <- t_eti_add(id_parametro = c(2032L, 2017L, 2009L, 2018L, 2035L, 2028L, 
+t_eti <- t_eti_add(id_parametro = c(2032L, 2017L, 2009L, 2018L, 2035L, 2028L,
                                     2102L, 2098L, 2097L, 2091L, 2099L, 2101L,
                                     2000L, 2111L),
-                   etiqueta = c(expression('Temperatura (ºC)'), 
-                                expression('OD (mg/L)'), 
-                                expression('Cond (μS/cm)'),
-                                expression('pH'), 
-                                expression('Turbidez (UNT)'), 
+                   etiqueta = c(expression('Temperatura (ºC)'),
+                                expression('OD (mg/L)'),
+                                expression('Cond ('*mu*'S/cm)'),
+                                expression('pH'),
+                                expression('Turbidez (UNT)'),
                                 expression('ST (mg/L)'),
-                                expression('NT (mg/L)'), 
-                                expression('PT (μg/L)'), 
-                                expression('PO'[4]*' (μg-P/L)'), 
-                                expression('NH'[3]*' (μg-N/L)'), 
-                                expression('NO'[3]*' (mg-N/L)'), 
+                                expression('NT (mg/L)'),
+                                expression('PT ('*mu*'g/L)'),
+                                expression('PO'[4]*' ('*mu*'g-P/L)'),
+                                expression('NH'[3]*' ('*mu*'g-N/L)'),
+                                expression('NO'[3]*' (mg-N/L)'),
                                 expression('NO'[2]*' (mg-N/L)'),
-                                'Clo-a (μg/L)',
+                                expression('Clo-a ('*mu*'g/L)'),
                                 'ColiTrm_MF (UFC/100mL)'))
+
 
 ```
 
 
 # Gráficos y análisis de datos básicos
 
-En los informes anuales primero se presenta por separando cada subcuenca/zona/cause, en el caso de laguna Merín, esa división se hace para cada río o arroyo y luego se integra esa iformación con gráficos que comparan las cuencas entre sí.
+En los informes anuales primero se presenta por separando cada subcuenca/zona/cauce; en el caso de laguna Merín, esa división se hace para cada río o arroyo y luego se integra esa iformación con gráficos que comparan las cuencas entre sí.
 
 ## Análisis de datos
 
-Consideraciones:  
+Consideraciones:
 
-- Las estaciones deben ordenarse desde las nacientes hasta la desembocadura  
+- Las estaciones deben ordenarse desde las nacientes hasta la desembocadura
 
-- el PT y PO4 deben estar en la misma unidad; en el caso del IET es necesario el PT en μg/L  
+- el PT y PO4 deben estar en la misma unidad; en el caso del IET es necesario el PT en μg/L
 
-- NT y todos los demás, en general están en mg/L  
+- NT y todos los demás, en general están en mg/L
 
 Los cáclulos que deben realizarse antes de empezar son:
 
-- Se calcula NH3 a partir de NH4 según [Canadian Water Quality Guidelines for the Protection of Aquatic Life](ceqg-rcqe.ccme.ca/en/index.html) ([ver Ammonia](http://ceqg-rcqe.ccme.ca/download/en/141)):  
+- Se calcula NH3 a partir de NH4 según [Canadian Water Quality Guidelines for the Protection of Aquatic Life](ceqg-rcqe.ccme.ca/en/index.html) ([ver Ammonia](http://ceqg-rcqe.ccme.ca/download/en/141)):
 
 $$NH_3 (\mu g) = \frac{1000 \times NH_4 (mg)}{(1+10^{(-pH+0.0901821+\frac{2729.92}{T(º C)+273.15} )})}$$
 
-- El valor de IET, se calcula solamente para las estaciones lóticas, con la siguiente ecuación:  
+- El valor de IET, se calcula solamente para las estaciones lóticas, con la siguiente ecuación:
 
 $$IET = 10 \times (6-\frac{0.42-0.36 \times ln(\overline{PT (\mu g/L)})}{ln(2)})-20$$
 
@@ -120,22 +122,14 @@ El IET se normaliza en una escala de 0 a 100, dividida en seis rangos de estados
 |:------------------|:-------------:|
 | Ultraoligotrófico |	IET ≤ 47	    |
 | Oligotrófico	    | 47 < IET ≤ 52	|
-| Mesotrófico	      | 52 < IET ≤ 59	| 
+| Mesotrófico	      | 52 < IET ≤ 59	|
 | Eutrófico	        | 59 < IET ≤ 63	|
-| Supereutrófico    | 63 < IET ≤ 67	| 
+| Supereutrófico    | 63 < IET ≤ 67	|
 | Hipereutrófico    | IET > 67	    |
 
 La interpretación del IET y el valor final a publicar en el informe debe ser realizado con cautela y tomando en cuenta la globalidad del ecosistema.
 
 ```{r Data}
-# La tabla d ya está definida en server.R:
-#
-# - Ver la definición del reactive "datos_informe" para encontrar el código
-# usado para importar los datos desde la base de datos del SIA
-#
-# - En el downloadHandler "crear_informe" es en donde se asigna 
-#   d <- datos_informe() y luego se ejecuta rmarkdown::render(...)
-# 
 d$periodo <- as.factor(stringr::str_to_title(d$periodo))
 
 d <- amoniaco_libre_add(d)
@@ -146,9 +140,9 @@ d <- amoniaco_libre_add(d)
 
 ### Fisicoquímicos y nutrientes
 
-Para una fase exploratoria se grafican todos los nutrientes, pero luego debe evaluarse cuidadosamente el número de valores cuantificados que hay en cada caso y volver a pensar si corresponde graficar o si es mejor colocar los valores en una tabla. 
+Para una fase exploratoria se grafican todos los nutrientes, pero luego debe evaluarse cuidadosamente el número de valores cuantificados que hay en cada caso y volver a pensar si corresponde graficar o si es mejor colocar los valores en una tabla.
 
-#### Olimar 
+#### Olimar
 
 ```{r Olimar_datos, include=FALSE}
 dx <- dplyr::filter(d, nombre_subcuenca_informes == "Olimar")
@@ -181,7 +175,7 @@ g_est_bar_all(dx, ids_comp, ncol = 2)
 dx <- dplyr::filter(d, nombre_subcuenca_informes == "Cebollatí")
 ```
 
-##### Fisicoquímicos 
+##### Fisicoquímicos
 
 ```{r Cebo_fq, cache=FALSE}
 g_mes_pto_all(dx, ids_fq, ncol = 3)
@@ -211,7 +205,7 @@ c3 <- g_cue_box(d, id_param = 2098L)
 c4 <- g_cue_box(d, id_param = 2101L)
 
 (c1 + c2) / (c3 + c4) +
-  plot_annotation(tag_levels = 'A') 
+  plot_annotation(tag_levels = 'A')
 ```
 
 ### Cloforila-A
@@ -220,18 +214,18 @@ En este caso hay un solo valor de clorofila
 Las líneas entrecortadas naranja y roja indican los niveles de alerta 1 y 2 de la OMS respectivamente.
 
 ```{r cloa, cache=FALSE}
-d %>% 
-  dplyr::filter(id_parametro == 2000L) %>% 
+d %>%
+  dplyr::filter(id_parametro == 2000L) %>%
   ggplot() +
   aes(mes, valor, color = codigo_pto) +
-  geom_jitter(alpha = 0.5, width = 0.05) + 
+  geom_jitter(alpha = 0.5, width = 0.05) +
   labs(x='Fecha', y = 'Cloa (μg/L)', colour="Estación") +
   geom_hline(yintercept = 10, linetype="twodash", colour='orange', size=.3) +
   geom_hline(yintercept = 50, linetype="twodash", colour='red', size=.3) +
   theme_bw() +
   facet_grid(rows = vars(nombre_subcuenca_informes)) +
   theme(panel.grid.minor = element_blank(),
-        text = element_text(size = 10), 
+        text = element_text(size = 10),
         axis.text.x = element_text(angle=0, vjust=1)) +
   guides(colour = guide_legend("Estación"))
 
@@ -241,17 +235,17 @@ d %>%
 
 ```{r coli, cache=FALSE}
 
-d %>% 
-  dplyr::filter(id_parametro == 2111L) %>% 
+d %>%
+  dplyr::filter(id_parametro == 2111L) %>%
   ggplot() +
   aes(mes, valor, color = codigo_pto) +
-  geom_jitter(alpha = 0.7, width = 0.1) + 
+  geom_jitter(alpha = 0.7, width = 0.1) +
   labs(x='Mes', y = 'Colif. Termot. (UFC/100 ml)', colour="Estación")+
-  geom_hline(yintercept = 2000, linetype="longdash", colour='red', size=0.3)+ 
+  geom_hline(yintercept = 2000, linetype="longdash", colour='red', size=0.3)+
   theme_bw()+
   facet_grid(rows = 'nombre_subcuenca_informes')+
   theme(panel.grid.minor = element_blank(),
-        text = element_text(size = 10), 
+        text = element_text(size = 10),
         axis.text.x = element_text(angle=0, vjust=1))+
   guides(colour = guide_legend("Estación"))
 
@@ -261,33 +255,16 @@ d %>%
 ### IET
 
 ```{r iet, cache=FALSE}
-# No sé si esto es correcto, pero el IET debería usarse solamente para
-# estaciones lóticas (ie: ríos, arroyos):
+# Esta selección tal vez sea incorrecta, pero se basa en la idea de que el IET
+# debería usarse solamente para estaciones lóticas (ie: ríos, arroyos):
 estaciones_loticas <- c("C0", "C1", "C2", "O2", "SL1", "SM1", "SM2", "T1", "T2",
                         "T3", "Y3", "C3", "O1", "Y1", "Y2")
-dfiet <-
-  d %>%
-  # Sólo quiero PT y estaciones lóticas:
-  dplyr::filter(id_parametro == 2098L,
-                codigo_pto %in% estaciones_loticas) %>% 
-  dplyr::select(id_muestra, nombre_subcuenca_informes, 
-                codigo_pto, anio, mes, valor) %>%
-  dplyr::group_by(codigo_pto) %>% # Para agregar por estación
-  # En este paso se hacen los cálculos, agregando por codigo_pto (i.e.:
-  # estación):
-  dplyr::summarise(IET = valor %>% media_geom %>% iet %>% round(1)) %>% 
-  # Clasificación de cada estación según IET:
-  dplyr::mutate(categ = dplyr::case_when(
-               IET <= 47 ~ "Ultraoligotrófico",
-    47 < IET & IET <= 52 ~ "Oligotrófico",
-    52 < IET & IET <= 59 ~ "Mesotrófico",
-    59 < IET & IET <= 63 ~ "Eutrófico",
-    63 < IET & IET <= 67 ~ "Supereutrófico",
-    67 < IET             ~ "Hipereutrófico"
-  ))
+dfiet <- d %>%
+  dplyr::filter(codigo_pto %in% estaciones_loticas) %>%
+  iet_tabla()
 
 g_iet(dfiet)
 
-knitr::kable(dfiet, format = "markdown", 
+knitr::kable(dfiet, format = "markdown",
              col.names = c("Estación", "IET", "Clasificación"))
 ```

@@ -59,7 +59,16 @@ La idea es que el paquete trabaje en conjunto con la aplicación
 
 Uno de los objetivos más importantes es que las herramientas del paquete
 sirvan para elaborar **informes automatizados**, mediante Rmarkdown. Hay
-un ejemplo con datos del programa Laguna Merín para tomar de referencia.
+un ejemplo (en construcción) con datos del programa Laguna Merín para
+tomar de referencia:
+
+``` r
+library(manoSIAR)
+# Tres formatos de salda posibles: PDF, HTML y DOC
+demo('informe-laguna-merin-pdf')
+demo('informe-laguna-merin-html')
+demo('informe-laguna-merin-doc')
+```
 
 ### Algunos ejemplos simples
 

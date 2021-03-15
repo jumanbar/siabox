@@ -67,11 +67,13 @@ iet_tabla <- function(.data, ...) {
     .data %>%
     # Sólo quiero PT:
     dplyr::filter(id_parametro == 2098L) %>%
-    # Para agregar por estación y posiblemente alguna otra variable, como mes o
-    # año:
+    # Agrupar/agregar por estación, y tal vez otra(s) variable(s), si el usuario
+    # las incluye en el argument '...', con el objetivo de hacer cálculos de
+    # media geométrica para cada estación por separado. La columna codigo_pto
+    # tiene los nombres abreviados de las estaciones de monitoreo.
     dplyr::group_by(codigo_pto, !!!grupo) %>%
     # En este paso se hacen los cálculos, agregando por codigo_pto (i.e.:
-    # estación):
+    # estación) y otras variables agregadas en ...:
     dplyr::summarise(IET = valor %>% media_geom %>% iet %>% round(1)) %>%
     # Clasificación de cada estación según IET:
     dplyr::mutate(categ = dplyr::case_when(
@@ -408,14 +410,14 @@ eti <- function(id_parametro, t_eti) {
 }
 
 #' Graficos de parámetros por mes
-#' 
+#'
 #' Conjunto de funciones para crear gráficos de informes.
 #'
 #' `g_mes_pto` grafica los valores de un parámetro por mes, usando colores para
 #' diferenciar las estaciones; `g_est_bar` muestra promedios y desvíos
 #' estándares de un parámetro, según las estaciones encontradas en `.data`
 #' (internamente procesa los datos con `d_est_bar`); `d_est_bar` perpara datos
-#' para la función anterior, incluyendo modas y desvíos; `g_cue_box` Grafica 
+#' para la función anterior, incluyendo modas y desvíos; `g_cue_box` Grafica
 #' valores de un parámetro con gráficos de cajas (boxplot), para comparar
 #' subcuencas.
 #' Las versiones `[..funcion..]_all` agrupan en una misma figura los gráficos
@@ -464,7 +466,7 @@ eti <- function(id_parametro, t_eti) {
 #'
 #' d <- datos_sia %>%
 #'   filtrar_datos(id_programa = 10L,
-#'                 rango_fechas = c("2019-01-01", "2019-12-31"), 
+#'                 rango_fechas = c("2019-01-01", "2019-12-31"),
 #'                 id_parametro = p)
 #'
 #' cebo <- dplyr::filter(d, nombre_subcuenca_informes == "Cebollatí")
