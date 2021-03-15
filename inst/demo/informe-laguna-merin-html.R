@@ -3,8 +3,7 @@ demoname <- paste0('informe-laguna-merin-', extension, '.Rmd')
 demofile <- system.file("examples", demoname, package = "manoSIAR")
 
 if (grepl('rstudio', .Platform$GUI, ignore.case = TRUE)) {
-  contenidos <- readLines(system.file('examples', paste0(rootname, '.Rmd'), 
-                                      package = 'manoSIAR'))
+  contenidos <- readLines(demofile)
   rstudioapi::documentNew(paste(contenidos, collapse = '\n'), 'rmarkdown')
 } else {
   i <- 0
