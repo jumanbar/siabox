@@ -128,17 +128,12 @@ d <- readRDS('extraccion_20210213.rds')
 
 Crear un gráfico de IET para las muestras tomadas en todas las
 estaciones contenidas en el conjunto de datos (usando las funciones
-`iet` y `g_iet` del paquete):
+`iet_tabla` (la cual internamente usa otra función, `iet`) y `g_iet` del
+paquete):
 
 ``` r
 # Gráfico del IET:
-d %>%
-  # Sólo queremos PT:
-  filter(id_parametro == 2098) %>%
-  # Agregamos columna IET:
-  mutate(IET = iet(valor)) %>%
-  # El gráfico:
-  g_iet()
+d %>% iet_tabla() %>% g_iet()
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
