@@ -95,7 +95,7 @@ iris %>% group_by(Species) %>% tsummary(Sepal.Length)
 #> 3 virginica     50   4.9     6.22  6.59     6.5      6.9   7.9
 
 # Cálculo de la raíz enésima:
-tibble(x = c(4, -4, 4, -4), n = c(2, 2, 3, 3)) %>% 
+tibble(x = c(4, -4, 4, -4), n = c(2, 2, 3, 3)) %>%
   mutate(raiz(x, n), x ^ (1 / n), abs(x) ^ (1 / n))
 #> # A tibble: 4 x 5
 #>       x     n `raiz(x, n)` `x^(1/n)` `abs(x)^(1/n)`
@@ -144,8 +144,8 @@ Cálculo del Amoníaco Libre, usando la función `amoniaco_libre_add`:
 d <- amoniaco_libre_add(d)
 
 # Se pueden ver algunos valores aquí:
-d %>% 
-  filter(id_parametro == 2091) %>% 
+d %>%
+  filter(id_parametro == 2091) %>%
   select(codigo_pto, fecha_muestra, param, valor)
 #> # A tibble: 39 x 4
 #>    codigo_pto fecha_muestra param  valor
@@ -201,7 +201,7 @@ anteriormente (la diferencia es el rango de fechas):
 d <- filtrar_datos(datos_sia, id_programa = 10L, id_matriz = 6L,
                    rango_fechas = c('2015-01-01', '2019-12-31'),
                    tipo_punto_id = 1L,
-                   id_parametro = c(2098, 2101, 2099, 2097, 2102, 2032, 
+                   id_parametro = c(2098, 2101, 2099, 2097, 2102, 2032,
                                     2018, 2090, 2021, 2017))
 #> Warning in filtrar_datos(datos_sia, id_programa = 10L, id_matriz = 6L,
 #> rango_fechas = c("2015-01-01", : id_estacion no especificado, se seleccionan por
@@ -228,7 +228,7 @@ implica que hay varias filas para una misma muestra.
 ``` r
 d <- filter(d, anio == 2019)
 # Algunos valores contenidos en los datos de ejemplo
-select(d, id_muestra, id_parametro, nombre_clave, param, valor, 
+select(d, id_muestra, id_parametro, nombre_clave, param, valor,
        LD = limite_deteccion, LC = limite_cuantificacion)
 #> # A tibble: 390 x 7
 #>    id_muestra id_parametro nombre_clave param  valor LD       LC      
@@ -287,8 +287,8 @@ count(d, id_muestra, codigo_pto, fecha_muestra)
 <!-- end list -->
 
 ``` r
-d %>% 
-  group_by(param) %>% 
+d %>%
+  group_by(param) %>%
   summarise(Promedio = mean(valor), Mediana = median(valor), Var = var(valor))
 #> # A tibble: 10 x 4
 #>    param  Promedio Mediana         Var
@@ -326,8 +326,8 @@ d %>% count(codigo_pto, param)
 <!-- end list -->
 
 ``` r
-d %>% 
-  filter(id_parametro == 2032) %>% 
+d %>%
+  filter(id_parametro == 2032) %>%
   ggplot() +
   aes(codigo_pto, valor, color = as.factor(mes)) +
   geom_point() +
