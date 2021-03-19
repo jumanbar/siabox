@@ -16,5 +16,5 @@ Código unicode con escape.
 Obtener unicode escapes
 }
 \examples{
-manoSIAR:::unicode("é")
+siabox:::unicode("é")
 }

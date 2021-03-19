@@ -22,7 +22,7 @@ Dado que se trata de tablas de gran tamaño (`datos_sia` tiene 223112 filas y 39
 El siguiente es un ejemplo datos similares al ejemplo usados anteriormente (la diferencia es el rango de fechas):
 
 ```{r}
-library(manoSIAR)
+library(siabox)
 d <- filtrar_datos(datos_sia, id_programa = 10L, id_matriz = 6L,
                    rango_fechas = c('2015-01-01', '2019-12-31'),
                    tipo_punto_id = 1L,

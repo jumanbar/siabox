@@ -1,4 +1,4 @@
 library(testthat)
-library(manoSIAR)
+library(siabox)
 
-test_check("manoSIAR")
+test_check("siabox")

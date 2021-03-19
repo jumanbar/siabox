@@ -24,6 +24,6 @@ excepción del último elemento que es separado con un conector ("y", por
 defecto).
 }
 \examples{
-cat("Numeros:", manoSIAR:::colapsar_secuencia(4:8), "\n")
-cat("Numeros:", manoSIAR:::colapsar_secuencia(4:8, comillas = TRUE), "\n")
+cat("Numeros:", siabox:::colapsar_secuencia(4:8), "\n")
+cat("Numeros:", siabox:::colapsar_secuencia(4:8, comillas = TRUE), "\n")
 }

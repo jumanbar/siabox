@@ -113,7 +113,7 @@ cp <- codigos_param %>%
   dplyr::select(grupo, codigo_nuevo, id_parametro)
 
 out <- out %>%
-  manoSIAR::valores_numericos(metodo = "informe", filtrar_no_num = TRUE) %>%
+  siabox::valores_numericos(metodo = "informe", filtrar_no_num = TRUE) %>%
   dplyr::left_join(cp, by = "id_parametro") %>%
   dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo),
                                        nombre_clave,

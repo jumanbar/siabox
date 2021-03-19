@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 library(magrittr)
-library(manoSIAR)
+library(siabox)
 library(dplyr)
 
 # Este código es para que funcionen los ejemplos de abajo, por ahora no es
@@ -28,7 +28,7 @@ d <- filtrar_datos(datos_sia, id_programa = 3, id_parametro = 2098,
 
 ```
 
-# manoSIAR
+# siabox
 
 Se trata de un paquete con algunas `data.frames` (o mejor dicho, [tibble](https://tibble.tidyverse.org/)s) que han sido importadas directamente del SIA, así como algunas funciones para trabajar o graficar con estos datos.
 
@@ -93,6 +93,6 @@ es que esos scripts generados se puedan aprovechar más, convirtiéndolos
 
 
 ```{r setup}
-# library(manoSIAR)
+# library(siabox)
 
 ```

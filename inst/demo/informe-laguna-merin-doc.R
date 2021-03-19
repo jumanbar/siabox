@@ -1,6 +1,6 @@
 extension <- 'doc'
 demoname <- paste0('informe-laguna-merin-', extension, '.Rmd')
-demofile <- system.file("examples", demoname, package = "manoSIAR")
+demofile <- system.file("examples", demoname, package = "siabox")
 rs <- grepl('rstudio', .Platform$GUI, ignore.case = TRUE) &
   RStudio.Version()$version >= '1.2.640'
 if (rs) {

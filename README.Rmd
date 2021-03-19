@@ -31,7 +31,7 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 library(tibble)
-library(manoSIAR)
+library(siabox)
 set.seed(0)
 # Esto genera mensajes de advertencia normales:
 d <- filtrar_datos(datos_sia, id_programa = 10L, id_matriz = 6L,
@@ -44,7 +44,7 @@ d <- filtrar_datos(datos_sia, id_programa = 10L, id_matriz = 6L,
 saveRDS(d, 'extraccion_20210213.rds')
 ```
 
-# manoSIAR
+# siabox
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -61,7 +61,7 @@ El paquete se puede instalar desde GitHub (12/3/2021: no se ha puesto a prueba a
 
 ```r
 # install.packages("devtools")
-devtools::install_github("jumanbar/manoSIAR")
+devtools::install_github("jumanbar/siabox")
 ```
 
 ## Modo de uso
@@ -76,16 +76,16 @@ Uno de los objetivos más importantes es que las herramientas del paquete sirvan
 
 ```r
 # Tres formatos de salda posibles: PDF, HTML y DOC
-demo('informe-laguna-merin-pdf',  'manoSIAR')
-demo('informe-laguna-merin-html', 'manoSIAR')
-demo('informe-laguna-merin-doc',  'manoSIAR')
+demo('informe-laguna-merin-pdf',  'siabox')
+demo('informe-laguna-merin-html', 'siabox')
+demo('informe-laguna-merin-doc',  'siabox')
 ```
 
 ### Algunos ejemplos simples
 
 ```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
-library(manoSIAR)
+library(siabox)
 
 # Cálculo de una media geométrica con valores aleatorios:
 x <- rnorm(100, 5)
@@ -309,17 +309,17 @@ est_id('olimar')
 <!--
 ## Installation
 
-You can install the released version of manoSIAR from [CRAN](https://CRAN.R-project.org) with:
+You can install the released version of siabox from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
-install.packages("manoSIAR")
+install.packages("siabox")
 ```
 
 El paquete se puede descargar desde [GitHub](https://github.com/) mediante los comandos:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("jumanbar/manoSIAR")
+devtools::install_github("jumanbar/siabox")
 ```
 -->
 
@@ -331,7 +331,7 @@ devtools::install_github("jumanbar/manoSIAR")
 La función `iet` calcula el IET para valores de Fósforo Total (en microgramos por litro):
 
 ```{r iet}
-library(manoSIAR)
+library(siabox)
 iet(c(25, 50, 75, 250))
 PT <- seq(0, 300, by=5)
 plot(PT, iet(PT), ylab = "IET", xlab = "PT (ug/L)", pch = 20)

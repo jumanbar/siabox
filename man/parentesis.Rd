@@ -24,9 +24,9 @@ Crea un texto con la secuencia de elementos entre paréntesis y separados por
 comas.
 }
 \examples{
-manoSIAR:::parentesis(3147:3152)
-manoSIAR:::parentesis(3147:3152, "-<<<- |", "| ->>>-")
-manoSIAR:::parentesis(3147:3152, comillas = TRUE)
-manoSIAR:::parentesis(c("gato", "perro"))
-manoSIAR:::parentesis(c("gato", "perro"), comillas = TRUE)
+siabox:::parentesis(3147:3152)
+siabox:::parentesis(3147:3152, "-<<<- |", "| ->>>-")
+siabox:::parentesis(3147:3152, comillas = TRUE)
+siabox:::parentesis(c("gato", "perro"))
+siabox:::parentesis(c("gato", "perro"), comillas = TRUE)
 }

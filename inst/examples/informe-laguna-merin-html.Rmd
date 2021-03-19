@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
 # > remotes::install_github(...)
 #
 # Sólo usar llamados a require o library:
-library(manoSIAR)
+library(siabox)
 library(tidyverse)
 library(patchwork)
 ```
@@ -44,7 +44,7 @@ ids_otr <- c(NH4 = 2090, Clo_a = 2000, ColifTrm_MF=2111)
 ```{r data}
 # Aquí es donde se importan los datos a usar en el informe. Hay dos opciones:
 #
-# 1. Traer datos externos. Para la mayoría de las funciones de manoSIAR es
+# 1. Traer datos externos. Para la mayoría de las funciones de siabox es
 # necesario que los datos tengan cieras características. Bajar los datos de iSIA
 # garantiza que así sea:
 
@@ -66,7 +66,7 @@ d <- datos_sia %>%
 ```{r t_eti, include=FALSE}
 # La tabla t_eti se define aquí para ajustar el formato de las etiquetas que van
 # a aparecer en los ejes de los gráficos. Si no se especifican así las
-# etiquetas, las funciones de manoSIAR usarán las columnas param y
+# etiquetas, las funciones de siabox usarán las columnas param y
 # uni_nombre (ver datos_sia) para hacer las etiquetas.
 t_eti <- t_eti_add(id_parametro = c(2032L, 2017L, 2009L, 2018L, 2035L, 2028L,
                                     2102L, 2098L, 2097L, 2091L, 2099L, 2101L,

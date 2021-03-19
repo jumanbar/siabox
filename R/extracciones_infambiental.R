@@ -586,7 +586,7 @@ consulta_muestras <- function(con, id_matriz = 6L,
     out <- dplyr::filter(out, mes %in% meses)
   }
 
-  # Quitar datos repetidos según id_estado (1. pendientes, 2. original, 
+  # Quitar datos repetidos según id_estado (1. pendientes, 2. original,
   # 3. aprobado):
   if (any(out$id_estado == 3)) {
     repes <- out %>%
@@ -864,19 +864,19 @@ unipar <- function(id_parametro, id_matriz = 6L, nombre_clave) {
 #' dep_id("flor")
 par_id <- function(patron, ...) {
 
-  patron <- manoSIAR:::toascii(tolower(patron))
-  
-  w <- which(manoSIAR:::toascii(tolower(sia_parametro$nombre_clave)) == patron)
+  patron <- siabox:::toascii(tolower(patron))
+
+  w <- which(siabox:::toascii(tolower(sia_parametro$nombre_clave)) == patron)
   if (length(w)) return(sia_parametro[w,])
 
-  w <- which(manoSIAR:::toascii(tolower(sia_parametro$parametro)) == patron)
+  w <- which(siabox:::toascii(tolower(sia_parametro$parametro)) == patron)
   if (length(w)) return(sia_parametro[w,])
-  
-  resA <- agrepl(patron, manoSIAR:::toascii(sia_parametro$nombre_clave),
+
+  resA <- agrepl(patron, siabox:::toascii(sia_parametro$nombre_clave),
                  ignore.case = TRUE,
                  ...)
 
-  resB <- agrepl(patron, manoSIAR:::toascii(sia_parametro$parametro),
+  resB <- agrepl(patron, siabox:::toascii(sia_parametro$parametro),
                  ignore.case = TRUE,
                  ...)
 
@@ -1053,7 +1053,7 @@ dep_id <- function(patron, ...) {
 #' @examples
 #' # Ejemplo con datos del programa Laguna Merin:
 #' d <- datos_sia %>%
-#'   dplyr::filter(id_programa == 10L) %>% 
+#'   dplyr::filter(id_programa == 10L) %>%
 #'   dplyr::select(id_parametro, valor_minimo_str,
 #'                 limite_deteccion, limite_cuantificacion)
 #'

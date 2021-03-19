@@ -17,7 +17,7 @@
 #'
 #' @examples
 #' v <- c("1.347e4", "<LC", "<78", "14.447", "7", "1,3E+02")
-#' manoSIAR:::det_nonum(v)
+#' siabox:::det_nonum(v)
 det_nonum <- function(v) {
   cientif <- grepl("^[[:digit:]]+[,\\.]*[[:digit:]]*([Ee][+-]*[[:digit:]]+)*$",
                    v, ignore.case = TRUE)
@@ -44,8 +44,8 @@ det_nonum <- function(v) {
 #' @return
 #'
 #' @examples
-#' cat("Numeros:", manoSIAR:::colapsar_secuencia(4:8), "\n")
-#' cat("Numeros:", manoSIAR:::colapsar_secuencia(4:8, comillas = TRUE), "\n")
+#' cat("Numeros:", siabox:::colapsar_secuencia(4:8), "\n")
+#' cat("Numeros:", siabox:::colapsar_secuencia(4:8, comillas = TRUE), "\n")
 colapsar_secuencia <- function(x, conector = "y", comillas = FALSE) {
   z <- ifelse(comillas, "'", "")
   if (length(x) == 0) {
@@ -103,11 +103,11 @@ con_sia <- function() {
 #' @return
 #'
 #' @examples
-#' manoSIAR:::limpia_num("2.3")
-#' manoSIAR:::limpia_num("2..3")
-#' manoSIAR:::limpia_num("2,3")
-#' manoSIAR:::limpia_num("2,,,,3")
-#' manoSIAR:::limpia_num("   2,,,, 3   ")
+#' siabox:::limpia_num("2.3")
+#' siabox:::limpia_num("2..3")
+#' siabox:::limpia_num("2,3")
+#' siabox:::limpia_num("2,,,,3")
+#' siabox:::limpia_num("   2,,,, 3   ")
 limpia_num <- function(x) {
   out <- x %>%
     # stringr::str_trim() %>%
@@ -130,11 +130,11 @@ limpia_num <- function(x) {
 #' @return
 #'
 #' @examples
-#' manoSIAR:::parentesis(3147:3152)
-#' manoSIAR:::parentesis(3147:3152, "-<<<- |", "| ->>>-")
-#' manoSIAR:::parentesis(3147:3152, comillas = TRUE)
-#' manoSIAR:::parentesis(c("gato", "perro"))
-#' manoSIAR:::parentesis(c("gato", "perro"), comillas = TRUE)
+#' siabox:::parentesis(3147:3152)
+#' siabox:::parentesis(3147:3152, "-<<<- |", "| ->>>-")
+#' siabox:::parentesis(3147:3152, comillas = TRUE)
+#' siabox:::parentesis(c("gato", "perro"))
+#' siabox:::parentesis(c("gato", "perro"), comillas = TRUE)
 parentesis <- function(v, ini = "(", fin = ")", comillas = FALSE) {
   if (comillas)
     v <- paste0("'", v, "'")
@@ -176,7 +176,7 @@ set_utf8 <- function(x) {
 #'         dieresis, etc, son sustituidos por su version ASCII.
 #'
 #' @examples
-#' manoSIAR:::toascii(c("sabañón!", "ungüento", "nâo è graça"))
+#' siabox:::toascii(c("sabañón!", "ungüento", "nâo è graça"))
 toascii <- function(texto) {
   stringi::stri_trans_general(texto, "Latin-ASCII")
 }
@@ -189,7 +189,7 @@ toascii <- function(texto) {
 #' @return Código unicode con escape.
 #'
 #' @examples
-#' manoSIAR:::unicode("é")
+#' siabox:::unicode("é")
 unicode <- function(x) {
   stringi::stri_escape_unicode(x)
 }

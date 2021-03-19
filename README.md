@@ -15,7 +15,7 @@ HACER PRUEBAS CON ESTE NUEVO 'datos_sia' y 'datos_sia_sed', con ejemplos, funcio
 
 Please edit that file -->
 
-# manoSIAR
+# siabox
 
 <!-- badges: start -->
 
@@ -42,7 +42,7 @@ prueba aún):
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("jumanbar/manoSIAR")
+devtools::install_github("jumanbar/siabox")
 ```
 
 ## Modo de uso
@@ -64,16 +64,16 @@ tomar de referencia:
 
 ``` r
 # Tres formatos de salda posibles: PDF, HTML y DOC
-demo('informe-laguna-merin-pdf',  'manoSIAR')
-demo('informe-laguna-merin-html', 'manoSIAR')
-demo('informe-laguna-merin-doc',  'manoSIAR')
+demo('informe-laguna-merin-pdf',  'siabox')
+demo('informe-laguna-merin-html', 'siabox')
+demo('informe-laguna-merin-doc',  'siabox')
 ```
 
 ### Algunos ejemplos simples
 
 ``` r
 library(tidyverse)
-library(manoSIAR)
+library(siabox)
 
 # Cálculo de una media geométrica con valores aleatorios:
 x <- rnorm(100, 5)
@@ -540,17 +540,17 @@ est_id('olimar')
 <!--
 ## Installation
 
-You can install the released version of manoSIAR from [CRAN](https://CRAN.R-project.org) with:
+You can install the released version of siabox from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
-install.packages("manoSIAR")
+install.packages("siabox")
 ```
 
 El paquete se puede descargar desde [GitHub](https://github.com/) mediante los comandos:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("jumanbar/manoSIAR")
+devtools::install_github("jumanbar/siabox")
 ```
 -->
 
@@ -562,7 +562,7 @@ La función `iet` calcula el IET para valores de Fósforo Total (en
 microgramos por litro):
 
 ``` r
-library(manoSIAR)
+library(siabox)
 iet(c(25, 50, 75, 250))
 #> [1] 50.65856 54.25856 56.36443 62.61750
 PT <- seq(0, 300, by=5)
