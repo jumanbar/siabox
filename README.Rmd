@@ -9,17 +9,10 @@ editor_options:
 
 <!-- README.md is generated from README.Rmd.
 
-NO TOCAR HASTA NO TENER EL PAQUETE INSTALADO Y ANDANDO ASÍ DEJO DE TENER
-PROBLEMAS CON FUNCIONES QUE SUPUESTAMENTE NO ESTÁN (CRUZO LOS DEDOS)
-
 Pendientes:
-
-Instrucciones para instalar el paquete
 
 Cambiar documentación de sia_datos_muestra_parametros: id_dato en vez de id.
 Lo mismo para datos_sia
-
-HACER PRUEBAS CON ESTE NUEVO 'datos_sia' y 'datos_sia_sed', con ejemplos, funciones, etc ....
 
 Please edit that file -->
 
