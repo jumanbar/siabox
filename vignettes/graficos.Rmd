@@ -10,12 +10,33 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 6, fig.height = 4, 
+                      fig.align='center')
 ```
+
+- 
+
+- par_id es muy útil
+
+- Códigos nuevos para parámetros (columna param en datos_sia*; tabla codigos_param)
+
+- Subcuencas
+
+- Etiquetas (incluir unipar capaz)
+
+
+
 
 
 ```{r}
+library(tidyverse)
 library(siabox)
+d <- filtrar_datos(datos_sia, id_programa = 10L, id_matriz = 6L,
+                   rango_fechas = c('2019-01-01', '2019-12-31'),
+                   tipo_punto_id = 1L,
+                   id_parametro = c(2098, 2101, 2099, 2097, 2102, 2032,
+                                    2018, 2090, 2021, 2017))
+
 # Gráfico individual para el fosfato:
 g_mes_pto(d, 2097)
 

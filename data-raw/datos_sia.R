@@ -114,16 +114,16 @@ cp <- codigos_param %>%
 
 out <- out %>%
   siabox::valores_numericos(metodo = "informe", filtrar_no_num = TRUE) %>%
+  dplyr::left_join(
+    dplyr::select(cuencas_informes, nombre_subcuenca_informes, codigo_pto_mod, id_estacion),
+    by = "id_estacion") %>%
   dplyr::left_join(cp, by = "id_parametro") %>%
   dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo),
                                        nombre_clave,
                                        codigo_nuevo),
                 anio = as.integer(anio),
                 mes = as.integer(mes)) %>%
-  dplyr::left_join(
-    dplyr::select(cuencas_informes, nombre_subcuenca_informes, id_estacion),
-    by = "id_estacion") %>%
-  dplyr::select(-id_estado)
+  dplyr::select(-id_estado, -codigo_nuevo)
 
 # dplyr::anti_join(
 #   dplyr::select(out, id_muestra, id_parametro), 

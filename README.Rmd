@@ -23,18 +23,23 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
-library(tibble)
-library(siabox)
 set.seed(0)
 # Esto genera mensajes de advertencia normales:
-d <- filtrar_datos(datos_sia, id_programa = 10L, id_matriz = 6L,
-                   rango_fechas = c('2019-01-01', '2019-12-31'),
-                   tipo_punto_id = 1L,
-                   id_parametro = c(2098, 2101, 2099, 2097, 2102, 2032,
-                                    2018, 2090, 2021, 2017))
+# d <- filtrar_datos(datos_sia, id_programa = 10L, id_matriz = 6L,
+#                    rango_fechas = c('2015-01-01', '2019-12-31'),
+#                    tipo_punto_id = 1L,
+#                    id_parametro = c(2098, 2101, 2099, 2097, 2102, 2032,
+#                                     2018, 2090, 2021, 2017))
+
+d <- siabox::filtrar_datos(siabox::datos_sia, 
+                           id_programa = 10L, id_matriz = 6L,
+                           rango_fechas = c('2019-01-01', '2019-12-31'),
+                           tipo_punto_id = 1L,
+                           id_parametro = c(2098, 2101, 2099, 2097, 2102, 2032,
+                                            2018, 2090, 2021, 2017))
                      # c(2000L, 2017L, 2018L, 2021L, 2032L, 2090L,
                      #                2097L, 2098L, 2099L, 2101L, 2102L)
-saveRDS(d, 'extraccion_20210213.rds')
+saveRDS(d, 'extraccion_20210514.rds')
 ```
 
 # siabox
@@ -73,29 +78,7 @@ demo('informe-laguna-merin-pdf',  'siabox')
 demo('informe-laguna-merin-html', 'siabox')
 demo('informe-laguna-merin-doc',  'siabox')
 ```
-
-### Algunos ejemplos simples
-
-```{r, warning=FALSE, message=FALSE}
-library(tidyverse)
-library(siabox)
-
-# Cálculo de una media geométrica con valores aleatorios:
-x <- rnorm(100, 5)
-media_geom(x)
-
-# Uso de tsummary para resumir datos, usando el conjunto de datos iris:
-iris %>% tsummary(Sepal.Length)
-
-# Lo mismo, pero agrupando por especies:
-iris %>% group_by(Species) %>% tsummary(Sepal.Length)
-
-# Cálculo de la raíz enésima:
-tibble(x = c(4, -4, 4, -4), n = c(2, 2, 3, 3)) %>%
-  mutate(raiz(x, n), x ^ (1 / n), abs(x) ^ (1 / n))
-```
-
-#### Con extracciones de iSIA
+### Con extracciones de iSIA
 
 El siguiente es un ejemplo que usa datos extraídos de iSIA (formato 'largo'):
 
@@ -106,8 +89,9 @@ El siguiente es un ejemplo que usa datos extraídos de iSIA (formato 'largo'):
 - Parámetros: ClorofilaA, NAmoniacal, NO2, NO3, NT, OD, pH, PO4, PT, SatO2 y T
 
 Cargar los datos en la sesión, bajo el nombre `d` (asume que el archivo se encuentra en el directorio de trabajo):
+
 ```{r, warning=FALSE, message=FALSE}
-d <- readRDS('extraccion_20210213.rds')
+d <- readRDS('extraccion_20210514.rds')
 ```
 
 Crear un gráfico de IET para las muestras tomadas en todas las estaciones contenidas en el conjunto de datos (usando las funciones `iet_tabla` (la cual internamente usa otra función, `iet`) y `g_iet` del paquete):
@@ -132,17 +116,19 @@ d %>%
 g_mes_pto_all(d, id_parametro = c(2098, 2101, 2099, 2097, 2102, 2091), ncol = 3)
 ```
 
+> La función amoniaco_libre_add se creó para hacer los cálculos necesarios y agregar el parámetro NH3L a la tabla. Para ver detalles del cálculo en sí, ver `?amoniaco_libre`.
+
 Las etiquetas del gráfico se pueden mejorar aún con la función `t_eti_add` (ver viñeta 'gráficos').
 
 El paquete cuenta con otras funciones listas para crear gráficos de informes: ver `?g_mes_pto` o `?g_long` para más ejemplos, pero se recomienda especialmente leer la viñeta 'graficos'.
 
-#### Con datos incluidos en el paquete
+### Con datos incluidos en el paquete
 
 El paquete viene con dos conjuntos de datos extraídos del SIA: ver `?datos_sia` o `?datos_sia_sed` para acceder a la documentación de estas tablas, con datos de aguas superficiales y de sedimentos, respectivamente.
 
 Dichas tablas tienen todos los datos encontrados en SIA, a la fecha en que fueron extraidos, para todos los programas y parámetros disponibles. El objetivo de estas tablas es el de hacer pruebas, ejemplos y código que luego se puede aplicar a datos más actualizados (extraídos con iSIA).
 
-Dado que se trata de tablas de gran tamaño (`datos_sia` tiene 223112 filas y 39 columnas), es conveniente filtrarlos según el subconjunto de interés. Para esto es que el paquete cuenta con la función `filtrar_datos`, que cumple la misma función que los filtros presentes en la aplicación iSIA.
+Dado que se trata de tablas de gran tamaño (`datos_sia` tiene `r nrow(datos_sia)` filas y `r ncol(datos_sia)` columnas), es conveniente filtrarlos según el subconjunto de interés. Para esto es que el paquete cuenta con la función `filtrar_datos`, que replica las funcionalidades de filtro de iSIA.
 
 El siguiente es un ejemplo datos similares al ejemplo usados anteriormente (la diferencia es el rango de fechas):
 
@@ -156,181 +142,25 @@ d <- filtrar_datos(datos_sia, id_programa = 10L, id_matriz = 6L,
 g_long(d, 2098, anio = 2019)
 ```
 
-### Formatos largo y ancho
-
-La tabla de ejemplo, extraida desde [iSIA](), tiene formato 'largo', es decir que los valores numéricos están todos en una única columna (`valor`), mientras que los distintos parámetros están indicados en otras columnas (ver `?datos_sia`). Entre otras cosas, este formato implica que hay varias filas para una misma muestra.
-
-```{r}
-d <- filter(d, anio == 2019)
-# Algunos valores contenidos en los datos de ejemplo
-select(d, id_muestra, id_parametro, nombre_clave, param, valor,
-       LD = limite_deteccion, LC = limite_cuantificacion)
-```
-
-> Nota: param es una columna agregada, no pertenece a las tablas originales del SIA. Ver `?datos_sia`
-
-> Nota 2: en el ejemplo se renombraron las columnas limite_deteccion y limite_cuantificacion como LD y LC, respectivamente, para limitar el ancho del texto.
-
-La cantidad de filas por muestra, `n`, equivale número de parámetros por muestra (cada muestra se corresponde a un punto de muestreo y una fecha):
-
-```{r}
-count(d, id_muestra, codigo_pto, fecha_muestra)
-```
-
-#### Ventajas
-
-(del formato 'largo')
-
-- Es más fácil agrupar datos para calcular promedios, IET, etc, según otras columnas contenidas en los datos. Esto es especialmente cierto cuando se usan funciones del `tidyverse` (y más especialmente con el paquete `dplyr`). Ejemplos:
-
-```{r}
-d %>%
-  group_by(param) %>%
-  summarise(Promedio = mean(valor), Mediana = median(valor), Var = var(valor))
-
-d %>% count(codigo_pto, param)
-```
-
-- Funciona mejor con las herramientas de `ggplot2`. Por ejemplo:
-
-```{r}
-d %>%
-  filter(id_parametro == 2032) %>%
-  ggplot() +
-  aes(codigo_pto, valor, color = as.factor(mes)) +
-  geom_point() +
-  scale_y_log10() +
-  ylab("Temperatura (ºC)")
-```
-
-#### Desventajas
-
-- Es más complicado realizar cálculos que involucran varios datos de la misma muestra, como es el caso del Amoníaco Libre (razón por la que existe `amoniaco_libre_add`)
-
-- También es más complicado realizar gráficos de dispersión entre diferentes parámetros (razón por la cual existe la función `ancho`; ver a continuación)
-
-#### La función `ancho`
-
-Es posible reconfigurar estas tablas con la función `ancho`, que es un [wrapper](https://en.wikipedia.org/wiki/Wrapper_function) de [`pivot_wider`](https://tidyr.tidyverse.org/reference/pivot_wider.html) (que a su vez es una versión más moderna de `reshape`), de forma que los valores se reparten en distintas columnas, nombradas según sus parámetros correspondientes. Esto es útil en muchas instancias, como por ejemplo, hacer gráficos de dispersión entre diferentes variables:
-
-```{r}
-da <- ancho(d)
-# La nueva tabla tiene columnas diferenciadas por parámetros y sus
-# correspondientes límites de detección y cuantificación:
-names(da)[27:ncol(da)]
-
-# Un gráfico de dispersión clásico se puede crear así:
-plot(SatO ~ OD, data = da)
-```
-
-También facilita, como se anunciaba anteriormente, ciertos cálculos:
-
-```{r}
-amoniaco_libre(da$NH4, da$pH, da$Tem)
-```
-
-Como es de esperar, en este caso cada muestra ocupa una única fila, y la tabla es mucho más ancha de lo que era:
-
-```{r}
-count(da, id_muestra, codigo_pto, fecha_muestra)
-dim(d)
-dim(da)
-```
-
-## Tablas de infambientalbd (base de datos)
-
-Infambientalbd es la base de datos en donde se almacena mucha información concerniente al SIA, especialmente la de monitoreos de aguas y sedimentos, incluyendo lo relativo a los programas de monitoreo (estaciones, cuencas, etc), parámetros (nombres, unidades de medida según matriz, etc.). _No incluye_ datos de aire.
-
-Este paquete cuenta con copias de muchas de las tablas contenidas en esta base de datos, en [clase](https://bookdown.org/jboscomendoza/r-principiantes4/tipos-de-datos.html) [**data.frame**](https://bookdown.org/jboscomendoza/r-principiantes4/data-frames.html) (en verdad, usa una variante más moderna: [tibble](https://r4ds.had.co.nz/tibbles.html)).
-
-Todas las tablas traídas de infambiental se nombran combinando el prefijo *sia_* con el nombre original. Ejemplo: la tabla `sia_parametro` contiene la misma información que la tabla `parametro` de infambientalbd.
-
-Como se estila en bases de datos, estas tablas generalmente hay una columna dedicada a un "id": un indentificador numérico que es único para cada entrada, la cual generalmente se llama `id_[..nombre..]` o simplemente `id`. Por ejemplo, en la tabla `sia_parametro`, la columna `id_parametro` identifica a cada parámetro con un número entero positivo. El rol de los identificadores es evitar ambigüedades. Por ejemplo, podemos usar el `id_parametro` para asegurarnos de que trabajamos con el parámetro que nos interesa; en el caso del Fósforo Total, el `id_parametro` es 2098:
+> La idea de replicar la funcionalidad de iSIA es de poder hacer pruebas antes de descargar datos, incluso pensando en la automatización de reportes.
 
 
-<!-- ```{r sia_parametro} -->
-```{r}
-filter(sia_parametro, id_parametro == 2098)
-```
 
-Otra característica importante es que ante un eventual cambio en el nombre de los parámetros (columnas `nombre_clave` y/o `parametro`), los `id` no van a cambiar, evitando confusiones.
+### Cálculos útiles
 
-> **NOTA**: En general, al exportar datos desde infambientalbd (i.e.: muestras con valores de parámetros), la regla que uso es usar nombres de `id` descriptivos, para las tablas principales (programas, estaciones, parámetros, etc). Entonces, si bien originalmente hay una columna `id` en la tabla `estacion`, al momento de la importación se ha renombrado como `id_estacion`. Esto aplica tanto para iSIA como para la mayoría de los datos contenidos en este paquete. De todas formas hay algunas tablas que mantienen los nombres originales.
+El paquete cuenta con algunas funciones relativamente simples que son de ayuda para realizar cálculos frecuentes: `iet`, `iet_tabla`, `amoniaco_libre`, `amoniaco_libre_add`, `media_geom`, `raiz` y `tsummary` .
 
-Las tablas más importantes son:
-
-- `datos_sia`: datos de matriz Aguas superficiales y `datos_sia_sed` de Sedimentos, extraidos el 2020-11-04. Esta tabla no está en infambientalbd, sino que es una tabla construida a partir de las existentes en esa base de datos.
-
-- `sia_estacion`: datos de las estaciones de monitoreo.
-
-- `sia_param_unidad`: tabla que relaciona `id` de parámetros con `id` de las unidades de medida (presentes en `sia_unidad`).
-
-- `sia_unidad`: tabla con las unidades de medida usadas en el SIA.
-
-- `sia_programa`: tabla con los programas de monitoreo del SIA.
-
-Por más detalles de estas tablas, ver la viñeta 'datos incluidos'
-
-
-### Buscadores de ID
-
-El paquete incluye buscadores de id para las varias tablas importadas del SIA, usando un texto (i.e.: un Google de ids). El texto o patrón puede ser una expresión regular (la cual se pasa internamente a [`agrepl`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/agrep)).
-
-Un par de ejemplos simples:
-
-```{r}
-# Búsqueda del id del parámetro de interés (Fósforo Total) por aproximación:
-par_id("fosforo")
-
-# Búsqueda del id de una estación en particular:
-est_id('olimar')
-```
-
-- `pro_id`: Busca programas en sia_programa en base al campo nombre_programa de dicha tabla.
-
-- `est_id`: Busca estaciones en sia_estacion en base a los campos codigo_pto y estacion de dicha tabla.
-
-- `mat_id`: Busca matrices en sia_matriz en base al campo nombre de dicha tabla.
-
-- `uni_id`: Busca unidades en sia_unidad en base al campo uni_nombre de dicha tabla.
-
-- `ins_id`: Busca instituciones en sia_institucion en base al campo nombre de dicha tabla.
-
-- `dep_id`: Busca departamentos en sia_departamento en base al campo dep_nombre de dicha tabla.
-
-
-<!--
-## Installation
-
-You can install the released version of siabox from [CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("siabox")
-```
-
-El paquete se puede descargar desde [GitHub](https://github.com/) mediante los comandos:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("jumanbar/siabox")
-```
--->
-
-
-## Funciones (cálculos)
-
-### Índice de estado trófico (IET)
+#### Índice de estado trófico (IET)
 
 La función `iet` calcula el IET para valores de Fósforo Total (en microgramos por litro):
 
 ```{r iet}
-library(siabox)
 iet(c(25, 50, 75, 250))
 PT <- seq(0, 300, by=5)
 plot(PT, iet(PT), ylab = "IET", xlab = "PT (ug/L)", pch = 20)
 ```
 
-### Tabla con categorías de IET
+#### Tabla con categorías de IET
 
 Agrupa valores de IET por estación de monitoreo (`codigo_pto`), asignando  categorías a los valores según su IET (Oligotrófico, Mesotrófico, etc...). Usa la media geométrica para agrupar los valores encontrados.
 
@@ -354,11 +184,45 @@ iet_tabla(d, anio, mes)
 
 # Esta función se puede combinar con herramientas de dplyr fácilmente:
 iet_tabla(d, anio) %>%
-  group_by(anio) %>%
-  summarise(n = sum(!is.na(IET)), IET = mean(IET, na.rm = TRUE))
+  group_by(anio, categ) %>%
+  tsummary(IET)
 ```
 
-- - -
+#### Estadísticas resumen
+
+La función **`tsummary`** es una ayuda para obtener cálculos similares a los de `summary`, que permite agregar según distintas variables (i.e.: columnas). Hay que tener en cuenta que sólamente puede hacer cálculos con variables numéricas.
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(siabox)
+
+# Uso de tsummary para resumir datos de Clorofila-A en el programa Río Cuareim:
+datos_sia %>% 
+  filter(param == 'Clo_a', id_programa == 5) %>% 
+  tsummary(valor)
+
+# Lo mismo, pero agrupando por estación de monitoreo:
+datos_sia %>% 
+  filter(id_parametro == 2000, id_programa == 5) %>% 
+  group_by(codigo_pto) %>% 
+  tsummary(valor)
+```
+
+> Nota: el primer ejemplo y el segundo difieren en 2 aspectos: el agrupamiento (con la función `group_by`, de [dplyr](https://dplyr.tidyverse.org/)) y las referencias al parámetro por nombre y por id. Tanto parámetros como otras categorías importantes, como programas de monitoreo, estaciones y unidades de medida, tienen varias formas de ser identificados, siendo id la única permanente.
+
+Otra función incluida en el paquete es `raiz`, que calcula la raíz enésima de un valor dado, incluso cuando ese valor es negativo (con el requisito de que n debe ser impar). La misma es usada, a su vez, por otra función incluida: `media_geom` (la [Media Geométrica](https://es.wikipedia.org/wiki/Media_geom%C3%A9trica)).
+
+```{r, warning=FALSE, message=FALSE}
+# Cálculo de la raíz enésima:
+tibble(x = c(4, -4, 4, -4), n = c(2, 2, 3, 3)) %>%
+  mutate(raiz(x, n), x ^ (1 / n), abs(x) ^ (1 / n))
+
+# Cálculo de una media geométrica con valores aleatorios:
+x <- rnorm(100, 8)
+mean(x)
+media_geom(x)
+```
+
 
 ## Para desearrolladores
 
@@ -368,12 +232,14 @@ Este paquete se creó siguiendo de forma aproximada los consejos del libro [R Pa
 
 Algunas notas:
 
-- Al usar funciones de paquetes externos, evitar `require` o `library`; usar en cambio los operadores `::` o `:::`. Ejemplo: `dplyr::filter`. Eso evita afectar el ambiente de trabajo del usuario final. En este paquete las excepciones son `ggplot2` y `%>%`, ya que de otra forma el código se vuelve muy engorroso rápidamente.
+- Al usar funciones de paquetes externos, evitar `require` o `library`; usar en cambio los operadores `::` o `:::`. Ejemplo: `dplyr::filter`. Eso evita afectar el ambiente de trabajo del usuario final (o sea, no hay que cargar todo el paquete `siabox` para usar una única función; `tsummary` es un ejemplo de función útil en sí misma). En este paquete las excepciones son `ggplot2` y `%>%`, ya que de otra forma el código se vuelve muy engorroso rápidamente.
+
+- Lo mismo para trabajar con los conjuntos de datos del paquete... Sucede que las funciones del paquete tienen asociado un NAMESPACE, así que cuando se llama a una función de `siabox` desde el cuerpo de otra función de `siabox`, se sobreentiende que el NAMESPACE del paquete está incluido en el camino de búsqueda de funciones. Pero esto no ocurre con los datasets (supongo que los creadores de R nunca lo consideraron necesario). Por esta razón, siempre que se, por ejemplo, `sia_parametro` dentro de una función de `siabox`, hay que escribir `siabox::sia_parametro`.
 
 - La función `devtools::load_all()` (Ctrl+Shift+L) sirve para "cargar" el paquete en la sesión, incluyendo funciones, viñetas, y otros códigos. Conviene correrlo cada vez que cambiamos alguna función y queremos probarla, por ejemplo.
 
 - La función `devtools::document()` (Ctrl+Shift+D) sirve para actualizar los archivos de documentación.
 
 ```{r fin, include=FALSE}
-unlink('extraccion_20210213.rds')
+unlink('extraccion_20210514.rds')
 ```

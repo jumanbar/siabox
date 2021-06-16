@@ -10,23 +10,386 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 6, fig.height = 4, 
+                      fig.align='center')
 ```
 
-El paquete viene con dos conjuntos de datos extraídos del SIA: ver `?datos_sia` o `?datos_sia_sed` para acceder a la documentación de estas tablas, con datos de aguas superficiales y de sedimentos, respectivamente.
+El paquete viene con dos conjuntos de datos extraídos del SIA, en forma de varias tablas (data.frames). Algunas tablas son una copia exacta des las de la base INFAMBIENTALBD, otras son muy similares, y otras son agregadas.
 
-Dichas tablas tienen todos los datos encontrados en SIA, a la fecha en que fueron extraidos, para todos los programas y parámetros disponibles. El objetivo de estas tablas es el de hacer pruebas, ejemplos y código que luego se puede aplicar a datos más actualizados (extraídos con iSIA).
+Para ver la lista completa de tablas incluidas en `siabox`, puede usar el comando:
 
-Dado que se trata de tablas de gran tamaño (`datos_sia` tiene 223112 filas y 39 columnas), es conveniente filtrarlos según el subconjunto de interés. Para esto es que el paquete cuenta con la función `filtrar_datos`, que cumple la misma función que los filtros presentes en la aplicación iSIA.
+```r
+data(package = "siabox")
+```
 
-El siguiente es un ejemplo datos similares al ejemplo usados anteriormente (la diferencia es el rango de fechas):
+## Datos listos para trabajar
 
-```{r}
+El paquete viene con dos tablas muy grandes, listas para usar (con ciertas consideraciones, como el tamaño y la mezcla de parámetros y programas) y estructuradas como una extracción desde [iSIA](http://dinama-shiny:3838/sia_apps/iSIA) (es decir, tienen las mismas columnas).
+
+Se trata de `datos_sia` y `datos_sia_sed` (se recomienda ver a la documentación de ambas), con datos de aguas superficiales y de sedimentos, respectivamente.
+
+Dichas tablas tienen todas las muestras registradas en SIA entre las fechas `r siabox:::colapsar_secuencia(range(siabox::datos_sia$fecha_muestra))`, para todos los programas y parámetros disponibles. El objetivo de estas tablas es el de hacer pruebas, ejemplos y código que luego se puede aplicar a datos más actualizados (extraídos con iSIA). 
+
+La lógica es: **si funciona con estos datos, funcionará para realizar informes automátizados**.
+
+### Filtrando `datos_sia`
+
+Dado que se trata de tablas de gran tamaño (`datos_sia` tiene `r scales::number(nrow(siabox::datos_sia))` filas y `r scales::number(ncol(siabox::datos_sia))` columnas), es conveniente filtrarlos según el subconjunto de interés. Normalmente nos interesa trabajar con datos de un rango de años determinados, de un programa de monitoreo determinado, etc. Esa es la montivación detrás de `filtrar_datos`. Las funcionalidades de la misma, a su vez, replican los filtros presentes en iSIA.
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
 library(siabox)
 d <- filtrar_datos(datos_sia, id_programa = 10L, id_matriz = 6L,
                    rango_fechas = c('2015-01-01', '2019-12-31'),
                    tipo_punto_id = 1L,
-                   id_parametro = c(2098, 2101, 2099, 2097, 2102, 2091))
+                   id_parametro = c(2098, 2101, 2099, 2097, 2102, 2032,
+                                    2018, 2090, 2021, 2017))
+range(d$fecha_muestra)
 
+count(d, nombre_subcuenca_informes)
+```
+
+Por supuesto que nada impide que se usen otras erramientas de R para filtrar, cortar o manipular los datos como sea.
+
+La tabla `d`, al igual que `datos_sia` y `datos_sia_sed`, tiene la misma estructura que las extracciones normales (en formato largo) de iSIA.
+
+Una vez que tenemos definida una tabla de datos con las cuales trabajar, ya podemos usar las funciones del paquete. Por ejemplo, las funciones con el prefijo `g_` crean gráficos (de clase `ggplot`). Por ejemplo, `g_long` grafica valores anuales longitudinales: muestra un parámetro seleccionado, para un año en particular, y los valores para todas las estaciones contenidas en los datos, comparando con años previos:
+
+```{r, message=FALSE, warning=FALSE}
 g_long(d, 2098, anio = 2019)
+```
+
+Ver la viñeta [graficos]() para aprender más sobre las funcionalidades gráficas del paquete.
+
+```r
+vignette('graficos', package = 'siabox')
+```
+
+<!-- devtools::build_vignettes() --> 
+
+## Tablas de infambientalbd
+
+Esta lista constituye el total de tablas importadas desde la base de datos INFAMBIENTAL. Algunas son copias muy similares y otras son exactas.
+
+- `sia_cuenca`
+- `sia_datos_muestra_parametros`
+- `sia_departamento`
+- `sia_estacion`
+- `sia_institucion`
+- `sia_matriz`
+- `sia_muestra`
+- `sia_param_unidad`
+- `sia_parametro`
+- `sia_programa_parametro`
+- `sia_programa`
+- `sia_sub_cuenca`
+- `sia_tipo_punto_estacion`
+- `sia_unidad`
+
+Infambientalbd es la base de datos del SIA en donde se almacena la información concerniente monitoreos de aguas y sedimentos, y algo más. En particular, incluye lo relativo a: 
+
+- Programas: estaciones, cuencas, subcuencas, etc
+
+- Parámetros: nombres, unidades de medida según matriz, etc.
+
+- Muestras de **Aguas superficiales** y de **Sedimentos**.
+
+- _No incluye_ muestras de Aire u otras matrices.
+
+Todas estas tablas se importaron como [clase](https://bookdown.org/jboscomendoza/r-principiantes4/tipos-de-datos.html) [**data.frame**](https://bookdown.org/jboscomendoza/r-principiantes4/data-frames.html) (en verdad, usa una variante más moderna: [tibble](https://r4ds.had.co.nz/tibbles.html)).
+
+Como convención, se nombran combinando el prefijo *sia_* con el nombre original. Ejemplo: la tabla `sia_parametro` contiene la misma información que la tabla `parametro` de infambientalbd.
+
+### IDs
+
+Como se estila en bases de datos, estas tablas generalmente hay una columna dedicada a un "id": un indentificador numérico que es único para cada entrada, la cual generalmente se llama `id_[..nombre..]` o simplemente `id`. Por ejemplo, en la tabla `sia_parametro`, la columna `id_parametro` identifica a cada parámetro con un número entero positivo. El rol de los identificadores es evitar ambigüedades. Por ejemplo, podemos usar el `id_parametro` = 2098 para asegurarnos de que trabajamos con Fósforo Total:
+
+<!-- ```{r sia_parametro} -->
+```{r}
+filter(sia_parametro, id_parametro == 2098)
+```
+
+Ante un eventual cambio en el nombre de los parámetros (columnas `nombre_clave`, `parametro` o `param`), los `id` no van a cambiar, evitando confusiones. **Lo mismo pasa con otros tipos de id**.
+
+### IDs en `datos_sia*`
+
+Las tablas `datos_sia` y `datos_sia_sed` se construyen a partir de la conjunción de las tablas de infambiental (usando las funciones de **join** de `dplyr`), y en general se mantienen los nombres de las columnas originales. La escepción general son aquellas columnas que se llaman `id` en la tabla original, que en `datos_sia*` se pasan a llamar `id_estacion`, `id_unidad`, etc.
+
+Esto es importante saberlo en caso de que querer hacer joins con las tablas originales. Esto rara vez va a afectar, esperamos, al usuarie de siabox, pero es de rigor mencionar.
+
+## Tablas importantes!
+
+- `datos_sia` y `datos_sia_sed`: tiene **todas** las muestras de _Aguas superficiales_ y _Sedimentos_, al momento en que se hizo la extracción del SIA (11 de Noviembre de 2020). No son tablas presentes en infambientalbd y, como se mencionó antes, tienen la misma estructura que datos extraídos desde la app iSIA.
+
+- `sia_estacion`: datos de las estaciones de monitoreo.
+
+- `sia_param_unidad`: tabla que relaciona `id` de parámetros con `id` de las unidades de medida (presentes en `sia_unidad`).
+
+- `sia_unidad`: tabla con las unidades de medida usadas en el SIA.
+
+- `sia_programa`: tabla con los programas de monitoreo del SIA.
+
+- `decreto`: tabla con los valores establecidos por el decreto 253/79
+
+- `codigos_param`: tabla con lista de parámetros y códigos nuevos propuestos. Estos no han sido oficialmente incorporados al SIA. Además incluye una columna llamada `grupo`, que divide a los parámetros en categorías (Biológicos, Metálicos, etc). Es una tabla en construcción conjunta entre DCA y DIA.
+
+- `cuencas_informes`: una clasificación de las estaciones de monitoreo según la subcuenca, siguiendo el criterio usado en informes de DINACEA, a la que pertenecen. Al momento sólo algunas estaciones están clasificadas y se aspira a completar la información, mediante el trabajo conjunto de DCA y DIA.
+
+- `t_eti_base`: esta tabla contiene las etiquetas que serán usadas en gráficos creados con las funciones del paquete. El objetivo es unificar criterios y eventualmente se espera poder construir un acuerdo para completar la tabla con todos los parámetros.
+
+## Buscadores de ID
+
+El paquete incluye buscadores de id para las varias tablas importadas del SIA, usando un texto. Algo así como un Google de ids. El texto o patrón puede ser una expresión regular (la cual se pasa internamente a [`agrepl`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/agrep)).
+
+Un par de ejemplos simples:
+
+```{r}
+# Búsqueda del id del parámetro de interés (Fósforo Total) por aproximación:
+par_id("fosforo")
+
+# Búsqueda del id de programas que incluyan la 'laguna de':
+pro_id('laguna de')
+```
+
+> Notar que el último resultado incluye Laguna Merín, ya que se trata de una búsqueda aproximada. Además, obviamente hay otras formas de obtener el id deseado, usando herramientas anteriores a `siabox`: simplemente hay que encontrar la/s filas deseadas en las tablas correspondientes, como `sia_programa`, en el último ejemplo.
+
+- `pro_id`: Busca programas en `sia_programa` en base al campo `nombre_programa` de dicha tabla.
+
+- `est_id`: Busca estaciones en `sia_estacion` en base a los campos `codigo_pto` y estacion de dicha tabla.
+
+- `mat_id`: Busca matrices en `sia_matriz` en base al campo `nombre` de dicha tabla.
+
+- `uni_id`: Busca unidades en `sia_unidad` en base al campo `uni_nombre` de dicha tabla.
+
+- `ins_id`: Busca instituciones en `sia_institucion` en base al campo `nombre` de dicha tabla.
+
+- `dep_id`: Busca departamentos en `sia_departamento` en base al campo `dep_nombre` de dicha tabla.
+
+La motivación de estas funciones es proveer de una forma rápida de encontrar los ids que le usuarie necesita.
+
+## Formatos largo y ancho
+
+El formato por defecto de las extracciones de iSIA, tiene formato 'largo', es decir due los valores numéricos están todos en una única columna (`valor`), mientras que los distintos parámetros están indicados en otras columnas (ver `?datos_sia`). Entre otras cosas, este formato implica que hay varias filas para una misma muestra (ver columna `id_muestra` en la salida del siguiente código):
+
+```{r}
+d <- filter(d, anio == 2019)
+# Algunos valores contenidos en los datos de ejemplo
+select(d, id_muestra, id_parametro, nombre_clave, param, valor,
+       LD = limite_deteccion, LC = limite_cuantificacion)
+```
+
+> Nota: 'param' es una columna agregada, no pertenece a las tablas originales del SIA. Ver `?datos_sia`
+
+> Nota 2: en el ejemplo se renombraron las columnas limite_deteccion y limite_cuantificacion como LD y LC, respectivamente, para simplificar.
+
+Como se puede ver en el ejemplo, una forma de reconocer el formato 'largo' es notar que hay muchas filas para una única muestra. En la siguiente tabla, `n` indica la cantidad de filas por muestra:
+
+```{r}
+count(d, id_muestra, codigo_pto, fecha_muestra)
+```
+
+En definitiva `n`, debería ser equivalente al número de parámetros medidos por muestra.
+
+#### Ventajas
+
+(del formato 'largo')
+
+- Es más fácil agrupar datos para calcular promedios, IET, etc, según otras columnas contenidas en los datos. Ejemplos (usando funciones de `dplyr`, que es parte del `tidyverse`, pero que [pueden ser replicados con funciones de R base](https://cran.r-project.org/web/packages/dplyr/vignettes/base.html)):
+
+```{r}
+d %>%
+  group_by(param) %>%
+  summarise(N = n(),
+            SE = sd(valor) / sqrt(N),
+            Promedio = mean(valor), 
+            Mediana = median(valor), 
+            Varianza = var(valor))
+
+d %>%
+  group_by(sub_cue_nombre, param) %>%
+  tsummary(valor)
+
+d %>% count(codigo_pto, param)
+```
+
+- Facilita el uso de herramientas de `ggplot2`. Por ejemplo:
+
+```{r}
+d %>%
+  filter(id_parametro == 2032) %>%
+  ggplot() +
+  aes(codigo_pto, valor, color = as.factor(mes)) +
+  geom_point() +
+  scale_y_log10() +
+  ylab("Temperatura (ºC)") + xlab(NULL) +
+  scale_color_discrete('Mes')
+```
+
+> En este ejemplo la ventaja radica en que la variable que define el color, o sea el mes, se encuentra ya dispuesta en una **única columna de la misma tabla**.
+
+#### Desventajas
+
+- Es más complicado realizar cálculos que involucran varios datos de la misma muestra, como es el caso del Amoníaco Libre (razón por la que existe `amoniaco_libre_add`)... dicho de otra forma, si quiero multiplicar, sumar, dividir, etc, valores de una columna por los valores de otra, el formato largo no es el indicado.
+
+- También es más complicado realizar regresiones o gráficos de dispersión entre diferentes parámetros.
+
+Por estas razones es que `siabox` incluye la función `ancho`, mostrada a continuación.
+
+#### La función `ancho`
+
+Es posible reconfigurar estas tablas con la función `ancho`, que es un [wrapper](https://en.wikipedia.org/wiki/Wrapper_function) de [`pivot_wider`](https://tidyr.tidyverse.org/reference/pivot_wider.html) (que a su vez es una versión más moderna de `reshape`), de forma que los valores se reparten en distintas columnas, nombradas según sus parámetros correspondientes. Esto es útil en muchas instancias, como por ejemplo, hacer gráficos de dispersión entre diferentes variables:
+
+```{r}
+da <- ancho(d)
+# La nueva tabla tiene columnas diferenciadas por parámetros y sus
+# correspondientes límites de detección y cuantificación:
+names(da)[27:ncol(da)]
+
+# Un par de gráficos de dispersión y regresiones lineales:
+lm(SatO ~ OD, data = da, subset = Tem < 20)
+lm(SatO ~ OD, data = da, subset = Tem >= 20)
+
+da %>% 
+  mutate(Temp = if_else(Tem < 20, '< 20', '>= 20')) %>% 
+  ggplot() + aes(OD, SatO, col = Temp) + 
+  geom_point() +
+  geom_smooth(method = 'lm')
+```
+
+También facilita, como se anunciaba anteriormente, ciertos cálculos:
+
+```{r}
+amoniaco_libre(da$NH4, da$pH, da$Tem)
+```
+
+Como es de esperar, la nueva tabla es mucho más ancha y cada muestra ocupa una única fila:
+
+```{r}
+# Comparar con el conteo
+count(d, id_muestra, codigo_pto, fecha_muestra)
+count(da, id_muestra, codigo_pto, fecha_muestra)
+dim(d)
+dim(da)
+```
+
+> Al ejecutar la función `ancho`, típicamente se pierden algunas columnas, ya que no es posible o práctico preservar su información: son columnas con valores o identificadores parámetros, u otras variables asociadas.
+
+- - -
+
+## Extra: cómo se arma `datos_sia`
+
+Las tablas `datos_sia` y `datos_sia_sed` se pueden crear a partir de las tablas importadas de infambientalbd. El siguiente código muestra el ejemplo para `datos_sia`, el cual se puede usar también para `datos_sia_sed`, cambiando el 6 por un 11 en la novena línea del código (donde dice `matriz_estacion == 6L`):
+
+```r
+out <- 
+  dplyr::rename(sia_datos_muestra_parametros, id_dato = id) %>% 
+  dplyr::left_join(sia_parametro, 
+                   by = 'id_parametro') %>% 
+  dplyr::left_join(dplyr::select(sia_muestra, -usuario),
+                   by = 'id_muestra') %>% 
+  dplyr::left_join(sia_institucion,
+                   by = 'id_institucion') %>% 
+  dplyr::inner_join(dplyr::filter(sia_estacion, matriz_estacion == 6L),
+                    by = c('id_estacion' = 'id')) %>% 
+  dplyr::left_join(sia_tipo_punto_estacion,
+                   by = c('tipo_punto_id' = 'id')) %>% 
+  dplyr::left_join(sia_sub_cuenca,
+                   by = c('sub_cuenca' = 'id')) %>% 
+  dplyr::left_join(sia_cuenca,
+                   by = c('sub_cue_cuenca_id' = 'id')) %>% 
+  dplyr::left_join(sia_departamento,
+                   by = c('departamento' = 'id')) %>% 
+  dplyr::select(-version) %>% 
+  dplyr::left_join(sia_programa,
+                   by = c('prog_monitoreo' = 'id_programa')) %>% 
+  dplyr::left_join(sia_param_unidad,
+                   by = c('id_parametro', 'matriz_estacion' = 'id_matriz')) %>% 
+  dplyr::left_join(sia_unidad,
+                   by = c('id_unidad_medida' = 'id')) %>% 
+  dplyr::transmute(
+    id_dato, id_muestra, nro_muestra, id_estado, nombre_programa,
+    id_programa = prog_monitoreo, cue_nombre, 
+    id_cuenca = sub_cue_cuenca_id, sub_cue_nombre, 
+    id_sub_cuenca = sub_cuenca, codigo_pto, id_estacion, 
+    tipo_punto_id, tip_pun_est_descripcion, id_depto = departamento,
+    departamento = dep_nombre, id_institucion, institucion = nombre,
+    usuario, periodo, 
+    anio = as.integer(lubridate::year(fecha_muestra)),
+    mes = as.integer(lubridate::month(fecha_muestra)),
+    anio_mes = paste0(anio, "_", stringr::str_pad(mes, pad = '0', width = 2)),
+    fecha_muestra, fecha_hora = paste(fecha_muestra, hora_muestra),
+    observaciones = paste0(observacion, '. ', observaciones),
+    id_matriz = matriz_estacion, id_parametro, parametro,
+    nombre_clave, id_unidad = id_unidad_medida, uni_nombre, 
+    valor_minimo_str, limite_deteccion, limite_cuantificacion
+  )
+
+# Quitar datos repetidos según id_estado (1. pendientes, 2. original, 
+# 3. aprobado):
+if (any(out$id_estado == 3)) {
+  repes <- out %>%
+    dplyr::count(id_muestra, id_parametro) %>%
+    dplyr::filter(n > 1)
+  
+  # A continuación: si es que hay repetidos, quedarme sólo con los que
+  # figuran como aprobados...
+  if (nrow(repes)) {
+    for (i in 1:nrow(repes)) {
+      w <- which(
+        out$id_muestra == repes$id_muestra[i] &
+          out$id_parametro == repes$id_parametro[i]
+      )
+      
+      # id_estado = 1: pendiente
+      # id_estado = 2: original
+      # id_estado = 3: aprobado
+      w_aprob <- which(out$id_estado[w] == 3)
+      
+      if (length(w_aprob)) {
+        fila <- out[w,][w_aprob,]
+        out <- out[-w,]
+        out <- rbind(out, fila)
+      }
+    }
+  }
+}
+
+# Casos en los que hay más de un dato para un id_muestra e id_parametro
+# (siempre con TermoTMF, hasta el momento, 2020-07-29):
+repes <- out %>% dplyr::count(id_muestra, id_parametro) %>% dplyr::filter(n > 1)
+if (nrow(repes)) {
+  for (i in 1:nrow(repes)) {
+    w <- which(
+      out$id_muestra == repes$id_muestra[i] &
+        out$id_parametro == repes$id_parametro[i]
+    )
+    w_ultimo <- which.max(out$id_dato[w])
+    
+    out <- out[-w[-w_ultimo],]
+  }
+}
+
+out <- dplyr::select(out, -id_dato)
+
+cp <- codigos_param %>%
+  dplyr::filter(!is.na(id_parametro)) %>%
+  dplyr::select(grupo, codigo_nuevo, id_parametro)
+
+out <- out %>%
+  siabox::valores_numericos(metodo = "informe", filtrar_no_num = TRUE) %>%
+  dplyr::left_join(
+    dplyr::select(cuencas_informes, 
+                  nombre_subcuenca_informes, 
+                  codigo_pto_mod, 
+                  id_estacion),
+    by = "id_estacion") %>%
+  dplyr::left_join(cp, by = "id_parametro") %>%
+  dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo),
+                                       nombre_clave,
+                                       codigo_nuevo),
+                anio = as.integer(anio),
+                mes = as.integer(mes)) %>%
+  dplyr::select(-id_estado, -codigo_nuevo)
+
+datos_sia <- out
 ```

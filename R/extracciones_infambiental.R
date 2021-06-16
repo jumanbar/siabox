@@ -125,14 +125,25 @@ ancho <- function(.data, unidades = FALSE) {
 
   }
 
-  # Si están, eliminar estas columnas innecesearias (para compatibilidad con
-  # server.R de iSIA: ver reactive 'datos_extraccion'):
-  w <- grep('^codigo_nuevo$|^parametro$|^grupo$|tipo_dato$', names(.data),
-            ignore.case = TRUE)
-  if (length(w)) {
-    warning('Se eliminan autom\u00e1ticamente las columnas: ',
-            colapsar_secuencia(names(.data)[w]))
-    .data <- .data[-w]
+  # PERO QUÉ HAGO CON LAS OBSERVACIONES??
+  #
+  # Doy por sentado que está id_muestra? o que está observaciones?
+
+  if ('observaciones' %in% names(.data)) {
+    obs <- dplyr::distinct(.data, id_muestra, observaciones)
+
+    if (nrow(obs) > length(unique(.data$id_muestra))) {
+      .data <- obs %>%
+        # Capaz que en vez de usar id_muestra se puede usar any_of y poner todas
+        # las columnas que podrían servir luego en el pivot wider para ser
+        # id_cols... de esta forma la función sería relativamente flexible...
+        # aunque no sé si vale la pena.
+        dplyr::group_by(id_muestra) %>%
+        dplyr::summarise(OBS = paste(observaciones, collapse = '. ')) %>%
+        dplyr::left_join(.data, ., by = 'id_muestra') %>%
+        dplyr::mutate(observaciones = OBS) %>%
+        dplyr::select(-OBS)
+    }
   }
 
   columnasok <- c("id_muestra", "nro_muestra", "nombre_programa", "id_programa",
@@ -141,9 +152,9 @@ ancho <- function(.data, unidades = FALSE) {
                   "tip_pun_est_descripcion", "id_depto", "departamento",
                   "id_institucion", "institucion", "usuario", "periodo", "anio",
                   "mes", "anio_mes", "fecha_muestra", "fecha_hora",
-                  "observaciones", "id_matriz", "id_tipo_dato",
-                  "grupo", "codigo_nuevo", "param", "nombre_subcuenca_informes",
-                  "codigo_pto_mod", "LD", "LC", "valor")
+                  "observaciones", "id_matriz", "nombre_subcuenca_informes",
+                  "codigo_pto_mod", "param", "LD", "LC", "valor"
+                  )
 
   out <- .data %>%
     dplyr::mutate(LD = limite_deteccion %>%
@@ -175,6 +186,26 @@ ancho <- function(.data, unidades = FALSE) {
     dplyr::rename_at(dplyr::vars(tidyselect::matches('^L[DC]')),
                      ~ stringr::str_remove_all(., '\\s+\\(.*\\)$') %>%
                        stringr::str_replace_all('(L[CD])_(.*)', '\\2_\\1'))
+
+  # param, values_from = c(valor, LD, LC))
+  # Si están, eliminar estas columnas innecesearias (para compatibilidad con
+  # server.R de iSIA: ver reactive 'datos_extraccion'):
+  # w <- grep('^codigo_nuevo$|^parametro$|^grupo$|tipo_dato$', names(.data),
+  #           ignore.case = TRUE)
+  # if (length(w)) {
+  #   warning('Se eliminan autom\u00e1ticamente las columnas: ',
+  #           colapsar_secuencia(names(.data)[w]))
+  #   .data <- .data[-w]
+  # }
+  w <- which(!(names(.data) %in% names(out)) &
+               !(names(.data) %in% c('param', 'valor', 'limite_deteccion',
+                                     'limite_cuantificacion')))
+  if (length(w)) {
+    adv <- paste('Se eliminaron autom\u00e1ticamente las columnas:',
+                 colapsar_secuencia(names(.data)[w])) %>%
+      stringr::str_wrap(80, indent = 1)
+    warning(adv)
+  }
 
   return(out)
 }
@@ -694,7 +725,8 @@ filtrar_datos <- function(.data,
   id_programa <- abs(as.integer(id_programa))
 
   mat_e <-
-    dplyr::filter(programa_matriz, id_programa == !!id_programa)$id_matriz
+    dplyr::filter(siabox::programa_matriz,
+                  id_programa == !!id_programa)$id_matriz
 
   if (id_matriz != mat_e) {
     warning("No hay datos de esa matriz ambiental (id_matriz = ", id_matriz,
@@ -731,20 +763,20 @@ filtrar_datos <- function(.data,
   }
 
   if (is.null(id_parametro)) {
-    id_parametro <- sia_parametro$id_parametro
+    id_parametro <- siabox::sia_parametro$id_parametro
     warning("id_parametro no especificado, se seleccionan ",
             "todos los par\u00e1metros por defecto")
   }
 
   if (is.null(id_estacion)) {
     id_estacion <-
-      dplyr::filter(sia_estacion, prog_monitoreo == !!id_programa)$id
+      dplyr::filter(siabox::sia_estacion, prog_monitoreo == !!id_programa)$id
 
     warning("id_estacion no especificado, se seleccionan por defecto ",
             "las estaciones correspondientes al programa seleccionado (",
             "id_programa = ", id_programa, ")")
   } else {
-    est_e <- dplyr::filter(sia_estacion, prog_monitoreo == id_programa)$id
+    est_e <- dplyr::filter(siabox::sia_estacion, prog_monitoreo == id_programa)$id
     w <- id_estacion %in% est_e
     if (!all(w)) {
       id_estacion <- id_estacion[w]
@@ -773,7 +805,7 @@ filtrar_datos <- function(.data,
 
   esperados <-
     tibble::tibble(id = id_estacion) %>%
-    dplyr::left_join(sia_estacion, by = "id") %>%
+    dplyr::left_join(siabox::sia_estacion, by = "id") %>%
     dplyr::pull(codigo_pto)
 
   if (is.null(orden_est)) {
@@ -815,17 +847,17 @@ filtrar_datos <- function(.data,
 unipar <- function(id_parametro, id_matriz = 6L, nombre_clave) {
   if (missing(id_parametro)) {
     id_parametro <-
-      sia_parametro %>%
+      siabox::sia_parametro %>%
       dplyr::filter(grepl(!!nombre_clave, nombre_clave, ignore.case = TRUE)) %>%
       dplyr::pull(id_parametro)
   }
   out <-
-    sia_parametro %>%
+    siabox::sia_parametro %>%
     dplyr::select(id_parametro, parametro, nombre_clave) %>%
     dplyr::filter(id_parametro %in% !!id_parametro) %>%
-    dplyr::left_join(sia_param_unidad, by = "id_parametro") %>%
+    dplyr::left_join(siabox::sia_param_unidad, by = "id_parametro") %>%
     dplyr::filter(id_matriz %in% !!id_matriz) %>%
-    dplyr::left_join(sia_unidad, by = c("id_unidad_medida" = "id")) %>%
+    dplyr::left_join(siabox::sia_unidad, by = c("id_unidad_medida" = "id")) %>%
     dplyr::select(id_parametro, parametro, nombre_clave, id_matriz,
                   id_unidad = id_unidad_medida, uni_nombre)
   return(out)
@@ -864,23 +896,23 @@ unipar <- function(id_parametro, id_matriz = 6L, nombre_clave) {
 #' dep_id("flor")
 par_id <- function(patron, ...) {
 
-  patron <- siabox:::toascii(tolower(patron))
+  patron <- toascii(tolower(patron))
 
-  w <- which(siabox:::toascii(tolower(sia_parametro$nombre_clave)) == patron)
-  if (length(w)) return(sia_parametro[w,])
+  w <- which(toascii(tolower(siabox::sia_parametro$nombre_clave)) == patron)
+  if (length(w)) return(siabox::sia_parametro[w,])
 
-  w <- which(siabox:::toascii(tolower(sia_parametro$parametro)) == patron)
-  if (length(w)) return(sia_parametro[w,])
+  w <- which(toascii(tolower(siabox::sia_parametro$parametro)) == patron)
+  if (length(w)) return(siabox::sia_parametro[w,])
 
-  resA <- agrepl(patron, siabox:::toascii(sia_parametro$nombre_clave),
+  resA <- agrepl(patron, toascii(siabox::sia_parametro$nombre_clave),
                  ignore.case = TRUE,
                  ...)
 
-  resB <- agrepl(patron, siabox:::toascii(sia_parametro$parametro),
+  resB <- agrepl(patron, toascii(siabox::sia_parametro$parametro),
                  ignore.case = TRUE,
                  ...)
 
-  sia_parametro[resA | resB,]
+  siabox::sia_parametro[resA | resB,]
 }
 
 #' @describeIn par_id Busca programas en \code{\link{sia_programa}} en base al
@@ -888,9 +920,9 @@ par_id <- function(patron, ...) {
 #'
 #' @export
 pro_id <- function(patron, ...) {
-  dplyr::filter(sia_programa, agrepl(toascii(patron),
-                                     toascii(nombre_programa),
-                                     ignore.case = TRUE, ...))
+  dplyr::filter(siabox::sia_programa, agrepl(toascii(patron),
+                                      toascii(nombre_programa),
+                                      ignore.case = TRUE, ...))
 
 }
 
@@ -901,15 +933,15 @@ pro_id <- function(patron, ...) {
 est_id <- function(patron, ...) {
   patron <- toascii(patron)
 
-  resA <- agrepl(patron, toascii(sia_estacion$codigo_pto),
+  resA <- agrepl(patron, toascii(siabox::sia_estacion$codigo_pto),
                  ignore.case = TRUE,
                  ...)
 
-  resB <- agrepl(patron, toascii(sia_estacion$estacion),
+  resB <- agrepl(patron, toascii(siabox::sia_estacion$estacion),
                  ignore.case = TRUE,
                  ...)
 
-  sia_estacion[resA | resB,]
+  siabox::sia_estacion[resA | resB,]
 
 }
 
@@ -918,8 +950,8 @@ est_id <- function(patron, ...) {
 #'
 #' @export
 mat_id <- function(patron, ...) {
-  dplyr::filter(sia_matriz, agrepl(toascii(patron),
-                                   toascii(nombre),
+  dplyr::filter(siabox::sia_matriz, agrepl(toascii(patron),
+                                  toascii(nombre),
                                    ignore.case = TRUE, ...))
 
 }
@@ -928,8 +960,8 @@ mat_id <- function(patron, ...) {
 #'   campo `uni_nombre` de dicha tabla.
 #' @export
 uni_id <- function(patron, ...) {
-  dplyr::filter(sia_unidad, agrepl(toascii(patron),
-                                   toascii(uni_nombre),
+  dplyr::filter(siabox::sia_unidad, agrepl(toascii(patron),
+                                  toascii(uni_nombre),
                                    ignore.case = TRUE, ...))
 
 }
@@ -938,8 +970,8 @@ uni_id <- function(patron, ...) {
 #'   base al campo `nombre` de dicha tabla.
 #' @export
 ins_id <- function(patron, ...) {
-  dplyr::filter(sia_institucion, agrepl(toascii(patron),
-                                 toascii(nombre),
+  dplyr::filter(siabox::sia_institucion, agrepl(toascii(patron),
+                                toascii(nombre),
                                  ignore.case = TRUE, ...))
 
 }
@@ -948,8 +980,8 @@ ins_id <- function(patron, ...) {
 #'   base al campo `dep_nombre` de dicha tabla.
 #' @export
 dep_id <- function(patron, ...) {
-  dplyr::filter(sia_departamento, agrepl(toascii(patron),
-                                         toascii(dep_nombre),
+  dplyr::filter(siabox::sia_departamento, agrepl(toascii(patron),
+                                        toascii(dep_nombre),
                                          ignore.case = TRUE, ...))
 
 }
@@ -1161,7 +1193,7 @@ valores_numericos <- function(.data,
   out$id_tipo_dato <- clasif$tipos
 
   if (!any(names(out) == "id_tipo_dato"))
-    out <- dplyr::left_join(out, tipos_de_dato, by = "id_tipo_dato")
+    out <- dplyr::left_join(out, siabox::tipos_de_dato, by = "id_tipo_dato")
 
   if (filtrar_no_num) out <- dplyr::filter(out, !is.na(valor))
 

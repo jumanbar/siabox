@@ -381,9 +381,9 @@
 #' @source \code{infambientalbd}
 "sia_programa"
 
-##' sia_programa_parametro ----
+## . sia_programa_parametro ----
 
-#' Relación entre programas y parametros
+#' Parámetros en cada programa
 #'
 #' Tabla que (intenta) registrar los parametros que son monitoreados en cada
 #' programa.
@@ -504,163 +504,6 @@
 
 ## AGREGADAS ----
 
-# . cuencas_informes -----
-
-#' Cuencas y subcuencas en informes
-#'
-#' @seealso \code{\link{sia_estacion}}
-#'
-#' @format Tabla con `r nrow(cuencas_informes)` filas y
-#' `r ncol(cuencas_informes)` columnas:
-#'
-#'   \describe{
-#'
-#'   \item{nombre_subcuenca_informes}{}
-#'
-#'   \item{codigo_pto}{}
-#'
-#'   \item{codigo_pto_mod}{}
-#'
-#'   \item{id_estacion}{}
-#'
-#'   \item{id_cuenca}{}
-#'
-#'   \item{cue_nombre}{}
-#'
-#'   \item{id_programa}{}
-#'
-#'   \item{nombre_programa}{}
-#'
-#'   }
-#'
-"cuencas_informes"
-
-# . usuarios -----
-
-#' Tabla con lista de usuarios
-#'
-#' La lista de usuarios que han cargado datos de muestras a las tablas del SIA.
-#'
-#' @seealso \code{\link{sia_datos_muestra_parametros}}
-#'
-#' @format Tabla con `r nrow(usuarios)` filas y
-#' `r ncol(usuarios)` columnas:
-#'
-#'   \describe{
-#'
-#'   \item{usuario}{character. Nombre de usuario}
-#'
-#'   }
-#'
-"usuarios"
-
-# . programa_matriz ----
-
-#' Matrices de programas
-#'
-#' Creada a partir de la tabla \code{\link{sia_estacion}}. Sirve de referencia
-#' para asociar programas de monitoreo con matrices ambientales.
-#'
-#' @seealso \code{\link{sia_estacion}}
-#'
-#' @format Tabla con `r nrow(programa_matriz)` filas y `r ncol(programa_matriz)`
-#'   columnas:
-#'
-#'   \describe{
-#'
-#'   \item{id_parametro}{integer. Identificador único de cada programa de
-#'   monitoreo.}
-#'
-#'   \item{id_matriz}{Número que indica el id de la matriz asociada al programa
-#'   de monitoreo (de momento: 6 = Aguas superficiales y 11 = Sedimentos;
-#'   15/10/2020)}
-#'
-#'   }
-#'
-#' @source \code{infambientalbd}
-#'
-#' @examples
-#' # Crear una versión actualizada de la tabla:
-#' programa_matriz <-
-#'   sia_estacion %>%
-#'     dplyr::distinct(prog_monitoreo, matriz_estacion) %>%
-#'     setNames(c("id_programa", "id_matriz")) %>%
-#'     dplyr::filter_all(~ !is.na(.))
-"programa_matriz"
-
-## . t_eti_base ----
-
-#' Tabla de etiquetas base
-#'
-#' Tabla de base para hacer etiquetas para gráficos u otros usos,
-#' basándose en las tablas del SIA (infambientalbd).
-#'
-#' Fecha de creación: 2020-10-29
-#'
-#' @format Tabla con `r nrow(t_eti_base)` filas y `r ncol(t_eti_base)` columnas:
-#'
-#'   \describe{
-#'
-#'   \item{id_parametro}{integer. Identificador único de cada parámetro.}
-#'
-#'   \item{etiqueta}{character. Texto de etiqueta para gráficos, etc...}
-#'
-#' }
-#'
-#' @source \code{infambientalbd}
-#'
-#' @examples
-#' # Código de creación:
-#' t_eti_base <-
-#'   sia_parametro %>%
-#'   dplyr::left_join(dplyr::select(codigos_param, id_parametro, codigo_nuevo),
-#'                    by = "id_parametro") %>%
-#'   dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo),
-#'                                        nombre_clave, codigo_nuevo)) %>%
-#'   dplyr::left_join(sia_param_unidad, by = "id_parametro") %>%
-#'   dplyr::filter(id_matriz == 6L) %>%
-#'   dplyr::left_join(sia_unidad, by = c("id_unidad_medida" = "id")) %>%
-#'   dplyr::transmute(id_parametro,
-#'                    etiqueta = paste0(param, " (", uni_nombre, ")"))
-"t_eti_base"
-
-## . codigos_param ----
-
-#' Tabla con códigos alternativos para parámetros
-#'
-#' Presenta códigos nuevos para parámetros, creados por Elena Rodó y Amelia
-#' Fabre.
-#'
-#' Última modificación: 2020-09-03
-#'
-#' @format Tabla con `r nrow(codigos_param)` filas y `r ncol(codigos_param)`
-#'   columnas:
-#'
-#'   \describe{
-#'
-#'   \item{grupo}{character. Grupo al que pertenece el parámetro}
-#'
-#'   \item{parametro}{character. Nombre (largo) del parámetro}
-#'
-#'   \item{codigo_anterior}{character. Nombre (largo) del parámetro, encontrado
-#'   anteriormente}
-#'
-#'   \item{codigo_nuevo}{character. Abreviación nueva propuesta para el
-#'   parámetro}
-#'
-#'   \item{codigo_nuevo_jm}{character. Abreviación nueva propuesta para el
-#'   parámetro, sugerencias de Juan M. Barreneche}
-#'
-#'   \item{obs}{character. Observaciones}
-#'
-#'   \item{id_parametro}{integer. Identificador único de cada parámetro.}
-#'
-#'   }
-#'
-#' @source \code{infambientalbd}
-"codigos_param"
-
-
 ## . datos_sia ----
 
 #' Datos extraídos del SIA.
@@ -761,22 +604,19 @@
 #'   clasificación de cada dato según siete categorías (ver
 #'   \code{\link{tipos_de_dato}})}
 #'
-#'   \item{tipo_dato}{Descripción, en texto, de la categoría correspondiente a
-#'   `id_tipo_dato`.}
+#'   \item{nombre_subcuenca_informes}{Nombre dado a cada subcuenca dentro de los
+#'   informes anuales de los programas de monitoreo.}
+#'   
+#'   \ite{codigo_pto_mnod}{Nombre de la estación modificado, siguiendo los 
+#'   códigos presentes en la tabla \code{\link{cuencas_informes}}}
 #'
 #'   \item{grupo}{Grupo al que pertenece el parámetro (ej.: Parámetros de
 #'   Biológicos, Parámetros de Ecotoxicidad). No todos los parámetros tienen un
 #'   grupo asignado.}
 #'
-#'   \item{codigo_nuevo}{Nombre corto del parámetro segun
-#'   \code{\link{codigos_param}}}
-#'
 #'   \item{param}{Nombre corto del parámetro (mejorado a partir de
 #'   \code{\link{codigos_param}}; en caso de parámetros que no figuran en esa
 #'   tabla, se usa el `nombre_clave` de \code{\link{sia_parametro}})}
-#'
-#'   \item{nombre_subcuenca_informes}{Nombre dado a cada subcuenca dentro de los
-#'   informes anuales de los programas de monitoreo.}
 #'
 #'   }
 #'
@@ -788,38 +628,6 @@
 #' @aliases datos_sia, datos_sia_sed
 "datos_sia"
 
-## . tipos_de_dato -----
-
-#' Tabla tipos de dato
-#'
-#' Esta tabla registra los tipos de dato encontrados en infambientalbd
-#' (específicamente, en la columna `valor_minimo_str` de la tabla
-#' \code{\link{sia_datos_muestra_parametros}}).
-#'
-#' Se espera que los tipos de dato (columna `tipo_dato`) se autoexpliquen. En
-#' particular, las categorías `<X` y `>X` refieren a casos en los que se X es un
-#' valor numérico, como "<2.0" o ">5000".
-#'
-#' @seealso \code{\link{clasif_tipo_dato}}
-#'
-#' @format Tabla con 7 filas y 2 columnas:
-#'
-#'   \describe{
-#'
-#'   \item{tipo_dato}{character. Nombre de las categorías (tipos) de datos.}
-#'
-#'   \item{id_tipo_dato}{integer. Id, número único entero que identifica a cada
-#'   tipo de dato}
-#'
-#'   }
-#'
-#' @examples
-#' # Para crear la tabla:
-#' tipos_de_dato <- tibble::tibble(
-#'   tipo_dato = c("NUMERICO", "<LD", "<LC", "LD<X<LC", "<X", ">X", "OTRO"),
-#'   id_tipo_dato = 1:7
-#' )
-"tipos_de_dato"
 
 ## . decreto -----
 
@@ -944,6 +752,146 @@
 #'   dplyr::filter(id_parametro != 2111L | id_metodo == 1L)
 "decreto"
 
+## . codigos_param ----
+
+#' Tabla con códigos alternativos para parámetros
+#'
+#' Presenta códigos nuevos para parámetros, creados por Elena Rodó y Amelia
+#' Fabre.
+#'
+#' Estos no han sido oficialmente incorporados al SIA. Además incluye una
+#' columna llamada `grupo`, que divide a los parámetros en categorías
+#' (Biológicos, Metálicos, etc). Es una tabla en construcción conjunta entre DCA
+#' y DIA.
+#'
+#' Última modificación: 2020-09-03
+#'
+#' @format Tabla con `r nrow(codigos_param)` filas y `r ncol(codigos_param)`
+#'   columnas:
+#'
+#'   \describe{
+#'
+#'   \item{grupo}{character. Grupo al que pertenece el parámetro}
+#'
+#'   \item{parametro}{character. Nombre (largo) del parámetro}
+#'
+#'   \item{codigo_anterior}{character. Nombre (largo) del parámetro, encontrado
+#'   anteriormente}
+#'
+#'   \item{codigo_nuevo}{character. Abreviación nueva propuesta para el
+#'   parámetro}
+#'
+#'   \item{codigo_nuevo_jm}{character. Abreviación nueva propuesta para el
+#'   parámetro, sugerencias de Juan M. Barreneche}
+#'
+#'   \item{obs}{character. Observaciones}
+#'
+#'   \item{id_parametro}{integer. Identificador único de cada parámetro.}
+#'
+#'   }
+#'
+#' @source \code{infambientalbd}
+"codigos_param"
+
+
+# . cuencas_informes -----
+
+#' Nombres de las cuencas y subcuencas para usar en informes
+#'
+#' Se trata de una clasificación de las estaciones de monitoreo según la
+#' subcuenca, siguiendo el criterio usado en informes de DINACEA, a la que
+#' pertenecen. Al momento sólo algunas estaciones están clasificadas y se aspira
+#' a completar la información, mediante el trabajo de DCA y DIA.
+#'
+#' La subcuenca asignada está en la primer columna:
+#' \code{nombre_subcuenca_informes}
+#'
+#' Surge debido a que las divisiones entre subcuencas encontradas en las bases
+#' de datos del SIA (\code{\link{sia_cuenca}} y \code{\link{sia_sub_cuenca}}) no
+#' se corresponden a las que se usan en los informes (un ejemplo claro es el
+#' programa Laguna Merín). La motivación es, entonces, proveer de una tabla que
+#' vincule cada estación con las subcuencas deseadas, a fin de facilitar los
+#' procedimientos (cálculos de estadísticos, gráficos, etc...).
+#'
+#' Al momento solamente algunas estaciones tienen un
+#' \code{nombre_subcuenca_informes} asignado (programas San Salvador y Laguna
+#' Merín). Se aspira a completar todos los casos posibles.
+#'
+#' @seealso \code{\link{sia_estacion}}
+#'
+#' @format Tabla con `r nrow(cuencas_informes)` filas y `r
+#'   ncol(cuencas_informes)` columnas:
+#'
+#'   \describe{
+#'
+#'   \item{nombre_subcuenca_informes}{Clasificación de las subcuencas para los
+#'   distintos programas. Es útil para separar datos en informes.}
+#'
+#'   \item{codigo_pto}{Códigos de las estaciones tal como están en el SIA (a la
+#'   fecha de extracción: 2020-10-22)}
+#'
+#'   \item{codigo_pto_mod}{Nuevos códigos para algunas estaciones del programa
+#'   Santa Lucía}
+#'
+#'   \item{id_estacion}{id de cada estación de monitoreo. Ver
+#'   \code{\link{sia_estacion}}}
+#'
+#'   \item{id_cuenca}{id de cada cuenca, definidas según la tabla
+#'   \code{\link{sia_cuenca}}}
+#'
+#'   \item{cue_nombre}{Nombre de cada cuenca, definidos según la tabla
+#'   \code{\link{sia_cuenca}}}
+#'
+#'   \item{id_programa}{id de cada programa, definidas según la tabla
+#'   \code{\link{sia_programa}}}
+#'
+#'   \item{nombre_programa}{Nombre de cada programa, definidos según la tabla
+#'   \code{\link{sia_programa}}}
+#'
+#'   }
+#'   
+"cuencas_informes"
+
+
+## . lim ----
+
+#' Tabla con rangos de valores normales para parámetros
+"lim"
+
+# . programa_matriz ----
+
+#' Matrices de programas
+#'
+#' Creada a partir de la tabla \code{\link{sia_estacion}}. Sirve de referencia
+#' para asociar programas de monitoreo con matrices ambientales.
+#'
+#' @seealso \code{\link{sia_estacion}}
+#'
+#' @format Tabla con `r nrow(programa_matriz)` filas y `r ncol(programa_matriz)`
+#'   columnas:
+#'
+#'   \describe{
+#'
+#'   \item{id_parametro}{integer. Identificador único de cada programa de
+#'   monitoreo.}
+#'
+#'   \item{id_matriz}{Número que indica el id de la matriz asociada al programa
+#'   de monitoreo (de momento: 6 = Aguas superficiales y 11 = Sedimentos;
+#'   15/10/2020)}
+#'
+#'   }
+#'
+#' @source \code{infambientalbd}
+#'
+#' @examples
+#' # Crear una versión actualizada de la tabla:
+#' programa_matriz <-
+#'   sia_estacion %>%
+#'     dplyr::distinct(prog_monitoreo, matriz_estacion) %>%
+#'     setNames(c("id_programa", "id_matriz")) %>%
+#'     dplyr::filter_all(~ !is.na(.))
+"programa_matriz"
+
 
 ## . reglas ----
 
@@ -988,5 +936,96 @@
 #' dplyr::filter(d, !is.na(od_alto), od_alto | od_bajo)
 "reglas"
 
-#' Tabla con rangos de valores normales para parámetros
-"lim"
+
+## . t_eti_base ----
+
+#' Tabla de etiquetas base
+#'
+#' Tabla de base para hacer etiquetas para gráficos u otros usos, basándose en
+#' las tablas del SIA (infambientalbd).
+#'
+#' La motivación es unificar criterios para el formato de las etiquetas
+#' utilizadas en los contenidos creados por DCA, incluyendo informes, reportes,
+#' etc. Se espera poder construir la tabla en base a acuerdos y eventualmente
+#' tener etiquetas unificadas para todos los parámetros.
+#'
+#' Fecha de creación: 2020-10-29
+#'
+#' @format Tabla con `r nrow(t_eti_base)` filas y `r ncol(t_eti_base)` columnas:
+#'
+#'   \describe{
+#'
+#'   \item{id_parametro}{integer. Identificador único de cada parámetro.}
+#'
+#'   \item{etiqueta}{character. Texto de etiqueta para gráficos, etc...}
+#'
+#'   }
+#'
+#' @source \code{infambientalbd}
+#'
+#' @examples
+#' # Código de creación:
+#' t_eti_base <-
+#'   sia_parametro %>%
+#'   dplyr::left_join(dplyr::select(codigos_param, id_parametro, codigo_nuevo),
+#'                    by = "id_parametro") %>%
+#'   dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo),
+#'                                        nombre_clave, codigo_nuevo)) %>%
+#'   dplyr::left_join(sia_param_unidad, by = "id_parametro") %>%
+#'   dplyr::filter(id_matriz == 6L) %>%
+#'   dplyr::left_join(sia_unidad, by = c("id_unidad_medida" = "id")) %>%
+#'   dplyr::transmute(id_parametro,
+#'                    etiqueta = paste0(param, " (", uni_nombre, ")"))
+"t_eti_base"
+
+## . tipos_de_dato -----
+
+#' Clasificación de los datos según el valore escrito
+#'
+#' Esta tabla registra los tipos de dato encontrados en infambientalbd
+#' (específicamente, en la columna `valor_minimo_str` de la tabla
+#' \code{\link{sia_datos_muestra_parametros}}).
+#'
+#' Se espera que los tipos de dato (columna `tipo_dato`) se autoexpliquen. En
+#' particular, las categorías `<X` y `>X` refieren a casos en los que se X es un
+#' valor numérico, como "<2.0" o ">5000".
+#'
+#' @seealso \code{\link{clasif_tipo_dato}}
+#'
+#' @format Tabla con 7 filas y 2 columnas:
+#'
+#'   \describe{
+#'
+#'   \item{tipo_dato}{character. Nombre de las categorías (tipos) de datos.}
+#'
+#'   \item{id_tipo_dato}{integer. Id, número único entero que identifica a cada
+#'   tipo de dato}
+#'
+#'   }
+#'
+#' @examples
+#' # Para crear la tabla:
+#' tipos_de_dato <- tibble::tibble(
+#'   tipo_dato = c("NUMERICO", "<LD", "<LC", "LD<X<LC", "<X", ">X", "OTRO"),
+#'   id_tipo_dato = 1:7
+#' )
+"tipos_de_dato"
+
+# . usuarios -----
+
+#' Tabla con lista de usuarios
+#'
+#' La lista de usuarios que han cargado datos de muestras a las tablas del SIA.
+#'
+#' @seealso \code{\link{sia_datos_muestra_parametros}}
+#'
+#' @format Tabla con `r nrow(usuarios)` filas y
+#' `r ncol(usuarios)` columnas:
+#'
+#'   \describe{
+#'
+#'   \item{usuario}{character. Nombre de usuario}
+#'
+#'   }
+#'
+"usuarios"

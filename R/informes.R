@@ -197,7 +197,7 @@ amoniaco_libre_add <- function(.data) {
 #' En general puede considerarse como el resultado de \code{prod(x) ^ (1 /
 #' length(x))}, aunque en lugar de usar \code{^(1/length(x))} se usa la función
 #' \code{\link{raiz}}, diseñada para contemplar casos particulares.
-#' 
+#'
 #' Elimina automáticamente los NAs contenidos en \code{x}.
 #'
 #' @seealso \href{https://es.wikipedia.org/wiki/Media_geom%C3%A9trica}{Artículo
@@ -338,7 +338,7 @@ tsummary <- function(.data, columna) {
 #'      ylab = dplyr::filter(t_eti, id_parametro == 9999L)[[2]])
 t_eti_add <- function(id_parametro = NULL, etiqueta) {
 
-  out <- t_eti_base
+  out <- siabox::t_eti_base
   if (is.null(id_parametro))
     return(out)
 
@@ -400,7 +400,7 @@ t_eti_add <- function(id_parametro = NULL, etiqueta) {
 eti <- function(id_parametro, t_eti) {
 
   if (missing(t_eti)) {
-    t_eti <- t_eti_base
+    t_eti <- siabox::t_eti_base
     warning("Argumento t_eti faltante: se usa la tabla base (ver ?t_eti_base)")
   }
 
@@ -499,14 +499,14 @@ g_mes_pto <- function(.data,
     if (missing(nombre_clave))
       stop("id_parametro y nombre_clave no especificados")
     id_parametro <-
-      dplyr::filter(sia_parametro, nombre_clave == !!nombre_clave)$id_parametro
+      dplyr::filter(siabox::sia_parametro, nombre_clave == !!nombre_clave)$id_parametro
     if (!length(id_parametro))
       stop("nombre_clave no encontrado en sia_parametro")
   }
 
   if (missing(ylab)) {
     if (missing(t_eti)) {
-      t_eti <- t_eti_base
+      t_eti <- siabox::t_eti_base
       warning("Se usa t_eti_base como sustituta del argumento t_eti")
     }
     ylab <- eti(id_parametro, t_eti)
@@ -532,9 +532,9 @@ g_mes_pto <- function(.data,
   # Si no hay datos del parámetro:
   if (!nrow(out$data)) {
     corte <-
-      sia_parametro %>%
+      siabox::sia_parametro %>%
       dplyr::filter(id_parametro == !!id_parametro) %>%
-      dplyr::left_join(codigos_param, by = "id_parametro")
+      dplyr::left_join(siabox::codigos_param, by = "id_parametro")
 
     texto_par <- corte$parametro.x
 
@@ -553,7 +553,7 @@ g_mes_pto <- function(.data,
   }
 
   # Decreto 253/79: Líneas Horizontales
-  dec <- dplyr::filter(decreto, id_parametro == !!id_parametro,
+  dec <- dplyr::filter(siabox::decreto, id_parametro == !!id_parametro,
                        clase == "1",
                        !is.na(valor))
   if (nrow(dec)) {
@@ -572,7 +572,7 @@ g_mes_pto <- function(.data,
 g_mes_pto_all <- function(.data, id_parametro, t_eti, ...) {
 
   if (missing(t_eti)) {
-    t_eti <- t_eti_base
+    t_eti <- siabox::t_eti_base
     warning("Se usa t_eti_base como sustituta del argumento t_eti")
   }
 
@@ -611,7 +611,8 @@ d_est_bar <- function(.data,
     if (missing(nombre_clave))
       stop("id_parametro y nombre_clave no especificados")
     id_parametro <-
-      dplyr::filter(sia_parametro, nombre_clave == !!nombre_clave)$id_parametro
+      dplyr::filter(siabox::sia_parametro, 
+                    nombre_clave == !!nombre_clave)$id_parametro
     if (!length(id_parametro))
       stop("nombre_clave no encontrado en sia_parametro")
   }
@@ -644,14 +645,15 @@ g_est_bar <- function(.data,
     if (missing(nombre_clave))
       stop("id_parametro y nombre_clave no especificados")
     id_parametro <-
-      dplyr::filter(sia_parametro, nombre_clave == !!nombre_clave)$id_parametro
+      dplyr::filter(siabox::sia_parametro, 
+                    nombre_clave == !!nombre_clave)$id_parametro
     if (!length(id_parametro))
       stop("nombre_clave no encontrado en sia_parametro")
   }
 
   if (missing(ylab)) {
     if (missing(t_eti)) {
-      t_eti <- t_eti_base
+      t_eti <- siabox::t_eti_base
       warning("Se usa t_eti_base como sustituta del argumento t_eti")
     }
     ylab <- eti(id_parametro, t_eti)
@@ -670,7 +672,8 @@ g_est_bar <- function(.data,
           text = element_text(size = 10),
           axis.text.x = element_text(angle=30, vjust=1))
 
-  dec <- dplyr::filter(decreto, id_parametro == !!id_parametro & clase == "1")
+  dec <- dplyr::filter(siabox::decreto, 
+                       id_parametro == !!id_parametro & clase == "1")
 
   if (nrow(dec)) {
     out <- out +
@@ -712,14 +715,14 @@ g_cue_box <- function(.data,
     if (missing(nombre_clave))
       stop("id_parametro y nombre_clave no especificados")
     id_parametro <-
-      dplyr::filter(sia_parametro, nombre_clave == !!nombre_clave)$id_parametro
+      dplyr::filter(siabox::sia_parametro, nombre_clave == !!nombre_clave)$id_parametro
     if (!length(id_parametro))
       stop("nombre_clave no encontrado en sia_parametro")
   }
 
   if (missing(ylab)) {
     if (missing(t_eti)) {
-      t_eti <- t_eti_base
+      t_eti <- siabox::t_eti_base
       warning("Se usa t_eti_base como sustituta del argumento t_eti")
     }
     ylab <- eti(id_parametro, t_eti)
@@ -783,12 +786,12 @@ g_iet <- function(.data) {
                        'Mesotr\u00f3fico', 'Eutr\u00f3fico',
                        'Supereutr\u00f3fico', 'Hipereutr\u00f3fico'),
              alpha = 0.6) +
-    geom_segment(aes(x=codigo_pto, xend=codigo_pto, y=0, yend=IET)) +
-    geom_point(size=1.5, with=0.1) +
+    geom_segment(aes(x = codigo_pto, xend = codigo_pto, y = 0, yend = IET)) +
+    geom_point(size = 1.5, with = 0.1) +
     # scale_shape_manual(values = c(15, 0, 1, 3, 17))+
     scale_y_continuous(limits = c(45, 70)) +
     scale_x_discrete() +
-    labs(y='IET', x='Estaciones')+
+    labs(y = 'IET', x = 'Estaciones') +
     theme_bw()
   return(out)
 }
@@ -1098,9 +1101,9 @@ g_long_files_loop <- function(.data, anio, ventana_anios, tabla_horiz,
 
   archivos <-
     tibble::tibble(id_parametro = id_par) %>%
-    dplyr::left_join(sia_parametro, by = "id_parametro") %>%
+    dplyr::left_join(siabox::sia_parametro, by = "id_parametro") %>%
     dplyr::mutate(out = nombre_clave %>%
-                    toascii() %>%
+                   toascii() %>%
                     stringr::str_replace_all("[^[:alnum:]]", "_") %>%
                     stringr::str_replace_all("_+", "_") %>%
                     paste0("grafico_", ., "_", anio,".png")) %>%
