@@ -99,22 +99,19 @@ partir del uso de la función \code{link{valores_numericos}} con la opción
 clasificación de cada dato según siete categorías (ver
 \code{\link{tipos_de_dato}})}
 
-\item{tipo_dato}{Descripción, en texto, de la categoría correspondiente a
-\code{id_tipo_dato}.}
+\item{nombre_subcuenca_informes}{Nombre dado a cada subcuenca dentro de los
+informes anuales de los programas de monitoreo.}
+
+\ite{codigo_pto_mnod}{Nombre de la estación modificado, siguiendo los
+códigos presentes en la tabla \code{\link{cuencas_informes}}}
 
 \item{grupo}{Grupo al que pertenece el parámetro (ej.: Parámetros de
 Biológicos, Parámetros de Ecotoxicidad). No todos los parámetros tienen un
 grupo asignado.}
 
-\item{codigo_nuevo}{Nombre corto del parámetro segun
-\code{\link{codigos_param}}}
-
 \item{param}{Nombre corto del parámetro (mejorado a partir de
 \code{\link{codigos_param}}; en caso de parámetros que no figuran en esa
 tabla, se usa el \code{nombre_clave} de \code{\link{sia_parametro}})}
-
-\item{nombre_subcuenca_informes}{Nombre dado a cada subcuenca dentro de los
-informes anuales de los programas de monitoreo.}
 
 }
 }
@@ -127,43 +124,6 @@ datos_sia
 \description{
 La tibble \code{datos_sia} tiene datos de matriz Aguas superficiales y
 \code{datos_sia_sed} de Sedimentos. Fecha de extracción: 2020-11-04.
-}
-\details{
-Código de creación de las tablas:\preformatted{cp <- codigos_param \%>\%
-  dplyr::filter(!is.na(id_parametro)) \%>\%
-  dplyr::select(grupo, codigo_nuevo, id_parametro)
-
-datos_sia <-
-  consulta_muestras(con, id_matriz = 6L) \%>\%
-  valores_numericos(metodo = "informe", filtrar_no_num = TRUE) \%>\%
-  dplyr::left_join(cp, by = "id_parametro") \%>\%
-  dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo),
-                                       nombre_clave,
-                                       codigo_nuevo),
-                anio = as.integer(anio),
-                mes = as.integer(mes)) \%>\%
-  dplyr::left_join(
-    dplyr::select(cuencas_informes, nombre_subcuenca_informes, id_estacion),
-    by = "id_estacion") \%>\%
-  dplyr::select(-id_estado)
-
-save(datos_sia, file = "data/datos_sia.rda")
-
-datos_sia_sed <- 
-  consulta_muestras(con, id_matriz = 11L) \%>\%
-  valores_numericos(metodo = "informe", filtrar_no_num = TRUE) \%>\%
-  dplyr::left_join(cp, by = "id_parametro") \%>\% 
-  dplyr::mutate(param = dplyr::if_else(is.na(codigo_nuevo), 
-                                       nombre_clave, 
-                                       codigo_nuevo), 
-                anio = as.integer(anio), mes = as.integer(mes)) \%>\%
-  dplyr::left_join(
-    dplyr::select(cuencas_informes, nombre_subcuenca_informes, id_estacion),
-    by = "id_estacion") \%>\%
-  dplyr::select(-id_estado)
-
-save(datos_sia_sed, file = "data/datos_sia_sed.rda")
-}
 }
 \seealso{
 \code{\link{tipos_de_dato}}, \code{\link{consulta_muestras}},

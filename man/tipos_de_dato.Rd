@@ -3,7 +3,7 @@
 \docType{data}
 \name{tipos_de_dato}
 \alias{tipos_de_dato}
-\title{Tabla tipos de dato}
+\title{Clasificación de los datos según el valore escrito}
 \format{
 Tabla con 7 filas y 2 columnas:
 

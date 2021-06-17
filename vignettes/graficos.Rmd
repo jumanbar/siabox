@@ -1,34 +1,42 @@
 ---
 title: "Gráficos"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    tod_depth: 2
+    number_sections: true
 vignette: >
   %\VignetteIndexEntry{graficos}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
+editor_options:
   chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.width = 6, fig.height = 4, 
+knitr::opts_chunk$set(echo = TRUE, fig.width = 6, fig.height = 4,
                       fig.align='center')
 ```
 
-- 
+# Resumen
 
-- par_id es muy útil
+En este documento veremos primero algunos ejemplos de cómo se usan las funciones gráficas del paquete y luego profundizaremos en los conceptos generales necesarios para entender las lógicas que hay detrás.
 
-- Códigos nuevos para parámetros (columna param en datos_sia*; tabla codigos_param)
+Luego visitaremos varios tópicos, dando algunos ejemplos relevantes (tenga en cuenta que en muchos casos ya existen ejemplos de prueba en la documentación de las funciones de interés):
 
-- Subcuencas
+- Patrones generales: los criterios que se usaron para construir y nombrar las funciones relacionadas a la construcción de gráficos.
+- Uso de los `id`, especialmente `id_parametro`: su relevancia y cómo el paquete intenta que sea lo más ameno posible.
+- Subcuencas e informes (tabla `cuencas_informes`): las clasificaciones de cuencas y, especialmetne, subcuencas, no están del todo alineadas con las formas en que se clasifican en los informes de rutina. La tabla `cuencas_informes` busca hacer complemento de la clasificación del SIA, a fin de poder automatizar informes.
+- Etiquetas apropiadas para los gráficos (argumento `t_eti`, tabla `t_eti_base` y función `t_eti_add`)
+- Modificar funciones ...
 
-- Etiquetas (incluir unipar capaz)
+# Un ejemplo para iniciar
 
+## Cargando datos
 
+Siempre lo primero es tener un conjunto de datos preparado. En este caso, serán de Laguna Merín 2019, para ciertos parámetros:
 
-
-
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(siabox)
 d <- filtrar_datos(datos_sia, id_programa = 10L, id_matriz = 6L,
@@ -36,27 +44,230 @@ d <- filtrar_datos(datos_sia, id_programa = 10L, id_matriz = 6L,
                    tipo_punto_id = 1L,
                    id_parametro = c(2098, 2101, 2099, 2097, 2102, 2032,
                                     2018, 2090, 2021, 2017))
+```
 
-# Gráfico individual para el fosfato:
-g_mes_pto(d, 2097)
+Este ejemplo usa la tabla `datos_sia`, la cual viene incluida en el paquete. Para saber más sobre los datos incluídos, se recomienda la viñeta correspondiente:
 
-# (Se trata de un tipo de gráfico para combinar, de ahí que no esté la leyenda)
+```r
+vignette('datos-incluidos', package = 'siabox')
+```
 
-# La etiqueta puede mejorarse. Para eso está la función t_eti_add:
-# 
-# # La etiqueta puede mejorarse. Para eso está la función t_eti_add:
+## Primer gráfico
 
+El gráfico siguiente me muestra los valores del fosfato (PO4) para cada estación y cada mes:
+
+```{r, message=FALSE, warning=FALSE}
+g_mes_pto(d, 2097, legend.position = 'bottom')
+```
+
+El nombre de la función hace referencia al gráfico resultante: `g_` por gráfico, `_mes_` porque es parte importante de la información representada y `_pto` porque es un gráfico de puntos. Más adelante (parte 1.ii) se explican los criterios utilizados, pero básicamente siguen ese patrón.
+
+## Las etiquetas
+
+En cuanto al eje y, podríamos decir que la etiqueta puede mejorarse. Para esto hay dos opciones:
+
+1. Usar el argumento `ylab` para **ese gráfico en particular**:
+
+```{r, message=FALSE, warning=FALSE}
+g_mes_pto(d, 2097, legend.position = 'bottom',
+          ylab = expression('PO'[4]*' ('*mu*'g-P/L)')) +
+  ggtitle('La diferencia es que el 4 en PO4 ahora es un subíndice')
+```
+
+> Nota: el lectore distraíde no lo habrá notado, pero en el ejemplo se usa el operador + y `ggtitle`, de ggplot2, para agregar un título... El mensaje es: las funciones del paquete son compabibles, en principio, con ggplot2.
+
+2. Cambiar la etiqueta de una vez por todas, de forma que de aquí en más, **todos los gráficos** de mi informe usarán esa etiqueta.
+
+En este caso, hay que recurrir al argumento `t_eti`. El mismo recibe una tabla listando parámetros y sus etiquetas correspondientes... El siguiente ejemplo muestra el cómo, sin explicar mucho lo que está ocurriendo, puesto que eso se hace más adelante (.
+
+En el mismo ya aprovechamos y cambiamos varias etiquetas al mismo tiempo, para luego usar la función `g_mes_pto_all`, que agrega los gráficos de todos los parámetros incluidos en el argumento `id_parametro`:
+
+```{r, message=FALSE, warning=FALSE}
 etiquetas <- t_eti_add(id_parametro = c(2098L, 2101L, 2099L, 2097L, 2091L),
-                       c(
-                         expression('PT ('*mu*'g-P/L)'),
+                       c(expression('PT ('*mu*'g-P/L)'),
                          expression('NO'[2]*' (mg-N/L)'),
                          expression('NO'[3]*' (mg-N/L)'),
                          expression('PO'[4]*' ('*mu*'g-P/L)'),
-                         expression('NH'[3]*' ('*mu*'g-N/L)')
-                       )
-                       )
+                         expression('NH'[3]*' ('*mu*'g-N/L)')))
 
 g_mes_pto_all(d, id_parametro = c(2098, 2101, 2099, 2097, 2102, 2091), ncol = 3,
               t_eti = etiquetas)
+```
+
+Si luego queremos usar otra función gráfica del paquete, podemos volver al argumento `t_eti` para reutilizar las etiquetas creadas:
+
+```{r, message=FALSE, warning=FALSE}
+g_est_dsv_all(d, id_parametro = c(2098, 2101, 2099, 2097, 2102, 2091), ncol = 3,
+              t_eti = etiquetas)
+```
+
+## Parámetros según `id`
+
+Tal vez haya llamado la atención que se usan números, como 2098, 2101, etc, para hacer referencia a los parámetros, generalmente con un argumento llamado `id_parametro`. 
+
+El criterio es que cada parámetro tiene un `id` asignado y permanente, de forma que el mismo se mantiene aún cuando el nombre, descripción u otra característica del parámetro sea modificado en el futuro. La función `par_id` se puede usar para buscar el `id_parametro` que precisamos:
+
+```{r}
+par_id('fósforo')
+```
+
+En la viñeta 'datos-incluidos' se profundizan tanto el uso de `id`s en general como las funciones de ayuda que provee el paquete. Se recomienda visitar dicha viñeta, especialmente las secciones "IDs", y "Buscadores de ID":
+
+```r
+vignette('datos-incluidos', package = 'siabox')
+```
+
+# Lista de funciones
+
+Se incluyen todas las que están relacionadas con la creación de gráficos.
+
+- `d_est_bar`: Prepara datos para `g_est_bar` (presentar modas y desvíos)
+- `d_lon`: Funcion que (internamente) prepara los datos para `g_lon_pto`
+- `eti`: Devuelve la etiqueta para el parámetro seleccionado por su `id`, basado en la tabla `t_eti` (segundo argumento).
+- `g_cue_box`: Gráfico de cajas (boxplot) para comparación de valores de un parámetro entre cuencas
+- `g_est_dsv`: Muestra promedios y desvíos estándares de un parámetro para las estaciones encontradas en `.data`
+- `g_est_dsv_all`: Ídem que anterior, pero para todos los parámetros incluidos en el argumento `id_parametro`
+- `g_iet_pto`: Gráfico de IET (Índice de Estado Trófico), con un fondo coloreado según categorías predeterminadas
+- `g_lon_pto`: Grafica los valores de los parámetros por estaciones, incluyendo comparación con años anteriores.
+- `g_lon_pto_files`: Ídem que `g_lon_pto`, pero guarda los gráficos en archivos, tantos como parámetros incluidos en el argumento `id_parametro`
+- `g_mes_pto`: Grafica los valores de un parámetro por mes, usando colores para diferenciar las estaciones
+- `g_mes_pto_all`: Ídem que el anterior, pero para todos los parámetros incluidos en el argumento `id_parametro`
+- `t_eti_add` : Agrega o modifica etiquetas a la tabla `t_eti_base`
+
+
+# Patrones generales
+
+Las funciones para crear gráficos intentan seguir patrones sencillos, a fin de ayudar a la memoria de quien las usa.
+
+## Argumentos
+
+Siguiendo el estilo de [dplyr](https://dplyr.tidyverse.org/), siempre el primer argumento es **`.data`**: una data.frame con los datos que van a usarse para el gráfico. Esto facilita el uso del pipe `%>%` de [magrittr](https://magrittr.tidyverse.org/).
+
+El segundo argumento siempre es `id_parametro`. La idea es que normalmente se seleccione el parámetro de interés usando su identificador único, el cual siempre será el mismo aunque cambie el nombre designado al parámetro (ver parte 2).
+
+Muchas funciones tienen el argumento opcional `nombre_clave`, de forma que se puede ingresar el nombre del parámetro. Es importante que `nombre_clave` debe estar escrito exactamente igual que en la columna del mismo nombre de `sia_parametro` (para saber más de esta data.frame incluida en el paquete, ver la ayuda de la misma, o la viñeta 'datos-incluidos'). En corto, el `nombre_clave` es la abreviación que utilizan normalmente las aplicaciones del SIA para referir a cada parámetro.
+
+Entonces, estos dos comandos son equivalentes:
+
+```r
+g_cue_box(d, id_parametro = 2098)
+g_cue_box(d, nombre_clave = 'PT')
+```
+
+Por último, además de otros argumentos necesarios para las distintas funciones, siempre se incluye al final el argumento `t_eti`, el cual puede omitirse o usar con referencia a una tabla con etiquetas asignadas a cada parámetro. Esto se profundiza en la parte 5.
+
+## Nombres
+
+Los nombres de las funciones siguen ciertos criterios:
+
+- prefijo: `g_` para gráficos, `d_` para preparar data.frames
+- tema: `_mes_` refiere a graficar valores a lo largo de los meses (eje x); `_est_` grafica valores a lo largo de las estaciones; etc... La elección de los nombres es subjetiva y no revela inmediatamente la salida generada.
+- formato: `_pto` refiere a gráfico de puntos, `_dsv` refiere a desvíos estándar, `_box` a gráfico de cajas, etc.
+- extra... por ejemplo `_all` refiere a una combinación de gráficos, generalmente incluyendo a todos los parámetros encontrados en el argumento `id_parametro`; `_files` guarda gráficos en archivos separados por parámetros u otro criterio.
+
+# En informes
+
+Las siguientes partes describen un poco las estrategias adoptadas por este paquete para poder automatizar la mayor cantidad posible de los contenidos de los informes.
+
+En general se trata de unificar criterios de nombre o formato. Por ejemplo, el uso de una tabla con todas las etiquetas necesarias, busca unificar el formato de las etiquetas en los gráficos. Esto se complementa con el uso de ids, en todos los casos que es posible, en lugar de los nombres de parámetros (o programas, etc), para no depender de que los nombres se mantengan estables (ya que, de hecho, sabemos que hay nombres que deberían ser modificados). De manera similar, existe una tabla para clasificar de manera alternativa las subcuencas y renombrar las estaciones de monitoreo.
+
+## Uso de los id
+
+En todas las funciones se pueden usar números para elegir parámetros, tales como, como 2098, 2101, etc, generalmente con un argumento llamado `id_parametro`. 
+
+El criterio es que cada parámetro tiene un `id` asignado y permanente, de forma que el mismo se mantiene aún cuando el nombre, descripción u otra característica del parámetro sea modificado en el futuro. La función `par_id` se puede usar para buscar el `id_parametro` que precisamos:
+
+```{r}
+par_id('fósforo')
+```
+
+Es importante recordar que no solamente los parámetros tienen `id`, sino que también los programas de monitoreo, estaciones, cuencas, etc. En la viñeta 'datos-incluidos' se profundizan tanto el uso de `id`s en general como las funciones de ayuda que provee el paquete. 
+
+Se recomienda visitar dicha viñeta, especialmente las secciones "IDs", y "Buscadores de ID":
+
+```r
+vignette('datos-incluidos', package = 'siabox')
+```
+
+## Subcuencas
+
+las clasificaciones de cuencas y, especialmetne, subcuencas, no están del todo alineadas con las formas en que se clasifican en los informes de rutina.
+
+Un ejemplo es el programa Laguna Merín. Si miramos la lista de subcuencas registradas en el SIA (tabla `sia_sub_cuenca`), encontramos estos nombres: `r filter(sia_sub_cuenca, sub_cue_cuenca_id == 4)$sub_cue_nombre %>% unique %>% siabox:::colapsar_secuencia()`. Sin embargo, esta es la clasificación que se realiza en los informes: `r filter(cuencas_informes, id_programa == 10)$nombre_subcuenca_informes %>% unique %>% siabox:::colapsar_secuencia()`.
+
+La tabla `cuencas_informes` busca hacer complemento de la clasificación del SIA, a fin de poder automatizar informes. Se trata de una data.frame que permite asociar estaciones, cuencas y programas, con una nueva clasificación de subcuencas, la cual está en una columna propia llamada `nombre_subcuenca_informes`:
+
+```{r}
+filter(cuencas_informes, id_programa == 10)
+```
+
+Para facilitar las tareas a usuaries, la columna mencionada está incluida en las tablas `datos_sia*` y en las descargas desde iSIA.
+
+La función `g_cue_box` usa esta clasificación por defecto:
+
+```{r, message=FALSE, warning=FALSE}
+d <- filtrar_datos(datos_sia, id_programa = 10L, id_matriz = 6L,
+                   rango_fechas = c('2014-01-01', '2019-12-31'),
+                   tipo_punto_id = 1L,
+                   id_parametro = c(2098, 2101, 2099, 2097, 2102, 2032,
+                                    2018, 2090, 2021, 2017))
+g_cue_box(d, id_parametro = 2099, t_eti = etiquetas)
+```
+
+Y a su vez, es fácil de usar para crear tablas con resúmenes:
+
+```{r}
+d %>%
+  filter(id_parametro == 2099) %>% 
+  group_by(nombre_subcuenca_informes) %>% 
+  tsummary(valor)
+```
+
+## Estaciones de monitoreo
+
+De una manera similar a lo que ocurre con la columna `nombre_subcuenca_informes` de la `cuencas_informes`, la columna `codigo_pto_mod` de la misma tabla incluye nombres alternativos (_modificados_) para las estaciones incluidas.
+
+Dicha columna está agregada, también, a las tablas `datos_sia*` y a las descargas de iSIA, aunque en los casos en los que no hay un nombre alternativo, simplemente queda el valor `NA`.
+
+Las columnas `nombre_subcuenca_informes` y `codigo_pto_mod` de la tabla `cuencas_informes` están en construcción y se aspira a construir colectivamente hasta cubrir las necesidades más importantes.
+
+## Etiquetas
+
+Las etiquetas que usamos para los parámetros en los gráficos (ejes x o y) constan de dos partes: nombre abreviado del parámetro y las unidades entre paréntesis.
+
+La idea es unificar el criterio para las mismas, y por eso la tabla **`t_eti_base`** reune todas las etiquetas, haciendo referencia a los parámetros mediante el `id_parametro`:
+
+```{r}
+t_eti_base
+```
+
+Lo que sucede es que muchas veces estas etiquetas no cumplen los requisitos de formato que necesita un informe o publicación. Por lo tanto, se creó la función `t_eti_add` para modificar etiquetas de parámetros, o incluso agregar parámetros y etiquetas nuevos.
+
+El resultado de usar esta función es una nueva tabla de etiquetas, que se puede usar para todo el resto del informe.
+
+```{r}
+etiquetas <- t_eti_add(id_parametro = 2098, etiqueta = 'Fósforo Total (µg/L)')
+tail(etiquetas)
+```
+
+> Nota: las etiquetas agregadas o modificadas, siempre se ponen al final; por esto es que el ejemplo usa `tail`.
+
+La función de ayuda `eti` nos permite mirar específicamente la etiqueta asociada a un `id_parametro` en particular:
+
+```{r}
+eti(2098)
+eti(2098, etiquetas)
+```
+
+Como se puede ver en el ejemplo, los resultados son diferentes. Eso es porque en el primer caso, `eti` consulta a la tabla de etiquetas por defecto, `t_eti_base`, mientras que en el segundo, utiliza la tabla creada para nuestro propósito: `etiquetas`.
+
+Como se puede deducir de estos ejemplos, las tablas de etiquetas deben ser actualizadas al inicio de todos los informes, si es que no estamos conformes con las etiquetas por defecto. Además de ser una inconveniencia, dificulta la unificación de criterios a usar por todo el departamento. Lo ideal sería acordar criterios para eventualmente tener una `t_eti_base` pulida que no necesite de las modificaciones ejemplificadas aquí.
+
+#### Una ayuda con las unidades
+
+Una situación frecuente es la necesidad de averiguar cuáles son las unidades de medida asignadas a cada parámetro dentro del SIA. La función `unipar` está pensada para facilitar la búsqueda de unidades. Para ello necesita `id`s de parámetro y matriz (esta última se asume 6, Aguas superficiales, por defecto, siendo la alternativa 11, Sedimentos):
+
+```{r}
+unipar(2099)
 ```
 

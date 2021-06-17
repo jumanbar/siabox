@@ -1,8 +1,23 @@
+siabox
+================
 
--   [siabox](#siabox)
-    -   [Instalación](#instalación)
-    -   [Modo de uso](#modo-de-uso)
-    -   [Para desearrolladores](#para-desearrolladores)
+-   [Introducción](#introducción)
+-   [Instalación](#instalación)
+-   [Modo de uso](#modo-de-uso)
+    -   [Con extracciones de iSIA](#con-extracciones-de-isia)
+    -   [Con datos incluidos en el
+        paquete](#con-datos-incluidos-en-el-paquete)
+    -   [Cálculos útiles](#cálculos-útiles)
+-   [Construcción colectiva del
+    paquete](#construcción-colectiva-del-paquete)
+    -   [Enviar código ‘suelto’](#enviar-código-suelto)
+    -   [Crear una función nueva](#crear-una-función-nueva)
+    -   [Modificar una función
+        existente](#modificar-una-función-existente)
+    -   [Código *listo para incorporar*](#código-listo-para-incorporar)
+    -   [Vías de comunicación](#vías-de-comunicación)
+    -   [Sobre el desarrollo de paquetes en
+        general](#sobre-el-desarrollo-de-paquetes-en-general)
 
 <!-- README.md is generated from README.Rmd.
 
@@ -13,7 +28,7 @@ Lo mismo para datos_sia
 
 Please edit that file -->
 
-# siabox
+# Introducción
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -43,7 +58,7 @@ vignette('graficos', package = 'siabox')
 vignette('datos-incluidos', package = 'siabox')
 ```
 
-## Instalación
+# Instalación
 
 El paquete se puede instalar desde GitHub:
 
@@ -52,7 +67,7 @@ El paquete se puede instalar desde GitHub:
 devtools::install_github("jumanbar/siabox")
 ```
 
-## Modo de uso
+# Modo de uso
 
 La idea es que el paquete trabaje en conjunto con la aplicación
 [iSIA](dinama-shiny:3838/sia_apps/iSIA/). En la práctica, el flujo puede
@@ -77,7 +92,7 @@ demo('informe-laguna-merin-html', 'siabox')
 demo('informe-laguna-merin-doc',  'siabox')
 ```
 
-### Con extracciones de iSIA
+## Con extracciones de iSIA
 
 El siguiente es un ejemplo que usa datos extraídos de iSIA (formato
 ‘largo’):
@@ -108,12 +123,12 @@ d <- filtrar_datos(datos_sia,
 Se puede, por ejemplo, crear un gráfico de IET como el siguiente:
 
 ``` r
-d %>% iet_tabla() %>% g_iet()
+d %>% iet_tabla() %>% g_iet_pto()
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
-En este caso se están usando las funciones `iet_tabla` y `g_iet` del
+En este caso se están usando las funciones `iet_tabla` y `g_iet_pto` del
 paquete. Aquí no se muestra, pero el paquete incluye una tercer función
 relacionada: `iet`.
 
@@ -157,14 +172,14 @@ g_mes_pto_all(d, id_parametro = c(2098, 2101, 2099, 2097, 2102, 2091), ncol = 3)
 > `t_eti_add` (ver viñeta ‘gráficos’).
 
 El paquete cuenta con otras funciones listas para crear gráficos de
-informes: ver `?g_mes_pto` o `?g_long` para más ejemplos, pero se
+informes: ver `?g_mes_pto` o `?g_lon_pto` para más ejemplos, pero se
 recomienda especialmente leer la viñeta ‘graficos’:
 
 ``` r
 vignette('graficos', package = 'siabox')
 ```
 
-### Con datos incluidos en el paquete
+## Con datos incluidos en el paquete
 
 El paquete viene con dos conjuntos de datos extraídos del SIA: ver
 `?datos_sia` o `?datos_sia_sed` para acceder a la documentación de estas
@@ -195,7 +210,7 @@ d <- filtrar_datos(datos_sia,
                    id_parametro = c(2098, 2101, 2099, 2097, 2102, 2032,
                                     2018, 2090, 2021, 2017))
 
-g_long(d, 2098, anio = 2019)
+g_lon_pto(d, 2098, anio = 2019)
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
@@ -211,14 +226,14 @@ el paquete, se recomienda visitar la viñeta `datos-incluidos`:
 vignette('datos-incluidos', package = 'siabox')
 ```
 
-### Cálculos útiles
+## Cálculos útiles
 
 El paquete cuenta con algunas funciones relativamente simples que son de
 ayuda para realizar cálculos frecuentes: `iet`, `iet_tabla`,
 `amoniaco_libre`, `amoniaco_libre_add`, `media_geom`, `raiz` y
 `tsummary` .
 
-#### Índice de estado trófico (IET)
+### Índice de estado trófico (IET)
 
 La función `iet` calcula el IET para valores de Fósforo Total (en
 microgramos por litro):
@@ -232,7 +247,7 @@ plot(PT, iet(PT), ylab = "IET", xlab = "PT (ug/L)", pch = 20)
 
 <img src="man/figures/README-iet-1.png" width="100%" />
 
-#### Tabla con categorías de IET
+### Tabla con categorías de IET
 
 Agrupa valores de IET por estación de monitoreo (`codigo_pto`),
 asignando categorías a los valores según su IET (Oligotrófico,
@@ -339,7 +354,7 @@ iet_tabla(d, anio) %>%
 #> 7  2019 Mesotrófico       14  54.6     55.4  56.5    57       57.5  58.5
 ```
 
-#### Estadísticas resumen
+### Estadísticas resumen
 
 La función **`tsummary`**, usada en el ejemplo anterior, es una ayuda
 para obtener cálculos similares a los de `summary`, que permite agrupar
@@ -420,7 +435,164 @@ media_geom(x)
 #> [1] 7.942157
 ```
 
-## Para desearrolladores
+# Construcción colectiva del paquete
+
+Al momento del lanzamiento de este paquete, el universo de funciones
+será limitado, naturalmente. Por esta razón es de interés considerar
+posibles aportes de usaries a la construcción del mismo.
+
+Para esto hay que tener en cuenta que todo lo que se incorpore al
+paquete será en forma de tablas o funciones: código que sirva [para un
+rango de situaciones](https://youtu.be/z-7DEclTCyQ).
+
+Para aportar esta construcción, pueden haber infinidad de formas, desde
+comentarios problemas, mejoras, etc, hasta aportes de código original.
+En este último caso me quiero concentrar. En principio se pueden
+imaginar dos formas ‘extremas’:
+
+-   Aportes de código ‘suelto’, que debe ser convertido en una función,
+    con todo lo que ello implica, e incorporada al paquete.
+
+-   Aportes de funciones listas para incluir en el paquete, sin más.
+
+El segundo caso es un ideal, seguramente poco realista aunque deseable.
+A continuación paso a describir algunas posibles formas de contribuir
+entre estos extremos.
+
+## Enviar código ‘suelto’
+
+Este caso sería simplemente enviando código que creado para hacer una
+gráfica o tabla, por ejemplo, aunque tiene algunos detalles extra a
+tener en cuenta.
+
+En primer lugar, el contexto. Para qué se utilizaría? En qué
+situaciones? Es para algún programa de monitoreo en particular? Etc. Es
+deseable que estas cosas se expresen con la mayor claridad posible.
+
+También es importante estar atento a que lo enviado sea suficiente para
+tener un [ejemplo mínimo
+reproducible](https://es.stackoverflow.com/help/minimal-reproducible-example),
+lo cual suele implicar datos, código, etc. En otras palabras: todo lo
+necesario para que otra persona pueda ejecutar el código y obtener
+exactamente el mismo resultado.
+
+## Crear una función nueva
+
+Las funciones implican un paso de abstracción en relación a lo que es el
+código suelto. Y además requiere pensar situaciones diferentes a las que
+llevaron a la creación del código original. Esto puede ser complejo,
+especialmente si se trata de creación de gráficos, aunque no
+necesariamente *dificil*.
+
+Algunas preguntas importantes a tener en cuenta son:
+
+-   Cuáles son los casos ‘normales’ de uso?
+
+-   Cómo contempla la función el cambio de un parámetro, por ejemplo? (o
+    la matriz, o el programa de monitoreo…)
+
+-   Relativo a la anterior, se toman en cuenta cambios indirectos, como
+    pueden ser las unidades de medida?
+
+-   Si el gráfico incluye estaciones de monitoreo, las toma de una lista
+    hecha a mano o las extrae de la tabla con los datos?
+
+-   La misma idea que la pregunta anterior aplica a otras categorías,
+    como departamentos, cuencas, etc…
+
+## Modificar una función existente
+
+Es posible que el aporte de alguien sea mejorar una función de las
+incluidas en el paquete. Para esto será necesario acceder al cuerpo de
+la función (i.e.: el ćodigo que tiene adentro) y crear un ambiente de
+desarrollo (es decir: reproducir todos los objetos que existen al
+momento en que se ejecuta la función, de forma que se puedan hacer
+pruebas y experimentos).
+
+Para obtener el código de una función, se puede simplemente escibir el
+nombre de la función en la consola y dar enter:
+
+``` r
+iet
+#> function(PT) {
+#>   10 * (6 - (0.42 - 0.36 * log(PT)) / log(2)) - 20
+#> }
+#> <bytecode: 0x558051b7f0f0>
+#> <environment: namespace:siabox>
+```
+
+Otra opción es usar `edit`:
+
+``` r
+edit(iet)
+```
+
+Incluso se puede ir directametne al código en el repositorio de Github
+(subcarpeta ‘R’):
+<https://github.com/jumanbar/siabox/blob/master/R/informes.R>
+
+Para lograr un ambiente de desarrollo, usualmente es necesario tener
+definidos objetos con los nombres de los argumentos. En el caso de `iet`
+hay un único argumento, `PT`, entonces con definir un vector numérico
+alcanza:
+
+``` r
+PT <- c(23, 44, 2.5)
+10 * (6 - (0.42 - 0.36 * log(PT)) / log(2)) - 20
+#> [1] 50.22550 53.59463 38.69962
+```
+
+Generalmente las funciones que nos interesará modificar son mucho más
+complejas (mirar `g_mes_pto` o `g_lon_pto` por ejemplo). Al método de
+crear objetos con los nombres de los argumentos, que funciona
+perfectamente, se suman alternativas como `debug`:
+
+``` r
+debug(g_lon_pto)
+g_lon_pto(d, 2098)
+```
+
+El uso de `debug` es una opción bastante práctica, pero no se recomienda
+usar si no se conoce el procedimiento! (un [video instructivo
+aquí](https://www.youtube.com/watch?v=xHzeS8AIun8&list=PL41C5vgvqV_PA-e634Q4wn5MKbubqv6P9&index=48))
+
+## Código *listo para incorporar*
+
+Aunque es utópico pensar que ocurrirá, no está de más señalar algunas
+consideraciones importantes a tener en cuenta para crear el código de
+una función cualquiera:
+
+1.  Al usar **funciones de paquetes externos**, evitar `require` o
+    `library`; usar en cambio los operadores `::` o `:::`. Ejemplo:
+    `dplyr::filter`. Eso evita afectar el ambiente de trabajo del
+    usuario final (o sea, no hay que cargar todo el paquete `siabox`
+    para usar una única función; `tsummary` es un ejemplo de función
+    útil en sí misma). En este paquete las excepciones son `ggplot2` y
+    `%>%`, ya que de otra forma el código se vuelve muy engorroso
+    rápidamente.
+
+2.  En el caso de **tablas internas** de `siabox`, es preciso usar `::`.
+    Por ejemplo, la tabla `sia_parametro` es llamada siempre así:
+    `siabox::sia_parametro` (por ejemplo, ver el codigo de `unipar`).
+
+3.  La **documentación** es fundamental. El paquete
+    [`roxygen2`](https://roxygen2.r-lib.org/) facilita muchísimo esta
+    tarea. En RStudio, el comando “Insert Roxygen Skeleton”
+    (Ctrl+Alt+Shift+R) hace el camino más llano aún.
+
+4.  Es parte de la documentación, pero merece un lugar aparte: crear
+    **ejemplos que funcionen** e ilustren el rango de funcionalidades,
+    es siempre un gran aporte y facilita mucho al aprendizaje de les
+    usuaries.
+
+## Vías de comunicación
+
+En un principio, recibiré contribuciones, críticas y comentarios al
+correo: <juan.manuel.barreneche@ambiente.gub.uy>. En principio es
+posible también usar Github para hacer aportes directamente desde allí,
+en el repositorio del paquete: <https://github.com/jumanbar/siabox>
+
+## Sobre el desarrollo de paquetes en general
 
 > (Sección que, al menos en parte, escribo para refrescar mi propia
 > memoria.)
@@ -434,15 +606,6 @@ capítulo 5: [Fundamental development
 workflows](https://r-pkgs.org/workflows101.html).
 
 Algunas notas:
-
--   Al usar funciones de paquetes externos, evitar `require` o
-    `library`; usar en cambio los operadores `::` o `:::`. Ejemplo:
-    `dplyr::filter`. Eso evita afectar el ambiente de trabajo del
-    usuario final (o sea, no hay que cargar todo el paquete `siabox`
-    para usar una única función; `tsummary` es un ejemplo de función
-    útil en sí misma). En este paquete las excepciones son `ggplot2` y
-    `%>%`, ya que de otra forma el código se vuelve muy engorroso
-    rápidamente.
 
 -   Lo mismo para trabajar con los conjuntos de datos del paquete…
     Sucede que las funciones del paquete tienen asociado un NAMESPACE,

@@ -111,20 +111,16 @@ ancho <- function(.data, unidades = FALSE) {
             'valor = valor_minimo_str.')
     .data$valor <- .data$valor_minimo_str
   }
+  
+  if (!any(names(.data) == 'codigo_nuevo')) {
+    .data$codigo_nuevo <- .data$nombre_clave
+  }
 
   if (!any(names(.data) == 'param')) {
     warning('Se cre\u00f3 autom\u00e1ticamente la columna "param".')
-    if (unidades) {
-      .data$param <- if (any(names(.data) == 'codigo_nuevo'))
-        paste0(.data$codigo_nuevo, ' (', .data$uni_nombre, ')') else
-          paste0(.data$nombre_clave, ' (', .data$uni_nombre, ')')
-    } else {
-      .data$param <- if (any(names(.data) == 'codigo_nuevo'))
-        .data$codigo_nuevo else .data$nombre_clave
-    }
-
+    .data$param <- paste0(.data$codigo_nuevo, ' (', .data$uni_nombre, ')')
   }
-
+  
   # PERO QUÉ HAGO CON LAS OBSERVACIONES??
   #
   # Doy por sentado que está id_muestra? o que está observaciones?
@@ -184,8 +180,7 @@ ancho <- function(.data, unidades = FALSE) {
     dplyr::rename_at(dplyr::vars(tidyselect::starts_with('valor_')),
                      ~ stringr::str_remove_all(., '^valor_')) %>%
     dplyr::rename_at(dplyr::vars(tidyselect::matches('^L[DC]')),
-                     ~ stringr::str_remove_all(., '\\s+\\(.*\\)$') %>%
-                       stringr::str_replace_all('(L[CD])_(.*)', '\\2_\\1'))
+                     ~ stringr::str_replace_all(., '(L[CD])_(.*)', '\\2_\\1'))
 
   # param, values_from = c(valor, LD, LC))
   # Si están, eliminar estas columnas innecesearias (para compatibilidad con
@@ -198,7 +193,8 @@ ancho <- function(.data, unidades = FALSE) {
   #   .data <- .data[-w]
   # }
   w <- which(!(names(.data) %in% names(out)) &
-               !(names(.data) %in% c('param', 'valor', 'limite_deteccion',
+               !(names(.data) %in% c('param', 'valor', 
+                                     'limite_deteccion',
                                      'limite_cuantificacion')))
   if (length(w)) {
     adv <- paste('Se eliminaron autom\u00e1ticamente las columnas:',

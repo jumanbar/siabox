@@ -1,5 +1,5 @@
 ---
-title: "Informe Anual"
+title: "Laguna Merin 2019"
 author: "DSCA-DEAI"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
@@ -72,12 +72,12 @@ d <- datos_sia %>%
 ```
 
 
-```{r t_eti, include=FALSE}
-# La tabla t_eti se define aquí para ajustar el formato de las etiquetas que van
+```{r etiqs, include=FALSE}
+# La tabla etiqs se define aquí para ajustar el formato de las etiquetas que van
 # a aparecer en los ejes de los gráficos. Si no se especifican así las
 # etiquetas, las funciones de siabox usarán las columnas param y
 # uni_nombre (ver datos_sia) para hacer las etiquetas.
-t_eti <- t_eti_add(id_parametro = c(2032L, 2017L, 2009L, 2018L, 2035L, 2028L,
+etiqs <- t_eti_add(id_parametro = c(2032L, 2017L, 2009L, 2018L, 2035L, 2028L,
                                     2102L, 2098L, 2097L, 2091L, 2099L, 2101L,
                                     2000L, 2111L),
                    etiqueta = c(expression('Temperatura (ºC)'),
@@ -159,13 +159,13 @@ dx <- dplyr::filter(d, nombre_subcuenca_informes == "Olimar")
 ##### Fisicoquímico
 
 ```{r Olimar_fq, fig.cap="Fisicoquímicos, Río Olimar"}
-g_mes_pto_all(dx, ids_fq, ncol = 3)
+g_mes_pto_all(dx, ids_fq, ncol = 3, t_eti = etiqs)
 ```
 
 ##### Nutrientes
 
 ```{r Olimar_nut, fig.cap="Nutrientes, Río Olimar"}
-g_mes_pto_all(dx, ids_nut, ncol = 3)
+g_mes_pto_all(dx, ids_nut, ncol = 3, t_eti = etiqs)
 ```
 
 Comparación entre estaciones
@@ -173,7 +173,7 @@ Comparación entre estaciones
 Los puntos representan la media o promedio y las líneas +/- desvío estándar
 
 ```{r Olimar_est, fig.cap="Comparación entre estaciones, Río Olimar"}
-g_est_bar_all(dx, ids_comp, ncol = 2)
+g_est_dsv_all(dx, ids_comp, ncol = 2, t_eti = etiqs)
 ```
 
 
@@ -186,19 +186,19 @@ dx <- dplyr::filter(d, nombre_subcuenca_informes == "Cebollatí")
 ##### Fisicoquímicos
 
 ```{r Cebo_fq, cache=FALSE}
-g_mes_pto_all(dx, ids_fq, ncol = 3)
+g_mes_pto_all(dx, ids_fq, ncol = 3, t_eti = etiqs)
 ```
 
 ##### Nutrientes
 
 ```{r Ceb_nut, cache=FALSE}
-g_mes_pto_all(dx, ids_nut, ncol = 3)
+g_mes_pto_all(dx, ids_nut, ncol = 3, t_eti = etiqs)
 ```
 
 ##### Comparación entre estaciones
 
 ```{r Cebo_est, cache=FALSE}
-g_est_bar_all(dx, id_parametro = ids_comp, ncol = 2)
+g_est_dsv_all(dx, id_parametro = ids_comp, ncol = 2, t_eti = etiqs)
 ```
 
 
@@ -207,10 +207,10 @@ g_est_bar_all(dx, id_parametro = ids_comp, ncol = 2)
 #### Fisicoquímicos y nutrientes
 
 ```{r cuencas1, cache=FALSE}
-c1 <- g_cue_box(d, id_param = 2009L)
-c2 <- g_cue_box(d, id_param = 2028L)
-c3 <- g_cue_box(d, id_param = 2098L)
-c4 <- g_cue_box(d, id_param = 2101L)
+c1 <- g_cue_box(d, id_param = 2009L, t_eti = etiqs)
+c2 <- g_cue_box(d, id_param = 2028L, t_eti = etiqs)
+c3 <- g_cue_box(d, id_param = 2098L, t_eti = etiqs)
+c4 <- g_cue_box(d, id_param = 2101L, t_eti = etiqs)
 
 (c1 + c2) / (c3 + c4) +
   plot_annotation(tag_levels = 'A')
@@ -218,7 +218,7 @@ c4 <- g_cue_box(d, id_param = 2101L)
 
 ### Cloforila-A
 
-En este caso hay un solo valor de clorofila
+En este caso hay un solo valor de clorofila por fecha de muestreo.
 Las líneas entrecortadas naranja y roja indican los niveles de alerta 1 y 2 de la OMS respectivamente.
 
 ```{r cloa, cache=FALSE}
@@ -236,7 +236,6 @@ d %>%
         text = element_text(size = 10),
         axis.text.x = element_text(angle=0, vjust=1)) +
   guides(colour = guide_legend("Estación"))
-
 ```
 
 ### Coliformes
@@ -259,6 +258,7 @@ d %>%
 
 ```
 
+> NOTA: está pendiente crear una función para estos gráficos (Clo-a y Colif)
 
 ### IET
 
@@ -271,7 +271,7 @@ dfiet <- d %>%
   dplyr::filter(codigo_pto %in% estaciones_loticas) %>%
   iet_tabla()
 
-g_iet(dfiet)
+g_iet_pto(dfiet)
 
 knitr::kable(dfiet, format = "markdown",
              col.names = c("Estación", "IET", "Clasificación"))

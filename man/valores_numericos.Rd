@@ -106,7 +106,7 @@ resto serán \code{NA}s}
 \examples{
 # Ejemplo con datos del programa Laguna Merin:
 d <- datos_sia \%>\%
-  dplyr::filter(id_programa == 10L) \%>\% 
+  dplyr::filter(id_programa == 10L) \%>\%
   dplyr::select(id_parametro, valor_minimo_str,
                 limite_deteccion, limite_cuantificacion)
 

@@ -4,8 +4,8 @@
 \alias{g_mes_pto}
 \alias{g_mes_pto_all}
 \alias{d_est_bar}
-\alias{g_est_bar}
-\alias{g_est_bar_all}
+\alias{g_est_dsv}
+\alias{g_est_dsv_all}
 \alias{g_cue_box}
 \title{Graficos de parámetros por mes}
 \usage{
@@ -29,9 +29,9 @@ d_est_bar(
   fun_desvio = stats::sd
 )
 
-g_est_bar(.data, id_parametro, nombre_clave, ylab, t_eti)
+g_est_dsv(.data, id_parametro, nombre_clave, ylab, t_eti)
 
-g_est_bar_all(.data, id_parametro, t_eti, ...)
+g_est_dsv_all(.data, id_parametro, t_eti, ...)
 
 g_cue_box(.data, id_parametro, nombre_clave, ylab, t_eti)
 }
@@ -70,16 +70,20 @@ Objeto de clase \code{gg} (hereda de \code{\link[ggplot2]{ggplot}}).
 
 }
 \description{
+Conjunto de funciones para crear gráficos de informes.
+}
+\details{
 \code{g_mes_pto} grafica los valores de un parámetro por mes, usando colores para
-diferenciar las estaciones; \code{g_est_bar} muestra promedios y desvíos
+diferenciar las estaciones; \code{g_est_dsv} muestra promedios y desvíos
 estándares de un parámetro, según las estaciones encontradas en \code{.data}
-(internamente procesa los datos con \code{d_est_bar}); \code{g_cue_box} Grafica valores
-de un parámetro con gráficos de cajas (boxplot), para comparar subcuencas.
+(internamente procesa los datos con \code{d_est_bar}); \code{d_est_bar} perpara datos
+para la función anterior, incluyendo modas y desvíos; \code{g_cue_box} Grafica
+valores de un parámetro con gráficos de cajas (boxplot), para comparar
+subcuencas.
 Las versiones \verb{[..funcion..]_all} agrupan en una misma figura los gráficos
 generados con \verb{[..funcion..]} para el total de parámetros encontrados en
 \code{id_parametro}.
-}
-\details{
+
 \code{g_mes_pto_all} en escencia llama a \code{\link{g_mes_pto}} tantas veces como
 id de parámetros en \code{id_parametro}, realizando una figura única que combina
 los gráficos de los parámetros individuales. , mientras que
@@ -95,13 +99,14 @@ correspondientes a los valores límites aceptados para la clase 1 de aguas
 \item \code{g_mes_pto_all}: Varios gráficos de valores de parámetros por mes en una
 misma figura, usando \code{g_mes_pto}.
 
-\item \code{d_est_bar}: Prepara datos para presentar modas y desvíos
+\item \code{d_est_bar}: Prepara datos para \code{g_est_bar} (presentar modas y
+desvíos)
 
-\item \code{g_est_bar}: Muestra promedios y desvíos estándares de un parámetro
+\item \code{g_est_dsv}: Muestra promedios y desvíos estándares de un parámetro
 para las estaciones encontradas en \code{.data}
 
-\item \code{g_est_bar_all}: Varios gráficos de promedios y desvíos estándares para
-parámetros por estación, en una misma figura, usando \code{g_est_bar}
+\item \code{g_est_dsv_all}: Varios gráficos de promedios y desvíos estándares para
+parámetros por estación, en una misma figura, usando \code{g_est_dsv}
 
 \item \code{g_cue_box}: Gráfico de cajas (boxplot) para comparación de valores
 de un parámetro entre cuencas
@@ -112,7 +117,7 @@ p <- c(PT=2098, NT=2102, ST=2028, Conduc=2009)
 
 d <- datos_sia \%>\%
   filtrar_datos(id_programa = 10L,
-                rango_fechas = c("2019-01-01", "2019-12-31"), 
+                rango_fechas = c("2019-01-01", "2019-12-31"),
                 id_parametro = p)
 
 cebo <- dplyr::filter(d, nombre_subcuenca_informes == "Cebollatí")
@@ -129,8 +134,8 @@ e <- datos_sia \%>\%
   filtrar_datos(id_programa = 4L,
                 rango_fechas = c(2017, 2019),
                 id_parametro = p)
-g_est_bar(e, nombre_clave = "PT")
-g_est_bar_all(e, p)
+g_est_dsv(e, nombre_clave = "PT")
+g_est_dsv_all(e, p)
 g_cue_box(e, p[1])
 }
 \seealso{

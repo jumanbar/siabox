@@ -416,7 +416,7 @@ eti <- function(id_parametro, t_eti) {
 #' Conjunto de funciones para crear gráficos de informes.
 #'
 #' `g_mes_pto` grafica los valores de un parámetro por mes, usando colores para
-#' diferenciar las estaciones; `g_est_bar` muestra promedios y desvíos
+#' diferenciar las estaciones; `g_est_dsv` muestra promedios y desvíos
 #' estándares de un parámetro, según las estaciones encontradas en `.data`
 #' (internamente procesa los datos con `d_est_bar`); `d_est_bar` perpara datos
 #' para la función anterior, incluyendo modas y desvíos; `g_cue_box` Grafica
@@ -485,8 +485,8 @@ eti <- function(id_parametro, t_eti) {
 #'   filtrar_datos(id_programa = 4L,
 #'                 rango_fechas = c(2017, 2019),
 #'                 id_parametro = p)
-#' g_est_bar(e, nombre_clave = "PT")
-#' g_est_bar_all(e, p)
+#' g_est_dsv(e, nombre_clave = "PT")
+#' g_est_dsv_all(e, p)
 #' g_cue_box(e, p[1])
 g_mes_pto <- function(.data,
                       id_parametro,
@@ -527,6 +527,7 @@ g_mes_pto <- function(.data,
           text = element_text(size = 10),
           axis.text.x = element_text(angle = 0, vjust = 1),
           legend.position = legend.position) +
+    scale_color_discrete('Estaci\u00f3n') +
     scale_x_continuous(breaks = 1:12)
 
   # Si no hay datos del parámetro:
@@ -577,12 +578,19 @@ g_mes_pto_all <- function(.data, id_parametro, t_eti, ...) {
   }
 
   lista <- vector(mode = "list", length = length(id_parametro))
+  j <- 0
   # for (i in 1:(length(id_parametro) - 1))
-  for (i in 1:(length(id_parametro)))
-    lista[[i]] <- g_mes_pto(.data, id_parametro = id_parametro[i], t_eti = t_eti)
+  for (i in 1:(length(id_parametro))) {
+    lista[[i]] <-
+      g_mes_pto(.data, id_parametro = id_parametro[i], t_eti = t_eti)
 
-  lista[[i]] <-
-    lista[[i]] +
+    tmp <- ggplot_build(lista[[i]])$data[[1]]
+    if (!('label' %in% names(tmp))) j <- i
+    # if (nrow(tmp) == 1L && tmp$group[[1]] == -1)
+  }
+
+  lista[[j]] <-
+    lista[[j]] +
     theme_update(legend.position = "bottom") +
     guides(colour = guide_legend("Estaci\u00f3n", title.position = 'left',
                                  direction = "horizontal",
@@ -598,7 +606,8 @@ g_mes_pto_all <- function(.data, id_parametro, t_eti, ...) {
   print(out)
 }
 
-#' @describeIn g_mes_pto Prepara datos para presentar modas y desvíos
+#' @describeIn g_mes_pto Prepara datos para \code{g_est_bar} (presentar modas y
+#'   desvíos)
 #'
 #' @export
 d_est_bar <- function(.data,
@@ -611,7 +620,7 @@ d_est_bar <- function(.data,
     if (missing(nombre_clave))
       stop("id_parametro y nombre_clave no especificados")
     id_parametro <-
-      dplyr::filter(siabox::sia_parametro, 
+      dplyr::filter(siabox::sia_parametro,
                     nombre_clave == !!nombre_clave)$id_parametro
     if (!length(id_parametro))
       stop("nombre_clave no encontrado en sia_parametro")
@@ -632,10 +641,10 @@ d_est_bar <- function(.data,
 }
 
 #' @describeIn g_mes_pto Muestra promedios y desvíos estándares de un parámetro
-#'   para las estaciones encontradas en `.data`
+#'   para las estaciones encontradas en \code{.data}
 #'
 #' @export
-g_est_bar <- function(.data,
+g_est_dsv <- function(.data,
                       id_parametro,
                       nombre_clave,
                       ylab,
@@ -645,7 +654,7 @@ g_est_bar <- function(.data,
     if (missing(nombre_clave))
       stop("id_parametro y nombre_clave no especificados")
     id_parametro <-
-      dplyr::filter(siabox::sia_parametro, 
+      dplyr::filter(siabox::sia_parametro,
                     nombre_clave == !!nombre_clave)$id_parametro
     if (!length(id_parametro))
       stop("nombre_clave no encontrado en sia_parametro")
@@ -672,7 +681,30 @@ g_est_bar <- function(.data,
           text = element_text(size = 10),
           axis.text.x = element_text(angle=30, vjust=1))
 
-  dec <- dplyr::filter(siabox::decreto, 
+  # Si no hay datos del parámetro:
+  if (!nrow(out$data)) {
+    corte <-
+      siabox::sia_parametro %>%
+      dplyr::filter(id_parametro == !!id_parametro) %>%
+      dplyr::left_join(siabox::codigos_param, by = "id_parametro")
+    
+    texto_par <- corte$parametro.x
+    
+    out <-
+      ggplot() +
+      theme_void() +
+      geom_text(aes(0, 0, label = paste0(texto_par, ":\nNO HAY DATOS"))) +
+      theme(panel.grid.minor = element_blank(),
+            panel.grid.major = element_blank(),
+            text = element_text(size = 10),
+            axis.text = element_blank(),
+            legend.position = legend.position) +
+      xlab(NULL) +
+      ylab(NULL)
+    return(out)
+  }
+  
+  dec <- dplyr::filter(siabox::decreto,
                        id_parametro == !!id_parametro & clase == "1")
 
   if (nrow(dec)) {
@@ -685,14 +717,16 @@ g_est_bar <- function(.data,
 }
 
 #' @describeIn g_mes_pto Varios gráficos de promedios y desvíos estándares para
-#'   parámetros por estación, en una misma figura, usando `g_est_bar`
+#'   parámetros por estación, en una misma figura, usando \code{g_est_dsv}
 #'
 #' @export
-g_est_bar_all <- function(.data, id_parametro, t_eti, ...) {
+g_est_dsv_all <- function(.data, id_parametro, t_eti, ...) {
 
   lista <- vector(mode = "list", length = length(id_parametro))
-  for (i in 1:(length(id_parametro)))
-    lista[[i]] <- g_est_bar(.data, id_parametro = id_parametro[i])
+  for (i in 1:(length(id_parametro))) {
+    lista[[i]] <-
+      g_est_dsv(.data, id_parametro = id_parametro[i], t_eti = t_eti)
+  }
 
   out <- patchwork::wrap_plots(lista, ...) +
     patchwork::plot_annotation(tag_levels = 'A')
@@ -765,8 +799,8 @@ g_cue_box <- function(.data,
 #'   filtrar_datos(id_programa = 3L, rango_fechas = 2019,
 #'                 tipo_punto_id = 1L, id_parametro = 2098) %>%
 #'   dplyr::mutate(IET = iet(valor)) %>%
-#'   g_iet
-g_iet <- function(.data) {
+#'   g_iet_pto
+g_iet_pto <- function(.data) {
   out <-
     .data %>%
     ggplot() +
@@ -798,10 +832,11 @@ g_iet <- function(.data) {
 
 # + Graficos sueltos ----
 
-#' @describeIn g_long Funcion que (internamente) prepara los datos para `g_long`
+#' @describeIn g_lon_pto Funcion que (internamente) prepara los datos para
+#'   \code{g_lon_pto}
 #'
 #' @export
-d_long <- function(.data,
+d_lon <- function(.data,
                    id_parametro,
                    anio,
                    ventana_anios = 5L,
@@ -887,15 +922,26 @@ d_long <- function(.data,
 
 #' Graficar valores anuales longitudinales
 #'
-#' Grafica los valores de los parámetros por estaciones.
+#' Grafica los valores de los parámetros por estaciones, incluyendo comparación
+#' con años anteriores.
 #'
 #' Las estaciones deben estar previamente ordenadas (como factores, no
 #' necesariamente factores ordenados). Específicamente, el campo de los datos
-#' que debe ser un factor es el de `codigo_pto`. La función
-#' \code{\link{filtrar_datos}} tiene facilidades para preparar datos de esta
-#' manera.
+#' que debe ser un factor es el de `codigo_pto`. El argumento \code{orden_est}
+#' de la función \code{\link{filtrar_datos}} puede ayudar a preparar los
+#' datos de esta manera.
 #'
-#' @describeIn g_long Grafica valores anuales longitudinales
+#' El gráfico creado con \code{g_lon} es considerablemente complejo, ya que usa
+#' una leyenda con categorías cualitativamente diferentes (meses en el año de
+#' interés, promedios del año anterior, promedios año de interés y promedios del
+#' lustro previo). Por esta razón, lo que hace internamente la función es
+#' preparar la una data.frame con los datos agrupados y categorizados
+#' correctamente, usando \code{d_lon}, y luego pasa a crear el gráfico con
+#' comandos de \code{ggplot2}.
+#'
+#' La función \code{d_lon} puede ser usada independientemente.
+#'
+#' @describeIn g_lon_pto Grafica valores anuales longitudinales
 #'
 #' @param .data data.frame. Datos del SIA (ver \code{\link{datos_sia}} y
 #'   ejemplos)
@@ -910,11 +956,12 @@ d_long <- function(.data,
 #' @param colores_meses character. Paleta de colores para usar en los distintos
 #'   meses.
 #' @param horiz numeric. Vector con dos valores: min y max, para ser graficados
-#'   con líneas horizontales.
+#'   con líneas horizontales. Típicamente representa mínimos y/o máximos
+#'   establecidos por decretos.
 #' @param tabla_horiz data.frame. Debe tener las columnas `id_parametro`,
 #'   `valor`, y `extremo` tal como en la tabla \code{\link{decreto}}
 #' @param path character. Ruta de directorio en donde guardar las imágenes
-#'   generadas por `g_long`
+#'   generadas por `g_lon_pto`
 #'
 #' @return
 #' @export
@@ -925,22 +972,24 @@ d_long <- function(.data,
 #'                    id_parametro = c(2032, 2009, 2017, 2018, 2097:2098, 2105),
 #'                    tipo_punto_id = 1)
 #' h <- dplyr::filter(decreto, clase == "1", !is.na(valor))
-#' g_long(d, 2032, 2019L, horiz = c(min = 5, max = 28))
-#' g_long(d, 2032, 2019L, horiz = c(min = 5, max = 28), ventana_anios = 7)
-#' g_long_files(d, 2019L, tabla_horiz = h)
-g_long <- function(.data,
+#' g_lon_pto(d, 2032, 2019L, horiz = c(min = 5, max = 28))
+#' g_lon_pto(d, 2032, 2019L, horiz = c(min = 5, max = 28), ventana_anios = 7)
+#' g_lon_pto_files(d, 2019L, tabla_horiz = h)
+g_lon_pto <- function(.data,
                    id_parametro,
                    anio,
                    ventana_anios = 5L,
                    colores_meses = scales::hue_pal()(12),
                    horiz) {
   # if (id_parametro == 2032L)
-  #   save(.data, id_parametro, anio, colores_meses, file = "tmp/g_long.RData")
+  #   save(.data, id_parametro, anio, colores_meses, file = "tmp/g_lon_pto.RData")
 
+  if (missing(anio)) anio <- max(.data$anio)
+  
   abr_meses <- c("Ene", "Feb", "Mar", "Abr", "May", "Jun",
                  "Jul", "Ago", "Set", "Oct", "Nov", "Dic")
 
-  datos <- d_long(.data, id_parametro, anio, ventana_anios, abr_meses)
+  datos <- d_lon(.data, id_parametro, anio, ventana_anios, abr_meses)
 
   if (is.null(datos)) return(NULL)
 
@@ -970,7 +1019,7 @@ g_long <- function(.data,
 
   valores_color <- c(
     # Para que los colores sean consistentes entre diferentes gráficas
-    # (especialmente cuando g_long es llamada por g_long_files):
+    # (especialmente cuando g_lon_pto es llamada por g_lon_pto_files):
     colores_meses[meses],
     # El promedio de los 5 (o n) años anteriores, por estación, en gris:
     if (!is.null(eti_lustro)) "#a6a6a6" else NULL,
@@ -1054,10 +1103,11 @@ g_long <- function(.data,
   return(g)
 }
 
-#' @describeIn g_long Guarda gráficos de `g_long` en archivos
+#' @describeIn g_lon_pto Guarda gráficos de `g_lon_pto` en archivos separados
+#'   por parámetro.
 #'
 #' @export
-g_long_files <- function(.data, anio, ventana_anios = 5L, tabla_horiz, path) {
+g_lon_pto_files <- function(.data, anio, ventana_anios = 5L, tabla_horiz, path) {
 
   directorio <- if (missing(path)) tempdir() else path
 
@@ -1068,34 +1118,34 @@ g_long_files <- function(.data, anio, ventana_anios = 5L, tabla_horiz, path) {
       # Para el shiny:
       out <- shiny::withProgress(
         message = "Preparando gr\u00e1ficas...", value = 0, min = 0, max = 1,
-        session = ses, expr = g_long_files_loop(.data, anio, ventana_anios,
+        session = ses, expr = g_lon_pto_files_loop(.data, anio, ventana_anios,
                                                 tabla_horiz, directorio,
                                                 pbar = TRUE)
       )
     } else {
-      out <- g_long_files_loop(.data, anio, ventana_anios, tabla_horiz,
+      out <- g_lon_pto_files_loop(.data, anio, ventana_anios, tabla_horiz,
                                directorio, pbar = FALSE)
     }
   } else {
-    out <- g_long_files_loop(.data, anio, ventana_anios, tabla_horiz,
+    out <- g_lon_pto_files_loop(.data, anio, ventana_anios, tabla_horiz,
                              directorio, pbar = FALSE)
   }
   return(out)
 
 }
 
-#' Helper para \code{\link{g_long_files}}
+#' Helper para \code{\link{g_lon_pto_files}}
 #'
 #' @param directorio character. Ruta al directorio donde se guardarán las
 #'   imágenes
 #' @param pbar logical. Define si se usa la capacidad de shiny de mostrar una
 #'   barra de progreso
-#' @inheritParams g_long_files
+#' @inheritParams g_lon_pto_files
 #' @return
 #'
 #' @examples
-g_long_files_loop <- function(.data, anio, ventana_anios, tabla_horiz,
-                              directorio, pbar = FALSE) {
+g_lon_pto_files_loop <- function(.data, anio, ventana_anios, tabla_horiz,
+                                 directorio, pbar = FALSE) {
   id_par <- sort(unique(.data$id_parametro))
   n <- length(id_par)
 
@@ -1123,7 +1173,7 @@ g_long_files_loop <- function(.data, anio, ventana_anios, tabla_horiz,
       }
     }
 
-    g <- g_long(.data, id_par[i], anio, ventana_anios,
+    g <- g_lon_pto(.data, id_par[i], anio, ventana_anios,
                 colores_meses = paleta, horiz = horiz)
 
     if (!is.null(g))

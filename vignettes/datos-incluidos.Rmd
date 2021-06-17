@@ -1,6 +1,9 @@
 ---
 title: "Datos incluidos"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    tod_depth: 2
 vignette: >
   %\VignetteIndexEntry{datos-incluidos}
   %\VignetteEncoding{UTF-8}
@@ -53,10 +56,10 @@ Por supuesto que nada impide que se usen otras erramientas de R para filtrar, co
 
 La tabla `d`, al igual que `datos_sia` y `datos_sia_sed`, tiene la misma estructura que las extracciones normales (en formato largo) de iSIA.
 
-Una vez que tenemos definida una tabla de datos con las cuales trabajar, ya podemos usar las funciones del paquete. Por ejemplo, las funciones con el prefijo `g_` crean gráficos (de clase `ggplot`). Por ejemplo, `g_long` grafica valores anuales longitudinales: muestra un parámetro seleccionado, para un año en particular, y los valores para todas las estaciones contenidas en los datos, comparando con años previos:
+Una vez que tenemos definida una tabla de datos con las cuales trabajar, ya podemos usar las funciones del paquete. Por ejemplo, las funciones con el prefijo `g_` crean gráficos (de clase `ggplot`). Por ejemplo, `g_lon_pto` grafica valores anuales longitudinales: muestra un parámetro seleccionado, para un año en particular, y los valores para todas las estaciones contenidas en los datos, comparando con años previos:
 
 ```{r, message=FALSE, warning=FALSE}
-g_long(d, 2098, anio = 2019)
+g_lon_pto(d, 2098, anio = 2019)
 ```
 
 Ver la viñeta [graficos]() para aprender más sobre las funcionalidades gráficas del paquete.
@@ -69,7 +72,7 @@ vignette('graficos', package = 'siabox')
 
 ## Tablas de infambientalbd
 
-Esta lista constituye el total de tablas importadas desde la base de datos INFAMBIENTAL. Algunas son copias muy similares y otras son exactas.
+Esta lista constituye el total de tablas importadas desde la base de datos INFAMBIENTAL. Algunas son copias muy similares y otras son copias exactas.
 
 - `sia_cuenca`
 - `sia_datos_muestra_parametros`
@@ -100,23 +103,6 @@ Todas estas tablas se importaron como [clase](https://bookdown.org/jboscomendoza
 
 Como convención, se nombran combinando el prefijo *sia_* con el nombre original. Ejemplo: la tabla `sia_parametro` contiene la misma información que la tabla `parametro` de infambientalbd.
 
-### IDs
-
-Como se estila en bases de datos, estas tablas generalmente hay una columna dedicada a un "id": un indentificador numérico que es único para cada entrada, la cual generalmente se llama `id_[..nombre..]` o simplemente `id`. Por ejemplo, en la tabla `sia_parametro`, la columna `id_parametro` identifica a cada parámetro con un número entero positivo. El rol de los identificadores es evitar ambigüedades. Por ejemplo, podemos usar el `id_parametro` = 2098 para asegurarnos de que trabajamos con Fósforo Total:
-
-<!-- ```{r sia_parametro} -->
-```{r}
-filter(sia_parametro, id_parametro == 2098)
-```
-
-Ante un eventual cambio en el nombre de los parámetros (columnas `nombre_clave`, `parametro` o `param`), los `id` no van a cambiar, evitando confusiones. **Lo mismo pasa con otros tipos de id**.
-
-### IDs en `datos_sia*`
-
-Las tablas `datos_sia` y `datos_sia_sed` se construyen a partir de la conjunción de las tablas de infambiental (usando las funciones de **join** de `dplyr`), y en general se mantienen los nombres de las columnas originales. La escepción general son aquellas columnas que se llaman `id` en la tabla original, que en `datos_sia*` se pasan a llamar `id_estacion`, `id_unidad`, etc.
-
-Esto es importante saberlo en caso de que querer hacer joins con las tablas originales. Esto rara vez va a afectar, esperamos, al usuarie de siabox, pero es de rigor mencionar.
-
 ## Tablas importantes!
 
 - `datos_sia` y `datos_sia_sed`: tiene **todas** las muestras de _Aguas superficiales_ y _Sedimentos_, al momento en que se hizo la extracción del SIA (11 de Noviembre de 2020). No son tablas presentes en infambientalbd y, como se mencionó antes, tienen la misma estructura que datos extraídos desde la app iSIA.
@@ -136,6 +122,24 @@ Esto es importante saberlo en caso de que querer hacer joins con las tablas orig
 - `cuencas_informes`: una clasificación de las estaciones de monitoreo según la subcuenca, siguiendo el criterio usado en informes de DINACEA, a la que pertenecen. Al momento sólo algunas estaciones están clasificadas y se aspira a completar la información, mediante el trabajo conjunto de DCA y DIA.
 
 - `t_eti_base`: esta tabla contiene las etiquetas que serán usadas en gráficos creados con las funciones del paquete. El objetivo es unificar criterios y eventualmente se espera poder construir un acuerdo para completar la tabla con todos los parámetros.
+
+
+## IDs
+
+Como se estila en bases de datos, en las tablas generalmente hay una columna dedicada a un "id": un indentificador numérico que es único para cada entrada, la cual generalmente se llama `id_[..nombre..]` o simplemente `id`. Por ejemplo, en la tabla `sia_parametro`, la columna `id_parametro` identifica a cada parámetro con un número entero positivo. El rol de los identificadores es evitar ambigüedades. Por ejemplo, podemos usar el `id_parametro` = 2098 para asegurarnos de que trabajamos con Fósforo Total:
+
+<!-- ```{r sia_parametro} -->
+```{r}
+filter(sia_parametro, id_parametro == 2098)
+```
+
+Ante un eventual cambio en el nombre de los parámetros (columnas `nombre_clave`, `parametro` o `param`), los `id` no van a cambiar, evitando confusiones. **Lo mismo pasa con otros tipos de id**.
+
+## IDs en `datos_sia*`
+
+Las tablas `datos_sia` y `datos_sia_sed` se construyen a partir de la conjunción de las tablas de infambiental (usando las funciones de **join** de `dplyr`), y en general se mantienen los nombres de las columnas originales. La escepción general son aquellas columnas que se llaman `id` en la tabla original, que en `datos_sia*` se pasan a llamar `id_estacion`, `id_unidad`, etc.
+
+Esto es importante saberlo en caso de que querer hacer joins con las tablas originales. Esto rara vez va a afectar, esperamos, al usuarie de siabox, pero es de rigor mencionar.
 
 ## Buscadores de ID
 
@@ -166,6 +170,17 @@ pro_id('laguna de')
 - `dep_id`: Busca departamentos en `sia_departamento` en base al campo `dep_nombre` de dicha tabla.
 
 La motivación de estas funciones es proveer de una forma rápida de encontrar los ids que le usuarie necesita.
+
+# Nombres alternativos para los parámetros
+
+La tabla `codigos_param` presenta códigos nuevos para la mayoria de los parámetros, creados por Elena Rodó y Amelia Fabre.
+
+Los códigos nuevos son utilizados tanto en iSIA como en las tablas `datos_sia*`, para proporcionar una transición al uso de los mismos.
+
+Debido a que no todos los parámetros tienen un nombre nuevo alternativo, las tablas `datos_sia*` tienen estas columnas:
+
+- `nombre_clave`: la abreviación que usa actualmente el SIA y sus aplicaciones; está presente en la tabla `sia_parametro`.
+- `param`: en caso de estar disponible, el código alternativo designado (`codigos_param$codigo_nuevo`) y en caso contrario, el `nombre_clave`.
 
 ## Formatos largo y ancho
 

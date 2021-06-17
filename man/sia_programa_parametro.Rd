@@ -3,8 +3,7 @@
 \docType{data}
 \name{sia_programa_parametro}
 \alias{sia_programa_parametro}
-\title{sia_programa_parametro ----
-Relación entre programas y parametros}
+\title{Parámetros en cada programa}
 \format{
 Tabla con 1391 filas y
 3)` columnas:

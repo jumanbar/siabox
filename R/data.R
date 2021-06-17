@@ -819,8 +819,8 @@
 #'
 #' @seealso \code{\link{sia_estacion}}
 #'
-#' @format Tabla con `r nrow(cuencas_informes)` filas y `r
-#'   ncol(cuencas_informes)` columnas:
+#' @format Tabla con `r nrow(cuencas_informes)` filas y 
+#'   `r ncol(cuencas_informes)` columnas:
 #'
 #'   \describe{
 #'

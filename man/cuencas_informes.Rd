@@ -3,28 +3,36 @@
 \docType{data}
 \name{cuencas_informes}
 \alias{cuencas_informes}
-\title{Cuencas y subcuencas en informes}
+\title{Nombres de las cuencas y subcuencas para usar en informes}
 \format{
 Tabla con 51 filas y
-8 columnas:
+8)` columnas:
 
 \describe{
 
-\item{nombre_subcuenca_informes}{}
+\item{nombre_subcuenca_informes}{Clasificación de las subcuencas para los
+distintos programas. Es útil para separar datos en informes.}
 
-\item{codigo_pto}{}
+\item{codigo_pto}{Códigos de las estaciones tal como están en el SIA (a la
+fecha de extracción: 2020-10-22)}
 
-\item{codigo_pto_mod}{}
+\item{codigo_pto_mod}{Nuevos códigos para algunas estaciones del programa
+Santa Lucía}
 
-\item{id_estacion}{}
+\item{id_estacion}{id de cada estación de monitoreo. Ver
+\code{\link{sia_estacion}}}
 
-\item{id_cuenca}{}
+\item{id_cuenca}{id de cada cuenca, definidas según la tabla
+\code{\link{sia_cuenca}}}
 
-\item{cue_nombre}{}
+\item{cue_nombre}{Nombre de cada cuenca, definidos según la tabla
+\code{\link{sia_cuenca}}}
 
-\item{id_programa}{}
+\item{id_programa}{id de cada programa, definidas según la tabla
+\code{\link{sia_programa}}}
 
-\item{nombre_programa}{}
+\item{nombre_programa}{Nombre de cada programa, definidos según la tabla
+\code{\link{sia_programa}}}
 
 }
 }
@@ -32,7 +40,25 @@ Tabla con 51 filas y
 cuencas_informes
 }
 \description{
-Cuencas y subcuencas en informes
+Se trata de una clasificación de las estaciones de monitoreo según la
+subcuenca, siguiendo el criterio usado en informes de DINACEA, a la que
+pertenecen. Al momento sólo algunas estaciones están clasificadas y se aspira
+a completar la información, mediante el trabajo de DCA y DIA.
+}
+\details{
+La subcuenca asignada está en la primer columna:
+\code{nombre_subcuenca_informes}
+
+Surge debido a que las divisiones entre subcuencas encontradas en las bases
+de datos del SIA (\code{\link{sia_cuenca}} y \code{\link{sia_sub_cuenca}}) no
+se corresponden a las que se usan en los informes (un ejemplo claro es el
+programa Laguna Merín). La motivación es, entonces, proveer de una tabla que
+vincule cada estación con las subcuencas deseadas, a fin de facilitar los
+procedimientos (cálculos de estadísticos, gráficos, etc...).
+
+Al momento solamente algunas estaciones tienen un
+\code{nombre_subcuenca_informes} asignado (programas San Salvador y Laguna
+Merín). Se aspira a completar todos los casos posibles.
 }
 \seealso{
 \code{\link{sia_estacion}}

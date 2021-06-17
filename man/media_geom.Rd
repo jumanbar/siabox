@@ -7,7 +7,7 @@
 media_geom(x)
 }
 \arguments{
-\item{x}{numeric}
+\item{x}{numeric. Vector numérico}
 }
 \value{
 Valor numérico equivalente a la media geométrica de x
@@ -22,6 +22,8 @@ Es la raíz \code{n}-ésima del producto de todos los números contenidos en
 En general puede considerarse como el resultado de \code{prod(x) ^ (1 /
 length(x))}, aunque en lugar de usar \code{^(1/length(x))} se usa la función
 \code{\link{raiz}}, diseñada para contemplar casos particulares.
+
+Elimina automáticamente los NAs contenidos en \code{x}.
 }
 \examples{
 media_geom(c(3, -2.34, 5427))

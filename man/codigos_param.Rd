@@ -40,6 +40,11 @@ Presenta códigos nuevos para parámetros, creados por Elena Rodó y Amelia
 Fabre.
 }
 \details{
+Estos no han sido oficialmente incorporados al SIA. Además incluye una
+columna llamada \code{grupo}, que divide a los parámetros en categorías
+(Biológicos, Metálicos, etc). Es una tabla en construcción conjunta entre DCA
+y DIA.
+
 Última modificación: 2020-09-03
 }
 \keyword{datasets}

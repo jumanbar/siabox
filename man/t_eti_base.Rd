@@ -22,10 +22,15 @@ Tabla con 302 filas y 2 columnas:
 t_eti_base
 }
 \description{
-Tabla de base para hacer etiquetas para gráficos u otros usos,
-basándose en las tablas del SIA (infambientalbd).
+Tabla de base para hacer etiquetas para gráficos u otros usos, basándose en
+las tablas del SIA (infambientalbd).
 }
 \details{
+La motivación es unificar criterios para el formato de las etiquetas
+utilizadas en los contenidos creados por DCA, incluyendo informes, reportes,
+etc. Se espera poder construir la tabla en base a acuerdos y eventualmente
+tener etiquetas unificadas para todos los parámetros.
+
 Fecha de creación: 2020-10-29
 }
 \examples{
