@@ -1,6 +1,6 @@
 Package: siabox
 Title: Datos y Funciones Para Trabajar con el SIA
-Version: 0.0.0.9000
+Version: 0.9.0
 Authors@R: 
     person(given = "Juan Manuel",
            family = "Barreneche",
