@@ -102,7 +102,7 @@ clasificación de cada dato según siete categorías (ver
 \item{nombre_subcuenca_informes}{Nombre dado a cada subcuenca dentro de los
 informes anuales de los programas de monitoreo.}
 
-\ite{codigo_pto_mnod}{Nombre de la estación modificado, siguiendo los
+\item{codigo_pto_mnod}{Nombre de la estación modificado, siguiendo los
 códigos presentes en la tabla \code{\link{cuencas_informes}}}
 
 \item{grupo}{Grupo al que pertenece el parámetro (ej.: Parámetros de

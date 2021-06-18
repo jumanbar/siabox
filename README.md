@@ -1,8 +1,8 @@
 siabox
 ================
 
--   [Introducción](#introducción)
 -   [Instalación](#instalación)
+-   [Introducción](#introducción)
 -   [Modo de uso](#modo-de-uso)
     -   [Con extracciones de iSIA](#con-extracciones-de-isia)
     -   [Con datos incluidos en el
@@ -26,6 +26,15 @@ Cambiar documentación de sia_datos_muestra_parametros: id_dato en vez de id.
 Lo mismo para datos_sia
 
 Please edit that file -->
+
+# Instalación
+
+El paquete se puede instalar desde GitHub:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("jumanbar/siabox")
+```
 
 # Introducción
 
@@ -57,15 +66,6 @@ vignette('graficos', package = 'siabox')
 vignette('datos-incluidos', package = 'siabox')
 ```
 
-# Instalación
-
-El paquete se puede instalar desde GitHub:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("jumanbar/siabox")
-```
-
 # Modo de uso
 
 La idea es que el paquete trabaje en conjunto con la aplicación
@@ -85,10 +85,9 @@ un ejemplo (en construcción) con datos del programa Laguna Merín para
 tomar de referencia:
 
 ``` r
-# Tres formatos de salda posibles: PDF, HTML y DOC
-demo('informe-laguna-merin-pdf',  'siabox')
-demo('informe-laguna-merin-html', 'siabox')
-demo('informe-laguna-merin-doc',  'siabox')
+demo_lm()      # HTML
+demo_lm('pdf') # PDF
+demo_lm('doc') # DOC
 ```
 
 ## Con extracciones de iSIA
@@ -516,7 +515,7 @@ iet
 #> function(PT) {
 #>   10 * (6 - (0.42 - 0.36 * log(PT)) / log(2)) - 20
 #> }
-#> <bytecode: 0x557bd4f1eb30>
+#> <bytecode: 0x56298ebaccc8>
 #> <environment: namespace:siabox>
 ```
 

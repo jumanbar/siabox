@@ -28,6 +28,15 @@ knitr::opts_chunk$set(
 set.seed(0)
 ```
 
+# Instalación
+
+El paquete se puede instalar desde GitHub:
+
+```r
+# install.packages("devtools")
+devtools::install_github("jumanbar/siabox")
+```
+
 # Introducción
 
 <!-- badges: start -->
@@ -46,15 +55,6 @@ vignette('graficos', package = 'siabox')
 vignette('datos-incluidos', package = 'siabox')
 ```
 
-# Instalación
-
-El paquete se puede instalar desde GitHub:
-
-```r
-# install.packages("devtools")
-devtools::install_github("jumanbar/siabox")
-```
-
 # Modo de uso
 
 La idea es que el paquete trabaje en conjunto con la aplicación [iSIA](dinama-shiny:3838/sia_apps/iSIA/). En la práctica, el flujo puede tomar dos caminos:
@@ -66,10 +66,9 @@ La idea es que el paquete trabaje en conjunto con la aplicación [iSIA](dinama-s
 Uno de los objetivos más importantes es que las herramientas del paquete sirvan para elaborar **informes automatizados**, mediante Rmarkdown. Hay un ejemplo (en construcción) con datos del programa Laguna Merín para tomar de referencia:
 
 ```r
-# Tres formatos de salda posibles: PDF, HTML y DOC
-demo('informe-laguna-merin-pdf',  'siabox')
-demo('informe-laguna-merin-html', 'siabox')
-demo('informe-laguna-merin-doc',  'siabox')
+demo_lm()      # HTML
+demo_lm('pdf') # PDF
+demo_lm('doc') # DOC
 ```
 ## Con extracciones de iSIA
 
