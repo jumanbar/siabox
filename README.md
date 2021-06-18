@@ -96,6 +96,9 @@ siabox::demo_lm('pdf') # PDF
 siabox::demo_lm('doc') # DOC
 ```
 
+> Nota: si no funciona el ejemplo, siempre se pueden acceder a los
+> archivos del repositorio, en la carpeta [inst/examples](inst/examples)
+
 ## Con extracciones de iSIA
 
 El siguiente es un ejemplo que usa datos extraídos de iSIA (formato
@@ -529,7 +532,7 @@ iet
 #> function(PT) {
 #>   10 * (6 - (0.42 - 0.36 * log(PT)) / log(2)) - 20
 #> }
-#> <bytecode: 0x55b776a21d58>
+#> <bytecode: 0x564c9cff2b78>
 #> <environment: namespace:siabox>
 ```
 

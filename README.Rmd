@@ -71,6 +71,9 @@ siabox::demo_lm()      # HTML
 siabox::demo_lm('pdf') # PDF
 siabox::demo_lm('doc') # DOC
 ```
+
+> Nota: si no funciona el ejemplo, siempre se pueden acceder a los archivos del repositorio, en la carpeta [inst/examples](inst/examples)
+
 ## Con extracciones de iSIA
 
 El siguiente es un ejemplo que usa datos extraídos de iSIA (formato 'largo'):
