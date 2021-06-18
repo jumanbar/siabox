@@ -267,37 +267,39 @@ media_geom(x)
 
 # Construcción colectiva
 
-Al momento del lanzamiento de este paquete, el universo de funciones será limitado, naturalmente. Por esta razón es de interés considerar posibles aportes de usaries a la construcción del mismo.
+Al momento del lanzamiento de este paquete, el universo de funciones será limitado, naturalmente. Por esta razón es de interés considerar posibles **aportes de usaries** a la construcción del mismo.
 
 Para esto hay que tener en cuenta que todo lo que se incorpore al paquete será en forma de tablas o funciones: código que sirva [para un rango de situaciones](https://youtu.be/z-7DEclTCyQ).
 
-Para aportar esta construcción, pueden haber infinidad de formas, desde comentarios problemas, mejoras, etc, hasta aportes de código original. En este último caso me quiero concentrar. En principio se pueden imaginar dos formas 'extremas': 
+Para aportar esta construcción, pueden haber infinidad de formas, desde comentarios sobre problemas, mejoras, etc, hasta aportes de código original. En este último caso me quiero concentrar. En principio se pueden imaginar dos formas 'extremas': 
 
-- Aportes de código 'suelto', que debe ser convertido en una función, con todo lo que ello implica, e incorporada al paquete.
+- Aportes de **código 'suelto'**, que debe ser convertido en una función, con todo lo que ello implica, e incorporada al paquete.
 
-- Aportes de funciones listas para incluir en el paquete, sin más.
+- Aportes de **funciones listas** para incluir en el paquete, sin más que agregar.
 
-El segundo caso es un ideal, seguramente poco realista aunque deseable. A continuación paso a describir algunas posibles formas de contribuir entre estos extremos.
+El segundo caso es un ideal, seguramente poco realista, aunque deseable. A continuación paso a describir algunas posibles formas de contribuir, que estarían entre estos extremos.
 
 ## Enviar código 'suelto'
 
-Este caso sería simplemente enviando código que creado para hacer una gráfica o tabla, por ejemplo, aunque tiene algunos detalles extra a tener en cuenta.
+Este caso sería simplemente enviando código que creado para hacer una gráfica o tabla, por ejemplo. Hay algunos detalles a tener en cuenta:
 
-En primer lugar, el contexto. Para qué se utilizaría? En qué situaciones? Es para algún programa de monitoreo en particular? Etc. Es deseable que estas cosas se expresen con la mayor claridad posible.
+En primer lugar, el **contexto**. Para qué se utilizaría? En qué situaciones? Es para algún programa de monitoreo en particular? Etc. Es deseable que estas cosas se expresen con la mayor claridad posible.
 
-También es importante estar atento a que lo enviado sea suficiente para tener un [ejemplo mínimo reproducible](https://es.stackoverflow.com/help/minimal-reproducible-example), lo cual suele implicar datos, código, etc. En otras palabras: todo lo necesario para que otra persona pueda ejecutar el código y obtener exactamente el mismo resultado.
+También es importante estar atento a que lo enviado sea suficiente para tener un [ejemplo mínimo reproducible](https://es.stackoverflow.com/help/minimal-reproducible-example), lo cual suele implicar datos, código, etc. En otras palabras: todo lo necesario para que otra persona pueda obtener exactamente el mismo resultado.
 
 ## Contribuir a la documentación
 
-No solamente código aporta, sino que mejoras a la documentación siempre son bienvenidas. Esto puede ser con sugerencias a lás páginas de ayuda de las funciones o datos, sugerencias o texto para incluir en el README.Rmd del paquete (el documento que está leyendo en este momento), o incluso en las viñetas y ejemplos de informes automatizados.
+No solamente el código ejecutable aporta, sino que mejoras a la documentación siempre son bienvenidas. Esto puede ser con sugerencias a lás **páginas de ayuda** de las funciones o datos, sugerencias o texto para incluir en el **README.Rmd** del paquete (el documento que está leyendo en este momento), o incluso en las **viñetas** y **ejemplos de informes automatizados**.
 
 ## Crear una función nueva
 
-Las funciones implican un paso de abstracción en relación a lo que es el código suelto. Y además requiere pensar situaciones diferentes a las que llevaron a la creación del código original. Esto puede ser complejo, especialmente si se trata de creación de gráficos, aunque no necesariamente _dificil_.
+Las funciones implican un incremento de abstracción en relación a lo que es el código suelto. Y además requiere pensar situaciones diferentes a las que llevaron a la creación del código original. Esto puede ser complejo, especialmente si se trata de creación de gráficos, aunque no necesariamente _dificil_.
 
 Algunas preguntas importantes a tener en cuenta son: 
 
 - Cuáles son los casos 'normales' de uso?
+
+- Cuáles son casos no contemplados y que deberían quedar explícitamente afuera del uso normal?
 
 - Cómo contempla la función el cambio de un parámetro, por ejemplo? (o la matriz, o el programa de monitoreo...)
 
@@ -309,9 +311,9 @@ Algunas preguntas importantes a tener en cuenta son:
 
 ## Modificar una función existente
 
-Es posible que el aporte de alguien sea mejorar una función de las incluidas en el paquete. Para esto será necesario acceder al cuerpo de la función (i.e.: el ćodigo que tiene adentro) y crear un ambiente de desarrollo (es decir: reproducir todos los objetos que existen al momento en que se ejecuta la función, de forma que se puedan hacer pruebas y experimentos).
+Pueden ser muy importantes aportes para mejorar las funciones incluidas en el paquete. Para esto será necesario acceder al cuerpo de la función (i.e.: el ćodigo que tiene adentro) y crear un ambiente de desarrollo (es decir: reproducir todos los objetos que existen al momento en que se ejecuta la función, de forma que se puedan hacer pruebas y experimentos).
 
-Para obtener el código de una función, se puede simplemente escibir el nombre de la función en la consola y dar enter:
+Para obtener el **código de una función**, se puede simplemente escibir el nombre de la función en la consola (sin paréntesis al final!) y dar enter:
 
 ```{r}
 iet
@@ -323,12 +325,13 @@ Otra opción es usar `edit`:
 edit(iet)
 ```
 
-Incluso se puede ir directametne al código en el repositorio de Github (subcarpeta 'R'): [https://github.com/jumanbar/siabox/blob/master/R/informes.R](https://github.com/jumanbar/siabox/blob/master/R/informes.R)
+Incluso se puede ir directametne al código en el repositorio de Github (subcarpeta 'R'): [https://github.com/jumanbar/siabox/blob/master/R/informes.R](R/informes.R)
 
-Para lograr un ambiente de desarrollo, usualmente es necesario tener definidos objetos con los nombres de los argumentos. En el caso de `iet` hay un único argumento, `PT`, entonces con definir un vector numérico alcanza:
+Para lograr un **ambiente de desarrollo**, usualmente es necesario tener definidos objetos con los nombres de los argumentos, en nuestro espacio de trabajo. En el caso de `iet` hay un único argumento, `PT`, entonces con definir un vector numérico alcanza:
 
 ```{r}
 PT <- c(23, 44, 2.5)
+# Esta línea es equivalente a todo el cuerpo de la función:
 10 * (6 - (0.42 - 0.36 * log(PT)) / log(2)) - 20
 ```
 
@@ -339,13 +342,15 @@ debug(g_lon_pto)
 g_lon_pto(d, 2098)
 ```
 
-El uso de `debug` es una opción bastante práctica, pero no se recomienda usar si no se conoce el procedimiento! (un [video instructivo aquí](https://www.youtube.com/watch?v=xHzeS8AIun8&list=PL41C5vgvqV_PA-e634Q4wn5MKbubqv6P9&index=48))
+El uso de `debug` es una opción bastante práctica y poderosa, pero no es recomendable si no se conoce el procedimiento! (siepre se puede aprender; dejamos aquí un [video instructivo](https://www.youtube.com/watch?v=xHzeS8AIun8&list=PL41C5vgvqV_PA-e634Q4wn5MKbubqv6P9&index=48))
 
 ## Código _listo para incorporar_
 
-Aunque es utópico pensar que ocurrirá, no está de más señalar algunas consideraciones importantes a tener en cuenta para crear el código de una función cualquiera:
+Este caso aplica para les desarrolladores más avanzados. Algunas consideraciones importantes:
 
-1. Al usar **funciones de paquetes externos**, evitar `require` o `library`; usar en cambio los operadores `::` o `:::`. Ejemplo: `dplyr::filter`. Eso evita afectar el ambiente de trabajo del usuario final (o sea, no hay que cargar todo el paquete `siabox` para usar una única función; `tsummary` es un ejemplo de función útil en sí misma). En este paquete las excepciones son `ggplot2` y `%>%`, ya que de otra forma el código se vuelve muy engorroso rápidamente.
+1. Al incluir, en el cuerpo de una función del paquete, **funciones de paquetes externos**, se debe evitar el uso de `require` o `library`. Usar en cambio los operadores `::` o `:::`.
+
+Ejemplo: `dplyr::filter`. Eso evita afectar el ambiente de trabajo del usuario final (o sea, no hay que cargar todo el paquete `siabox` para usar una única función; `tsummary` es un ejemplo de función útil en sí misma). En este paquete las excepciones son `ggplot2` y `%>%`, ya que de otra forma el código se vuelve muy engorroso rápidamente.
 
 2. En el caso de **tablas internas** de `siabox`, es preciso usar `::`. Por ejemplo, la tabla `sia_parametro` es llamada siempre así: `siabox::sia_parametro` (por ejemplo, ver el codigo de `unipar`).
 
