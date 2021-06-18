@@ -283,6 +283,10 @@ En primer lugar, el contexto. Para qué se utilizaría? En qué situaciones? Es 
 
 También es importante estar atento a que lo enviado sea suficiente para tener un [ejemplo mínimo reproducible](https://es.stackoverflow.com/help/minimal-reproducible-example), lo cual suele implicar datos, código, etc. En otras palabras: todo lo necesario para que otra persona pueda ejecutar el código y obtener exactamente el mismo resultado.
 
+## Contribuir a la documentación
+
+No solamente código aporta, sino que mejoras a la documentación siempre son bienvenidas. Esto puede ser con sugerencias a lás páginas de ayuda de las funciones o datos, sugerencias o texto para incluir en el README.Rmd del paquete (el documento que está leyendo en este momento), o incluso en las viñetas y ejemplos de informes automatizados.
+
 ## Crear una función nueva
 
 Las funciones implican un paso de abstracción en relación a lo que es el código suelto. Y además requiere pensar situaciones diferentes a las que llevaron a la creación del código original. Esto puede ser complejo, especialmente si se trata de creación de gráficos, aunque no necesariamente _dificil_.
