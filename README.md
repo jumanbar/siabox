@@ -10,6 +10,7 @@ siabox
     -   [Cálculos útiles](#cálculos-útiles)
 -   [Construcción colectiva](#construcción-colectiva)
     -   [Enviar código ‘suelto’](#enviar-código-suelto)
+    -   [Contribuir a la documentación](#contribuir-a-la-documentación)
     -   [Crear una función nueva](#crear-una-función-nueva)
     -   [Modificar una función
         existente](#modificar-una-función-existente)
@@ -33,8 +34,13 @@ El paquete se puede instalar desde GitHub:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("jumanbar/siabox")
+devtools::install_github("jumanbar/siabox", build_vignettes = TRUE)
 ```
+
+> Nota: se puede instalar con la opción `build_vignettes = FALSE`, pero
+> en ese caso no tendrá acceso a las viñetas, que son parte importante
+> de la documentación. De todas formas, puede ver las viñetas en formato
+> markdown, en la carpeta [vignettes](vignettes)
 
 # Introducción
 
@@ -474,6 +480,14 @@ lo cual suele implicar datos, código, etc. En otras palabras: todo lo
 necesario para que otra persona pueda ejecutar el código y obtener
 exactamente el mismo resultado.
 
+## Contribuir a la documentación
+
+No solamente código aporta, sino que mejoras a la documentación siempre
+son bienvenidas. Esto puede ser con sugerencias a lás páginas de ayuda
+de las funciones o datos, sugerencias o texto para incluir en el
+README.Rmd del paquete (el documento que está leyendo en este momento),
+o incluso en las viñetas y ejemplos de informes automatizados.
+
 ## Crear una función nueva
 
 Las funciones implican un paso de abstracción en relación a lo que es el
@@ -515,7 +529,7 @@ iet
 #> function(PT) {
 #>   10 * (6 - (0.42 - 0.36 * log(PT)) / log(2)) - 20
 #> }
-#> <bytecode: 0x56298ebaccc8>
+#> <bytecode: 0x55af6d2bd368>
 #> <environment: namespace:siabox>
 ```
 
