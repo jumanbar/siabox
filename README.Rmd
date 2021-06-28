@@ -38,6 +38,8 @@ devtools::install_github("jumanbar/siabox", build_vignettes = TRUE)
 ```
 > Nota: se puede instalar con la opción `build_vignettes = FALSE`, pero en ese caso no tendrá acceso a las viñetas, que son parte importante de la documentación. De todas formas, puede ver las viñetas en formato markdown, en la carpeta [vignettes](vignettes)
 
+Ver actualizaciones: [log.md](log.md)
+
 # Introducción
 
 <!-- badges: start -->
