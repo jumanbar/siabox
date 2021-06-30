@@ -81,7 +81,7 @@ La idea es que el paquete trabaje en conjunto con la aplicación
 tomar dos caminos:
 
 1.  Se puede trabajar con **datos extraidos** de la aplicación
-    [iSiA](dinama-shiny:3838/sia_apps/iSIA/) en el momento.
+    [iSIA](dinama-shiny:3838/sia_apps/iSIA/) en el momento.
 
 2.  Se pueden usar datos que ya están **en el paquete** para analizar o
     hacer pruebas. El código así generado luego se puede utilizar para
@@ -113,6 +113,12 @@ El siguiente es un ejemplo que usa datos extraídos de iSIA (formato
 -   Parámetros: ClorofilaA, NAmoniacal, NO2, NO3, NT, OD, pH, PO4, PT,
     SatO2 y T
 
+Una vez que descargamos el archivo desde iSIA, que se podría llamar, por
+ejemplo `extraccion_20210630.rds`, la forma de importarlos es con la
+función `readRDS` de R:
+
+    d <- readRDS("extraccion_20210630.rds")
+
 Afortunadamente, no es necesario descargar estos datos en particular, ya
 que se encuentran en el paquete mismo. Vamos a crear una data.frame
 llamada `d`, usando la función `filtrar_datos`, que simula los filtros
@@ -137,6 +143,10 @@ d %>% iet_tabla() %>% g_iet_pto()
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+
+> Nota: estos datos fueron extraídos en noviembre de 2020, por lo que
+> cualquier corrección o inclusión de datos que se haya hecho desde esa
+> fecha hasta hoy, estarán ausentes.
 
 En este caso se están usando las funciones `iet_tabla` y `g_iet_pto` del
 paquete. Aquí no se muestra, pero el paquete incluye una tercer función
@@ -537,10 +547,11 @@ enter:
 
 ``` r
 iet
-#> function(PT) {
-#>   10 * (6 - (0.42 - 0.36 * log(PT)) / log(2)) - 20
+#> function (PT) 
+#> {
+#>     10 * (6 - (0.42 - 0.36 * log(PT))/log(2)) - 20
 #> }
-#> <bytecode: 0x559f6622e3d0>
+#> <bytecode: 0x56360199c430>
 #> <environment: namespace:siabox>
 ```
 
