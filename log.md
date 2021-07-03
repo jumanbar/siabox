@@ -1,6 +1,21 @@
 # 2021-07-03
 
-- Funciones `[...]_id`: ahora, si el `patron` (primer argumento) es un valor numérico, devuelve la entrada de la tabla correspondiente con el `id == patron`, si es que hay alguna. Ejemplo: `par_id(2098)` devuelve la entrada de fósforo total de la tabla `sia_parametro`.
+- Funciones `[...]_id`: ahora, si el `patron` (primer argumento) es un valor numérico, devuelve la entrada de la tabla correspondiente con el `id == patron`, si es que hay alguna. Ejemplos:
+
+```r
+> par_id(2098)
+# A tibble: 1 x 7
+  id_parametro parametro     enumerado nombre_clave decimales par_vigente codigo_airviro
+         <int> <chr>         <lgl>     <chr>            <int> <lgl>       <chr>         
+1         2098 Fósforo total FALSE     PT                   9 TRUE        NA        
+
+> pro_id(10)
+# A tibble: 1 x 6
+  id_programa nombre_programa codigo_programa visible_externos version id_programa_silad
+        <int> <chr>           <chr>           <lgl>              <int>             <int>
+1          10 Laguna Merin    LM              TRUE                  23                 0
+
+```
 
 - g_mes_pto_all: ahora no da error si se pide una sóla gráfica para un parámetro sin datos
 
