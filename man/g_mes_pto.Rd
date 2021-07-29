@@ -7,6 +7,7 @@
 \alias{g_est_dsv}
 \alias{g_est_dsv_all}
 \alias{g_cue_box}
+\alias{g_tie_lin}
 \title{Graficos de parámetros por mes}
 \usage{
 g_mes_pto(
@@ -41,14 +42,24 @@ g_est_dsv(
 g_est_dsv_all(.data, id_parametro, t_eti, ...)
 
 g_cue_box(.data, id_parametro, nombre_clave, ylab, t_eti)
+
+g_tie_lin(
+  .data,
+  id_parametro,
+  nombre_clave,
+  legend.position = "right",
+  hline,
+  ylab,
+  t_eti
+)
 }
 \arguments{
 \item{.data}{data.frame. Datos del SIA (ver \code{\link{datos_sia}} y
 ejemplos)}
 
 \item{id_parametro}{integer. Id de uno/escalar (\code{g_mes_pto}) o varios
-elementos (\code{g_mes_pto_all}). Se debe(n) corresponder con los ids
-encontrados columna homónima de \code{\link{sia_parametro}}}
+elementos (\code{g_mes_pto_all}, \code{g_tie_lin}). Se debe(n) corresponder con los
+ids encontrados columna homónima de \code{\link{sia_parametro}}}
 
 \item{nombre_clave}{character. Nombre clave del parámetro (ej.: "PT"), según
 los nombres usados en la columna \code{nombre_clave} de
@@ -70,6 +81,9 @@ trata de una o más columnas de \code{.data} sin comillas}
 \item{fun_moda}{function. Funcion para calulcular la moda de \code{valor}}
 
 \item{fun_desvio}{function. Función para calcular desvío de \code{valor}}
+
+\item{hline}{numeric o data.frame. Para agregar líneas horizontales a las
+series de tiempo de \code{g_tie_lin}. Ver detalles.}
 }
 \value{
 Objeto de clase \code{gg} (hereda de \code{\link[ggplot2]{ggplot}}).
@@ -86,10 +100,21 @@ estándares de un parámetro, según las estaciones encontradas en \code{.data}
 (internamente procesa los datos con \code{d_est_bar}); \code{d_est_bar} perpara datos
 para la función anterior, incluyendo modas y desvíos; \code{g_cue_box} Grafica
 valores de un parámetro con gráficos de cajas (boxplot), para comparar
-subcuencas.
-Las versiones \verb{[..funcion..]_all} agrupan en una misma figura los gráficos
-generados con \verb{[..funcion..]} para el total de parámetros encontrados en
-\code{id_parametro}.
+subcuencas. La función \code{g_tie_lin} grafica series de tiempo con líneas,
+tomando hasta 5 parámetros a la vez. Las versiones \verb{[..funcion..]_all}
+agrupan en una misma figura los gráficos generados con \verb{[..funcion..]} para
+el total de parámetros encontrados en \code{id_parametro}.
+
+El argumento \code{hline} de \code{g_tie_lin} puede usarse de dos maneras posibles:
+\enumerate{
+\item Si es un valor numérico, tiene que tener la misma cantidad de elementos
+que parámetros graficados, independientemente de que los parámetros sean
+explicitados como argumentos o no.
+\item Si es un data.frame, tiene que tener las columnas \code{id_parametro} y
+\code{hline}, de tipo integer (o equivalente) y numeric, respectivamente. Por cada
+fila con un \code{id_parametro} coincidente con los graficados, la función
+agregará una línea horizontal en el facet correspondiente.
+}
 
 \code{g_mes_pto_all} en escencia llama a \code{\link{g_mes_pto}} tantas veces como
 id de parámetros en \code{id_parametro}, realizando una figura única que combina
@@ -117,6 +142,8 @@ parámetros por estación, en una misma figura, usando \code{g_est_dsv}
 
 \item \code{g_cue_box}: Gráfico de cajas (boxplot) para comparación de valores
 de un parámetro entre cuencas
+
+\item \code{g_tie_lin}: Series de tiempo por estación, hasta 5 parámetros.
 }}
 
 \examples{
@@ -129,23 +156,58 @@ d <- datos_sia \%>\%
 
 cebo <- dplyr::filter(d, nombre_subcuenca_informes == "Cebollatí")
 
-g_mes_pto(cebo, id_parametro = 2009, ylab = 'Cond (μS/cm)')
-g_mes_pto(cebo, nombre_clave = 'Conduc', ylab = 'Cond (μS/cm)')
+# ======= Mensuales: puntos (g_mes_pto) =================================== #
+g_mes_pto(cebo, id_parametro = 2009, ylab = 'Cond (µS/cm)')
+g_mes_pto(cebo, nombre_clave = 'Conduc', ylab = 'Cond (µS/cm)')
 g_mes_pto_all(cebo, id_parametro = p)
 g_mes_pto_all(cebo, id_parametro = 2098L)
 g_mes_pto_all(cebo, id_parametro = 2008L) # Vacío
 g_mes_pto_all(cebo, id_parametro = c(p, 2008L)) # Vacío
+
+# ======= Cuencas: boxplot ======= #
 g_cue_box(d, nombre_clave = "PT")
 
+# ======= Estaciones: puntos + desvío estándar (g_est_dsv) ================ #
 e <- datos_sia \%>\%
   filtrar_datos(id_programa = 4L,
                 rango_fechas = c(2017, 2019),
                 id_parametro = p)
+
 g_est_dsv(e, nombre_clave = "PT")
 g_est_dsv_all(e, p)
 g_est_dsv(e, 2008)
 g_est_dsv_all(e, 2098)
 g_cue_box(e, p[1])
+
+# ======= Series de tiempo (g_tie_lin) ==================================== #
+d <- filtrar_datos(datos_sia, 4L, rango_fechas = c(2015, 2019),
+                   id_parametro = 2032L, tipo_punto_id = 1L)
+g_tie_lin(d, 2032L)
+g_tie_lin(d, 2032L) + geom_hline(yintercept = 27) +
+  ggtitle("Agrega línea horizontal", "T = 27 ºC")
+g_tie_lin(d, 2032L, hline = 27) +
+  ggtitle("Agrega línea horizontal, con el argumento hline", "T = 27 ºC")
+g_tie_lin(d, 2032L, ylab = "Temperatura ºC")
+g_tie_lin(d, 2000L) # NO HAY DATOS
+
+d <- filtrar_datos(datos_sia, 4L, rango_fechas = c(2015, 2019),
+                   tipo_punto_id = 1L)
+
+g_tie_lin(d) # Grafica sólo 5 parámetros
+g_tie_lin(d, c(2032L, 2017L, 2098L))
+
+d <- filtrar_datos(datos_sia, 4L, rango_fechas = c(2015, 2019),
+                   id_parametro = c(2032L, 2017L, 2098L),
+                   id_estacion = c(100245, 100249, 100254),
+                   orden_est = c("RN1", "RN6", "RN12"),
+                   tipo_punto_id = 1L)
+lineash <- data.frame(id_parametro = c(2032L, 2032L, 2017L),
+                      hline = c(14, 26, 9.8))
+p <- g_tie_lin(d, hline = lineash)
+print(p)
+
+## Para hacer un gráfico interactivo (necesita el paquete plotly):
+## plotly::ggplotly(p) #FancyPants
 }
 \seealso{
 \code{\link{t_eti_base}}

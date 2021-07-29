@@ -704,13 +704,13 @@ consulta_muestras <- function(con, id_matriz = 6L,
 #' filtrar_datos(datos_sia, 5, 6)
 #' filtrar_datos(datos_sia, 5, 11)
 filtrar_datos <- function(.data,
-                          id_programa = 4L, # Not NULL!
+                          id_programa, # Not NULL!
                           id_matriz = 6L,
                           rango_fechas = NULL,
                           id_parametro = NULL,
                           id_estacion = NULL,
                           orden_est = NULL,
-                          tipo_punto_id = NULL) {
+                          tipo_punto_id = 1L) {
 
   if (missing(id_programa))
     stop("id_programa espera un \u00fanico n\u00famero entero positivo.")
@@ -816,10 +816,18 @@ filtrar_datos <- function(.data,
   } else {
     w <- esperados %in% orden_est
     if (!all(w)) {
+      we <- which(sia_estacion$codigo_pto %in% orden_est)
       orden_est <- c(orden_est, esperados[!w])
-      warning("Se agregaron las estaciones ",
-              colapsar_secuencia(esperados[!w]),
-              " al final de orden_est")
+      if (!length(we)) {
+        warning("Los nombres de estaciones indicados en el argumento ",
+                "orden_est no se corresponden a estaciones conocidas")
+      } else {
+        id_e <- sia_estacion$id[we]
+      }
+      warning("Se agregaron las estaciones ", colapsar_secuencia(esperados[!w]),
+              " al final de orden_est. Para evitar agregar m\u00e1s estaciones",
+              " incluya el argumento:\n\tid_estacion = c(",
+              paste(id_e, collapse = ", "), ")")
     }
   }
   out$codigo_pto <- factor(out$codigo_pto, levels = orden_est)

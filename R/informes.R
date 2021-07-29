@@ -480,10 +480,21 @@ eti <- function(id_parametro, t_eti) {
 #' (internamente procesa los datos con `d_est_bar`); `d_est_bar` perpara datos
 #' para la función anterior, incluyendo modas y desvíos; `g_cue_box` Grafica
 #' valores de un parámetro con gráficos de cajas (boxplot), para comparar
-#' subcuencas.
-#' Las versiones `[..funcion..]_all` agrupan en una misma figura los gráficos
-#' generados con `[..funcion..]` para el total de parámetros encontrados en
-#' `id_parametro`.
+#' subcuencas. La función `g_tie_lin` grafica series de tiempo con líneas,
+#' tomando hasta 5 parámetros a la vez. Las versiones `[..funcion..]_all`
+#' agrupan en una misma figura los gráficos generados con `[..funcion..]` para
+#' el total de parámetros encontrados en `id_parametro`.
+#'
+#' El argumento `hline` de `g_tie_lin` puede usarse de dos maneras posibles:
+#'
+#' 1. Si es un valor numérico, tiene que tener la misma cantidad de elementos
+#' que parámetros graficados, independientemente de que los parámetros sean
+#' explicitados como argumentos o no.
+#'
+#' 2. Si es un data.frame, tiene que tener las columnas `id_parametro` y
+#' `hline`, de tipo integer (o equivalente) y numeric, respectivamente. Por cada
+#' fila con un `id_parametro` coincidente con los graficados, la función
+#' agregará una línea horizontal en el facet correspondiente.
 #'
 #' `g_mes_pto_all` en escencia llama a \code{\link{g_mes_pto}} tantas veces como
 #' id de parámetros en `id_parametro`, realizando una figura única que combina
@@ -494,13 +505,15 @@ eti <- function(id_parametro, t_eti) {
 #' @param .data data.frame. Datos del SIA (ver \code{\link{datos_sia}} y
 #'   ejemplos)
 #' @param id_parametro integer. Id de uno/escalar (`g_mes_pto`) o varios
-#'   elementos (`g_mes_pto_all`). Se debe(n) corresponder con los ids
-#'   encontrados columna homónima de \code{\link{sia_parametro}}
+#'   elementos (`g_mes_pto_all`, `g_tie_lin`). Se debe(n) corresponder con los
+#'   ids encontrados columna homónima de \code{\link{sia_parametro}}
 #' @param legend.position character. Valor enviado directamente al argumento
 #'   `legend.position` de la función \code{\link[ggplot2]{theme}}
 #' @param nombre_clave character. Nombre clave del parámetro (ej.: "PT"), según
 #'   los nombres usados en la columna `nombre_clave` de
 #'   \code{\link{sia_parametro}}
+#' @param hline numeric o data.frame. Para agregar líneas horizontales a las
+#'   series de tiempo de `g_tie_lin`. Ver detalles.
 #' @param t_eti `tbl_df`. Opcional. Tabla de etiquetas
 #' @param ylab Opcional. Etiqueta para el eje y del gráfico resultante. Si este
 #'   argumento no es especificado, se utilizará la función \code{eti} para crear
@@ -532,23 +545,58 @@ eti <- function(id_parametro, t_eti) {
 #'
 #' cebo <- dplyr::filter(d, nombre_subcuenca_informes == "Cebollatí")
 #'
+#' # ======= Mensuales: puntos (g_mes_pto) =================================== #
 #' g_mes_pto(cebo, id_parametro = 2009, ylab = 'Cond (μS/cm)')
 #' g_mes_pto(cebo, nombre_clave = 'Conduc', ylab = 'Cond (μS/cm)')
 #' g_mes_pto_all(cebo, id_parametro = p)
 #' g_mes_pto_all(cebo, id_parametro = 2098L)
 #' g_mes_pto_all(cebo, id_parametro = 2008L) # Vacío
 #' g_mes_pto_all(cebo, id_parametro = c(p, 2008L)) # Vacío
+#'
+#' # ======= Cuencas: boxplot ======= #
 #' g_cue_box(d, nombre_clave = "PT")
 #'
+#' # ======= Estaciones: puntos + desvío estándar (g_est_dsv) ================ #
 #' e <- datos_sia %>%
 #'   filtrar_datos(id_programa = 4L,
 #'                 rango_fechas = c(2017, 2019),
 #'                 id_parametro = p)
+#'
 #' g_est_dsv(e, nombre_clave = "PT")
 #' g_est_dsv_all(e, p)
 #' g_est_dsv(e, 2008)
 #' g_est_dsv_all(e, 2098)
 #' g_cue_box(e, p[1])
+#'
+#' # ======= Series de tiempo (g_tie_lin) ==================================== #
+#' d <- filtrar_datos(datos_sia, 4L, rango_fechas = c(2015, 2019),
+#'                    id_parametro = 2032L, tipo_punto_id = 1L)
+#' g_tie_lin(d, 2032L)
+#' g_tie_lin(d, 2032L) + geom_hline(yintercept = 27) +
+#'   ggtitle("Agrega línea horizontal", "T = 27 ºC")
+#' g_tie_lin(d, 2032L, hline = 27) +
+#'   ggtitle("Agrega línea horizontal, con el argumento hline", "T = 27 ºC")
+#' g_tie_lin(d, 2032L, ylab = "Temperatura ºC")
+#' g_tie_lin(d, 2000L) # NO HAY DATOS
+#'
+#' d <- filtrar_datos(datos_sia, 4L, rango_fechas = c(2015, 2019),
+#'                    tipo_punto_id = 1L)
+#'
+#' g_tie_lin(d) # Grafica sólo 5 parámetros
+#' g_tie_lin(d, c(2032L, 2017L, 2098L))
+#'
+#' d <- filtrar_datos(datos_sia, 4L, rango_fechas = c(2015, 2019),
+#'                    id_parametro = c(2032L, 2017L, 2098L),
+#'                    id_estacion = c(100245, 100249, 100254),
+#'                    orden_est = c("RN1", "RN6", "RN12"),
+#'                    tipo_punto_id = 1L)
+#' lineash <- data.frame(id_parametro = c(2032L, 2032L, 2017L),
+#'                       hline = c(14, 26, 9.8))
+#' p <- g_tie_lin(d, hline = lineash)
+#' print(p)
+#'
+#' ## Para hacer un gráfico interactivo (necesita el paquete plotly):
+#' ## plotly::ggplotly(p) #FancyPants
 g_mes_pto <- function(.data,
                       id_parametro,
                       nombre_clave,
@@ -733,17 +781,17 @@ g_est_dsv <- function(.data,
   }
 
   tmp <-
-    d_est_bar(.data, id_parametro, codigo_pto) 
-  
+    d_est_bar(.data, id_parametro, codigo_pto)
+
   # Si no hay datos del parámetro:
   if (nrow(tmp) == 1L && is.na(tmp$codigo_pto)) {
     corte <-
       siabox::sia_parametro %>%
       dplyr::filter(id_parametro == !!id_parametro) %>%
       dplyr::left_join(siabox::codigos_param, by = "id_parametro")
-    
+
     texto_par <- corte$parametro.x
-    
+
     out <-
       ggplot() +
       theme_void() +
@@ -757,7 +805,7 @@ g_est_dsv <- function(.data,
       ylab(NULL)
     return(out)
   }
-  
+
   out <- tmp %>%
     ggplot() +
     aes(x = codigo_pto, y = moda) +
@@ -793,7 +841,7 @@ g_est_dsv_all <- function(.data, id_parametro, t_eti, ...) {
     lista[[i]] <-
       g_est_dsv(.data, id_parametro = id_parametro[i], t_eti = t_eti)
   }
-  
+
   if (i == 1) return(lista[[1]])
 
   out <- patchwork::wrap_plots(lista, ...) +
@@ -898,6 +946,129 @@ g_iet_pto <- function(.data) {
   return(out)
 }
 
+#' @describeIn g_mes_pto Series de tiempo por estación, hasta 5 parámetros.
+#'
+#' @export
+g_tie_lin <- function(.data,
+                      id_parametro,
+                      nombre_clave,
+                      legend.position = 'right',
+                      hline,
+                      ylab,
+                      t_eti) {
+
+  id_p <- unique(.data$id_programa)
+  if (length(id_p) > 1L) {
+    progs <- dplyr::filter(sia_programa, id_programa %in% id_p)$nombre_programa
+    # .data <- dplyr::filter(.data, id_programa == id_p[[1]])
+    warning("Se encontraron varios programas de monitoreo en el conjunto de ",
+            "datos: ", colapsar_secuencia(progs, comillas = TRUE))
+  }
+
+  if (missing(id_parametro)) {
+    if (missing(nombre_clave)) {
+      id_parametro <- unique(.data$id_parametro)
+      if (length(id_parametro) > 5L) {
+        warning("Se grafican solamente los primeros 5 par\u00e1metros ",
+                "encotrados en el conjunto de datos (de un total de ",
+                length(id_parametro), ")")
+        id_parametro <- id_parametro[1:5]
+      }
+
+    } else {
+      id_parametro <-
+        dplyr::filter(.data, nombre_clave %in% !!nombre_clave)$id_parametro %>%
+        unique()
+      if (!length(id_parametro))
+        stop("ning\u00fan nombre_clave no encontrado ",
+             "en los datos ingresados (.data)")
+    }
+  }
+
+  if (missing(ylab)) {
+    if (missing(t_eti)) {
+      t_eti <- siabox::t_eti_base
+      warning("Se usa t_eti_base como sustituta del argumento t_eti")
+    }
+  } else if (length(id_parametro) == 1L) {
+    t_eti <- tibble::tibble(id_parametro = !!id_parametro,
+                            etiqueta = ylab)
+
+  }
+
+  datos <-
+    .data %>%
+    dplyr::filter(id_parametro %in% !!id_parametro) %>%
+    dplyr::mutate(fecha_hora = lubridate::ymd_hms(fecha_hora)) %>%
+    dplyr::left_join(t_eti, by = "id_parametro")
+
+  out <-
+    ggplot(datos) +
+    aes(fecha_hora, valor, color = codigo_pto) +
+    # aes(fecha_muestra, valor, color = codigo_pto) +
+    geom_line() +
+    xlab("Fecha - Hora") +
+    theme_bw() +
+    theme(legend.position = legend.position) +
+    scale_color_discrete('Estaci\u00f3n')
+
+  ## Esta funcionalidad tal vez la elimine en el futuro: es como un remanente de
+  ## otras funciones que se usan para informes, como g_mes_pto, que facilita la
+  ## solución de casos en los que debería graficarse un parámetro determinado,
+  ## pero puede suceder que no haya datos.
+  if (length(id_parametro) == 1L) {
+    if (!nrow(out$data)) {
+      corte <-
+        siabox::sia_parametro %>%
+        dplyr::filter(id_parametro == !!id_parametro) %>%
+        dplyr::left_join(siabox::codigos_param, by = "id_parametro")
+
+      texto_par <- corte$parametro.x
+
+      out <-
+        ggplot() +
+        theme_void() +
+        geom_text(aes(0, 0, label = paste0(texto_par, ":\nNO HAY DATOS"))) +
+        theme(panel.grid.minor = element_blank(),
+              panel.grid.major = element_blank(),
+              text = element_text(size = 10),
+              axis.text = element_blank(),
+              legend.position = legend.position) +
+        xlab(NULL) +
+        ggplot2::ylab(NULL)
+      return(out)
+    }
+  }
+  out <- out +
+    facet_grid(rows = vars(etiqueta), scales = "free_y") +
+    ggplot2::ylab(NULL)
+
+  if (!missing(hline)) {
+    if (is.data.frame(hline)) {
+      lineas <- dplyr::left_join(hline, t_eti, by = "id_parametro")
+    } else if (is.numeric(hline)) {
+      if (length(id_parametro) != length(hline)) {
+        stop("La cantidad de l\u00edneas horizontales (hline: ", length(hline),
+             " elementos) no coincide con la cantidad de par\u00e1metros (",
+             length(id_parametro),")")
+      } else {
+        lineas <- tibble::tibble(id_parametro = !!id_parametro,
+                                 hline = !!hline) %>%
+          dplyr::left_join(t_eti, by = "id_parametro")
+      }
+    } else {
+      stop("hline no es data.frame ni numeric")
+    }
+    out <- out +
+      geom_hline(aes(yintercept = hline),
+                 data = lineas,
+                 linetype = 2, color = "darkgrey")
+  }
+
+  return(out)
+}
+
+
 # + Graficos sueltos ----
 
 #' @describeIn g_lon_pto Funcion que (internamente) prepara los datos para
@@ -930,10 +1101,10 @@ d_lon <- function(.data,
     dplyr::ungroup()
 
   # Para que los meses tengan siempre los mismos colores (ver "valores", abajo):
-  meses <- unique(sort(d_anio$mes))
+  # meses <- unique(sort(d_anio$mes))
 
   # Etiquetas para los meses:
-  eti_meses <- levels(d_anio$peri)[meses]
+  # eti_meses <- levels(d_anio$peri)[meses]
 
   # Id de las estaciones que nos interesan (solamente las que tienen datos para
   # el año seleccionado):
