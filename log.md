@@ -1,3 +1,20 @@
+# 2021-08-05
+
+Las tablas importadas desde el SIA (`sia_cuenca`, `sia_datos_muestra_parametros`, `sia_departamento`, `sia_estacion`, `sia_institucion`, `sia_matriz`, `sia_muestra`, `sia_param_unidad`, `sia_parametro`, `sia_programa`, `sia_programa_parametro`, `sia_sub_cuenca`, `sia_tipo_punto_estacion` y `sia_unidad`), así como otras construidas a partir de las anteriores (`datos_sia`, `datos_sia_sed`, `usuarios` y `t_eti_base`), fueron actualizadas.
+
+También se incluye a la lista de funciones "exportadas" (o externas?) del paquete a `colapsar_secuencia`, que arregla vectores con listas de cosas en forma de listado expresado en lenguaje natural:
+
+```r
+library(siabox)
+cat("Los primeros 5 programas de monitoreo en el SIA son:\n\t", 
+    colapsar_secuencia(sia_programa$nombre_programa[1:5], comillas = TRUE))
+```
+
+    Los primeros 5 programas de monitoreo en el SIA son:
+    	 'Playa', 'Fray Bentos', 'Santa Lucía', 'Río Negro' y 'Rio Cuareim'
+ 
+Un cambio menor además, es la eliminación de `RPostgreSQL` como paquete necesario, y el agregado de `RPostgres` como paquete sugerido (no es estrictamente necesario).
+
 # 2021-07-03
 
 La función `g_tie_lin` fue creada para graficar series de tiempo de 1 a 5 parámetros.

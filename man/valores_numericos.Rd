@@ -121,7 +121,7 @@ valores_numericos(d, metodo = "informe") \%>\%
     porcentaje_menor_lim = sum(id_tipo_dato \%in\% 2:4) / dplyr::n()
     )
 
-# Ejemplo con datos del programa Santa Lucía:
+# Ejemplo con datos del programa Santa LucÃ­a:
 filtrar_datos(datos_sia, id_programa = 3) \%>\%
   valores_numericos(metodo = "basico")
 }

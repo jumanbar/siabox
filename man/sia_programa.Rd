@@ -5,7 +5,7 @@
 \alias{sia_programa}
 \title{Lista de programas de monitoreo}
 \format{
-Tabla con 31 filas y 6
+Tabla con 34 filas y 6
 columnas:
 
 \describe{
@@ -36,6 +36,6 @@ infambientalbd). Corresponden a las matrices ambientales "Aguas
 superficiales" y "Sedimentos"
 }
 \details{
-Fecha de extraccion: 2020-10-22
+Fecha de extraccion: 2021-08-05
 }
 \keyword{datasets}

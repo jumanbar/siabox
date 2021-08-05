@@ -7,7 +7,7 @@
 \alias{datos_sia_sed}
 \title{Datos extraídos del SIA.}
 \format{
-Tabla con 223112 filas y 39 columnas:
+Tabla con 258379 filas y 39 columnas:
 
 \describe{
 
@@ -123,7 +123,10 @@ datos_sia
 }
 \description{
 La tibble \code{datos_sia} tiene datos de matriz Aguas superficiales y
-\code{datos_sia_sed} de Sedimentos. Fecha de extracción: 2020-11-04.
+\code{datos_sia_sed} de Sedimentos.
+}
+\details{
+Fecha de extracción: `2021-08-05
 }
 \seealso{
 \code{\link{tipos_de_dato}}, \code{\link{consulta_muestras}},

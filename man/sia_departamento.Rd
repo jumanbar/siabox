@@ -31,6 +31,6 @@ estaciones del programa de monitoreo "Laguna Garzón" presentan esta categoría
 en la columna "departamento" (Se encuentran entre Maldonado y Rocha).
 }
 \details{
-Fecha de extraccion: 2020-10-22
+Fecha de extraccion: 2021-08-05
 }
 \keyword{datasets}

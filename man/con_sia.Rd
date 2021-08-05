@@ -13,3 +13,9 @@ Una conexión tipo DBI de PosgtgreSQL
 Genera una conexión con la base de datos infambiental, usando el usuario y
 clave de JMB. Sólo funciona en algunas PCs (ej.: servidor o PC de JMB).
 }
+\examples{
+\dontrun{
+con <- con_sia()
+sia_parametro <- dplyr::tbl(con, "parametro")
+}
+}

@@ -5,7 +5,7 @@
 \alias{t_eti_base}
 \title{Tabla de etiquetas base}
 \format{
-Tabla con 302 filas y 2 columnas:
+Tabla con 336 filas y 2 columnas:
 
 \describe{
 
@@ -31,10 +31,10 @@ utilizadas en los contenidos creados por DCA, incluyendo informes, reportes,
 etc. Se espera poder construir la tabla en base a acuerdos y eventualmente
 tener etiquetas unificadas para todos los parámetros.
 
-Fecha de creación: 2020-10-29
+Fecha de creación: `2021-08-05
 }
 \examples{
-# Código de creación:
+# CÃ³digo de creaciÃ³n:
 t_eti_base <-
   sia_parametro \%>\%
   dplyr::left_join(dplyr::select(codigos_param, id_parametro, codigo_nuevo),

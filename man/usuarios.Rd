@@ -5,7 +5,7 @@
 \alias{usuarios}
 \title{Tabla con lista de usuarios}
 \format{
-Tabla con 35 filas y
+Tabla con 38 filas y
 1 columnas:
 
 \describe{

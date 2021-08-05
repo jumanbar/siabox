@@ -6,13 +6,13 @@
 \usage{
 filtrar_datos(
   .data,
-  id_programa = 4L,
+  id_programa,
   id_matriz = 6L,
   rango_fechas = NULL,
   id_parametro = NULL,
   id_estacion = NULL,
   orden_est = NULL,
-  tipo_punto_id = NULL
+  tipo_punto_id = 1L
 )
 }
 \arguments{

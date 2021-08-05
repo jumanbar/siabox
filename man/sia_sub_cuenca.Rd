@@ -6,7 +6,7 @@
 \title{Lista de subcuencas}
 \format{
 Tabla con 302 filas y
-6)` columnas:
+7)` columnas:
 
 \describe{
 
@@ -44,7 +44,7 @@ Las columnas \code{sub_cue_curso}, \code{sub_cue_cod_sc} y
 \code{cursos_de_agua} refieren a otras tablas de \code{infambientalbd} no
 incluidas en el presente paquete.
 
-Fecha de extraccion: 2020-10-22
+Fecha de extraccion: 2021-08-05
 }
 \examples{
 dplyr::left_join(dplyr::select(sia_sub_cuenca, id:sub_cue_cuenca_id),

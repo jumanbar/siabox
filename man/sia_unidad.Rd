@@ -5,7 +5,7 @@
 \alias{sia_unidad}
 \title{Lista de las unidades de medidas contempladas por el SIA}
 \format{
-Tabla con 115 filas y 3 columnas:
+Tabla con 118 filas y 3 columnas:
 
 \describe{
 
@@ -29,6 +29,6 @@ las unidades con \code{\link{sia_parametro}} es necesaria la tabla
 \code{\link{sia_param_unidad}}
 }
 \details{
-Fecha de extraccion: 2020-10-22
+Fecha de extraccion: 2021-08-05
 }
 \keyword{datasets}

@@ -31,6 +31,6 @@ Tipos de estaciones de monitoreo, según (la profundidad de) las muestras que
 se toman
 }
 \details{
-Fecha de extraccion: 2020-10-22
+Fecha de extraccion: 2021-08-05
 }
 \keyword{datasets}

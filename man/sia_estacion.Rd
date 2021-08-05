@@ -5,7 +5,7 @@
 \alias{sia_estacion}
 \title{Estaciones de monitoreo}
 \format{
-Tabla con 429 filas y 17
+Tabla con 402 filas y 17
 columnas:
 
 \describe{
@@ -69,6 +69,6 @@ una determinada matriz y programa. También se usa para determinar la matriz
 de cada programa de monitoreo.
 }
 \details{
-Fecha de extraccion: 2020-10-22
+Fecha de extraccion: 2021-08-05
 }
 \keyword{datasets}

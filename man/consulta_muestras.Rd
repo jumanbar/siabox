@@ -173,20 +173,12 @@ más reciente de la tabla \code{datos_muestra_parametros} y se descarta el resto
 }
 \examples{
 \dontrun{
-# Conexión con la base de datos:
-drv <- DBI::dbDriver("PostgreSQL")
-con <- DBI::dbConnect(drv, dbname = "infambientalbd",
+# ConexiÃ³n con la base de datos:
+con <- DBI::dbConnect(RPostgres::Postgres(), dbname = "infambientalbd",
                       host = "172.20.0.34", port = 5432,
                       user = "shiny_usr", password = "shiny_passwd")
-# Para trabajar en máquina windows, en donde ya sé que la
-# codificación de caracteres es WIN1252 (en verdad Sys.getlocale() dice
-# "Spanish_Uruguay.1252", pero asumo que es lo mismo y en las pruebas que
-# hice anduvo bien):
-if (grepl("DINAMA-OAN11", Sys.info()["nodename"], ignore.case = TRUE)) {
-  DBI::dbExecute(con, "SET NAMES 'WIN1252';")
-}
 
-# Todas las muestras de todos los programas en el año 2019:
+# Todas las muestras de todos los programas en el aÃ±o 2019:
 consulta_muestras(con, fecha_ini = "2019-12-24", fecha_fin = "2019-12-31")
 consulta_muestras(con, id_programa = 1L,
                   id_estacion = c(100054L, 100061L, 100063L, 100172L),

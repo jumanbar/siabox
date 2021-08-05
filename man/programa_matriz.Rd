@@ -30,7 +30,7 @@ Creada a partir de la tabla \code{\link{sia_estacion}}. Sirve de referencia
 para asociar programas de monitoreo con matrices ambientales.
 }
 \examples{
-# Crear una versión actualizada de la tabla:
+# Crear una versiÃ³n actualizada de la tabla:
 programa_matriz <-
   sia_estacion \%>\%
     dplyr::distinct(prog_monitoreo, matriz_estacion) \%>\%

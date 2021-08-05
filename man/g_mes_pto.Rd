@@ -154,20 +154,20 @@ d <- datos_sia \%>\%
                 rango_fechas = c("2019-01-01", "2019-12-31"),
                 id_parametro = p)
 
-cebo <- dplyr::filter(d, nombre_subcuenca_informes == "Cebollatí")
+cebo <- dplyr::filter(d, nombre_subcuenca_informes == "CebollatÃ­")
 
 # ======= Mensuales: puntos (g_mes_pto) =================================== #
-g_mes_pto(cebo, id_parametro = 2009, ylab = 'Cond (µS/cm)')
-g_mes_pto(cebo, nombre_clave = 'Conduc', ylab = 'Cond (µS/cm)')
+g_mes_pto(cebo, id_parametro = 2009, ylab = 'Cond (Î¼S/cm)')
+g_mes_pto(cebo, nombre_clave = 'Conduc', ylab = 'Cond (Î¼S/cm)')
 g_mes_pto_all(cebo, id_parametro = p)
 g_mes_pto_all(cebo, id_parametro = 2098L)
-g_mes_pto_all(cebo, id_parametro = 2008L) # Vacío
-g_mes_pto_all(cebo, id_parametro = c(p, 2008L)) # Vacío
+g_mes_pto_all(cebo, id_parametro = 2008L) # VacÃ­o
+g_mes_pto_all(cebo, id_parametro = c(p, 2008L)) # VacÃ­o
 
 # ======= Cuencas: boxplot ======= #
 g_cue_box(d, nombre_clave = "PT")
 
-# ======= Estaciones: puntos + desvío estándar (g_est_dsv) ================ #
+# ======= Estaciones: puntos + desvÃ­o estÃ¡ndar (g_est_dsv) ================ #
 e <- datos_sia \%>\%
   filtrar_datos(id_programa = 4L,
                 rango_fechas = c(2017, 2019),
@@ -184,16 +184,16 @@ d <- filtrar_datos(datos_sia, 4L, rango_fechas = c(2015, 2019),
                    id_parametro = 2032L, tipo_punto_id = 1L)
 g_tie_lin(d, 2032L)
 g_tie_lin(d, 2032L) + geom_hline(yintercept = 27) +
-  ggtitle("Agrega línea horizontal", "T = 27 ºC")
+  ggtitle("Agrega lÃ­nea horizontal", "T = 27 ÂºC")
 g_tie_lin(d, 2032L, hline = 27) +
-  ggtitle("Agrega línea horizontal, con el argumento hline", "T = 27 ºC")
-g_tie_lin(d, 2032L, ylab = "Temperatura ºC")
+  ggtitle("Agrega lÃ­nea horizontal, con el argumento hline", "T = 27 ÂºC")
+g_tie_lin(d, 2032L, ylab = "Temperatura ÂºC")
 g_tie_lin(d, 2000L) # NO HAY DATOS
 
 d <- filtrar_datos(datos_sia, 4L, rango_fechas = c(2015, 2019),
                    tipo_punto_id = 1L)
 
-g_tie_lin(d) # Grafica sólo 5 parámetros
+g_tie_lin(d) # Grafica sÃ³lo 5 parÃ¡metros
 g_tie_lin(d, c(2032L, 2017L, 2098L))
 
 d <- filtrar_datos(datos_sia, 4L, rango_fechas = c(2015, 2019),
@@ -206,7 +206,7 @@ lineash <- data.frame(id_parametro = c(2032L, 2032L, 2017L),
 p <- g_tie_lin(d, hline = lineash)
 print(p)
 
-## Para hacer un gráfico interactivo (necesita el paquete plotly):
+## Para hacer un grÃ¡fico interactivo (necesita el paquete plotly):
 ## plotly::ggplotly(p) #FancyPants
 }
 \seealso{

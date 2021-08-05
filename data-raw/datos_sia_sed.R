@@ -115,7 +115,7 @@ cp <- codigos_param %>%
 out <- out %>%
   siabox::valores_numericos(metodo = "informe", filtrar_no_num = TRUE) %>%
   dplyr::left_join(
-    dplyr::select(cuencas_informes, nombre_subcuenca_informes, 
+    dplyr::select(cuencas_informes, nombre_subcuenca_informes,
                   codigo_pto_mod, id_estacion),
     by = "id_estacion") %>%
   dplyr::left_join(cp, by = "id_parametro") %>%

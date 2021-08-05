@@ -27,7 +27,7 @@ La tabla de cuencas tiene 8 cuencas definidas, incluyendo
 categorías extra (Falta Cuenca y Dato Migrado).
 }
 \details{
-Fecha de extraccion: 2020-10-22
+Fecha de extraccion: 2021-08-05
 }
 \examples{
 dplyr::left_join(dplyr::select(sia_sub_cuenca, id:sub_cue_cuenca_id),

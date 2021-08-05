@@ -454,17 +454,9 @@ clasif_tipo_dato <- function(x, metodo = "simple") {
 #' @examples
 #' \dontrun{
 #' # Conexión con la base de datos:
-#' drv <- DBI::dbDriver("PostgreSQL")
-#' con <- DBI::dbConnect(drv, dbname = "infambientalbd",
+#' con <- DBI::dbConnect(RPostgres::Postgres(), dbname = "infambientalbd",
 #'                       host = "172.20.0.34", port = 5432,
 #'                       user = "shiny_usr", password = "shiny_passwd")
-#' # Para trabajar en máquina windows, en donde ya sé que la
-#' # codificación de caracteres es WIN1252 (en verdad Sys.getlocale() dice
-#' # "Spanish_Uruguay.1252", pero asumo que es lo mismo y en las pruebas que
-#' # hice anduvo bien):
-#' if (grepl("DINAMA-OAN11", Sys.info()["nodename"], ignore.case = TRUE)) {
-#'   DBI::dbExecute(con, "SET NAMES 'WIN1252';")
-#' }
 #'
 #' # Todas las muestras de todos los programas en el año 2019:
 #' consulta_muestras(con, fecha_ini = "2019-12-24", fecha_fin = "2019-12-31")
@@ -487,6 +479,11 @@ consulta_muestras <- function(con, id_matriz = 6L,
                               meses = NULL,
                               fecha_ini = "1900-01-01",
                               fecha_fin = Sys.Date()) {
+
+  if (!requireNamespace("DBI", quietly = TRUE)) {
+    stop("El paquete \"DBI\" es necesario para esta funci\u00f3n.",
+         call. = FALSE)
+  }
 
   fecha_ini <- as.character(fecha_ini)
   fecha_fin <- as.character(fecha_fin)

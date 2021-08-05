@@ -5,7 +5,7 @@
 \alias{sia_parametro}
 \title{Lista de parámetros de SIA}
 \format{
-Tabla con 356 filas y 7
+Tabla con 404 filas y 7
 columnas:
 
 \describe{
@@ -40,6 +40,6 @@ infambientalbd. Para conectarla con \code{\link{sia_unidad}}, es necesaria la
 tabla \code{\link{sia_param_unidad}}.
 }
 \details{
-Fecha de extraccion: 2020-10-22
+Fecha de extraccion: 2021-08-05
 }
 \keyword{datasets}

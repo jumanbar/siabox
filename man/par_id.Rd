@@ -65,7 +65,7 @@ base al campo \code{dep_nombre} de dicha tabla.
 }}
 
 \examples{
-par_id("fósforo")
+par_id("fÃ³sforo")
 par_id(2098)
 par_id(-2098)
 par_id(2098.98654)

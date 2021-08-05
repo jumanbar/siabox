@@ -21,13 +21,13 @@ Suggests:
     testthat,
     shiny,
     knitr,
-    rmarkdown
+    rmarkdown,
+    RPostgres
 Imports: 
     dplyr,
     magrittr,
     lubridate,
     patchwork,
-    RPostgreSQL,
     scales,
     stringr,
     tibble,

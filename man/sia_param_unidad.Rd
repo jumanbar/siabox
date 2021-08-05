@@ -5,7 +5,7 @@
 \alias{sia_param_unidad}
 \title{Lista de correspondencias entre parámetros y unidades}
 \format{
-Tabla con 1321 filas y
+Tabla con 1381 filas y
 4)` columnas:
 
 \describe{
@@ -35,6 +35,6 @@ matriz ambiental. Necesaria para conectar \code{\link{sia_parametro}} con
 \code{\link{sia_unidad}}
 }
 \details{
-Fecha de extraccion: 2020-10-22
+Fecha de extraccion: 2021-08-05
 }
 \keyword{datasets}

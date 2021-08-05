@@ -32,6 +32,6 @@ La tabla tiene los nombres y abreviaciones de las matrices ambientales
 definidas e infambientalbd, así como el id único de cada clase.
 }
 \details{
-Fecha de extraccion: 2020-10-22
+Fecha de extraccion: 2021-08-05
 }
 \keyword{datasets}

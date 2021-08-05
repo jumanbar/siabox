@@ -4,7 +4,7 @@
 \alias{colapsar_secuencia}
 \title{Preparar lista para imprimir}
 \usage{
-colapsar_secuencia(x, conector = "y", comillas = FALSE)
+colapsar_secuencia(x, conector = " y ", comillas = FALSE)
 }
 \arguments{
 \item{x}{Vector atomico para imprimir.}
@@ -16,7 +16,7 @@ colapsar_secuencia(x, conector = "y", comillas = FALSE)
 \code{x}}
 }
 \value{
-
+Vector character. Ver ejemplos.
 }
 \description{
 Crea un string con la secuencia delementos en x separados por comas, con
@@ -24,6 +24,8 @@ excepción del último elemento que es separado con un conector ("y", por
 defecto).
 }
 \examples{
-cat("Numeros:", siabox:::colapsar_secuencia(4:8), "\n")
-cat("Numeros:", siabox:::colapsar_secuencia(4:8, comillas = TRUE), "\n")
+cat("Numeros:", colapsar_secuencia(4:8), "\n")
+cat("Numeros:", colapsar_secuencia(4:8, ", "), "\n")
+cat("Numbers:", colapsar_secuencia(4:8, " & "), "\n")
+cat("Numeros:", colapsar_secuencia(4:8, comillas = TRUE), "\n")
 }

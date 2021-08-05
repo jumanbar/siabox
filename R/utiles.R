@@ -3,7 +3,59 @@
 # Funciones extras que pueden ser útiles pero no son fundamentales. En
 # principio, mi idea es no exportarlas con el resto del paquete.
 #
-# La única excepción es la función demo_lm
+# Las excepciones son las funciones demo_lm y colapsar_secuencia
+
+# . . . . . . . . .  . . . . .  .  . . . . . . . . -----
+#
+# EXPORT ----
+
+#' Preparar lista para imprimir
+#'
+#' Crea un string con la secuencia delementos en x separados por comas, con
+#' excepción del último elemento que es separado con un conector ("y", por
+#' defecto).
+#'
+#' @param x Vector atomico para imprimir.
+#'
+#' @param conector Caracter para conectar el ultimo elemento de la lista
+#'   (tipicamente 'y', '&', 'and', etc...)
+#'
+#' @param comillas logical o character. Si es logical, determina si se deben
+#'   agregar comillas a los elementos de \code{x}. Si es character, usa el valor
+#'   asignado para agregar antes y después de cada elemento de \code{x}
+#'
+#' @return Vector character. Ver ejemplos.
+#'
+#' @export
+#'
+#' @examples
+#' cat("Numeros:", colapsar_secuencia(4:8), "\n")
+#' cat("Numeros:", colapsar_secuencia(4:8, ", "), "\n")
+#' cat("Numbers:", colapsar_secuencia(4:8, " & "), "\n")
+#' cat("Numeros:", colapsar_secuencia(4:8, comillas = TRUE), "\n")
+colapsar_secuencia <- function(x, conector = " y ", comillas = FALSE) {
+  if (is.character(comillas)) {
+    z <- comillas
+  } else if (is.logical(comillas)) {
+    z <- ifelse(comillas, "'", "")
+  } else {
+    stop("El argumento comillas debe ser character o logical")
+  }
+
+  if (length(x) == 0) {
+    out <- ""
+  } else if (length(x) == 1) {
+    out <- as.character(x)
+  } else {
+    l <- length(x)
+    out <- paste0(
+      z,
+      paste0(x[-l], collapse = paste0(z, ", ", z)),
+      paste0(z, conector, z, x[l], z)
+    )
+  }
+  return(out)
+}
 
 #' Demostración de informe para Laguna Merín
 #'
@@ -46,6 +98,8 @@ demo_lm <- function(extension = c('html', 'pdf', 'doc')) {
 }
 
 # . . . . . . . . .  . . . . .  .  . . . . . . . . -----
+#
+# INTERNAL ----
 
 #' Determinar cuáles son no numéricos
 #'
@@ -68,66 +122,50 @@ det_nonum <- function(v) {
   return(!cientif & !comun)
 }
 
-
-#' Preparar lista para imprimir
-#'
-#' Crea un string con la secuencia delementos en x separados por comas, con
-#' excepción del último elemento que es separado con un conector ("y", por
-#' defecto).
-#'
-#' @param x Vector atomico para imprimir.
-#'
-#' @param conector Caracter para conectar el ultimo elemento de la lista
-#'   (tipicamente 'y', '&', 'and', etc...)
-#'
-#' @param comillas Determina si se deben agregar comillas a los elementos de
-#'   \code{x}
-#'
-#' @return
-#'
-#' @examples
-#' cat("Numeros:", siabox:::colapsar_secuencia(4:8), "\n")
-#' cat("Numeros:", siabox:::colapsar_secuencia(4:8, ", "), "\n")
-#' cat("Numeros:", siabox:::colapsar_secuencia(4:8, comillas = TRUE), "\n")
-colapsar_secuencia <- function(x, conector = " y ", comillas = FALSE) {
-  z <- ifelse(comillas, "'", "")
-  if (length(x) == 0) {
-    out <- ""
-  } else if (length(x) == 1) {
-    out <- as.character(x)
-  } else {
-    l <- length(x)
-    out <- paste0(
-      z,
-      paste0(x[-l], collapse = paste0(z, ", ", z)),
-      paste0(z, conector, z, x[l], z)
-    )
-  }
-  return(out)
-}
-
-
 #' Conexión con SIA
 #'
 #' Genera una conexión con la base de datos infambiental, usando el usuario y
 #' clave de JMB. Sólo funciona en algunas PCs (ej.: servidor o PC de JMB).
 #'
 #' @return Una conexión tipo DBI de PosgtgreSQL
+#' @examples
+#' \dontrun{
+#' con <- con_sia()
+#' sia_parametro <- dplyr::tbl(con, "parametro")
+#' }
 con_sia <- function() {
-  # BASE DE DATOS SIA
-  drv <- DBI::dbDriver("PostgreSQL")
-
-  # *
   pw <- {
     "shiny_passwd"
   }
-  out <- DBI::dbConnect(drv, dbname = "infambientalbd",
-                        host = "172.20.0.34", port = 5432,
-                        user = "shiny_usr", password = pw)
 
-  if (grepl("DINAMA-OAN11", Sys.info()["nodename"], ignore.case = TRUE)) {
-    # dbExecute(con, "SET CLIENT_ENCODING TO 'WIN1252';")
-    DBI::dbExecute(out, "SET NAMES 'WIN1252';")
+  if (!requireNamespace("DBI", quietly = TRUE)) {
+    stop("El paquete \"DBI\" es necesario para esta funci\u00f3n.",
+         call. = FALSE)
+  }
+
+  if (!requireNamespace("RPostgres", quietly = TRUE)) {
+    stop("El paquete \"RPostgres\" es necesario para esta funci\u00f3n.",
+         call. = FALSE)
+  }
+
+  nodo <- Sys.info()["nodename"]
+  # Determinar en qué computadora se están ejecutando los comandos:
+  prueba <- grepl("MA112|DINAMA", nodo, ignore.case = TRUE)
+
+  out <- if (prueba) {
+    DBI::dbConnect(RPostgres::Postgres(),
+                   user = "shiny_usr",
+                   password = pw,
+                   host = "172.20.0.34",
+                   port = 5432,
+                   dbname = "infambientalbd")
+  } else {
+    DBI::dbConnect(RPostgres::Postgres(),
+                   dbname = 'infambientalbd',
+                   host = 'localhost',
+                   port = 5432,
+                   user = 'juan',
+                   password = 'shiny')
   }
 
   return(out)

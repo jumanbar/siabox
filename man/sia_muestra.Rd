@@ -5,7 +5,7 @@
 \alias{sia_muestra}
 \title{Inventario de muestras de infambientalbd}
 \format{
-Tabla con 17243 filas y 11
+Tabla con 19952 filas y 11
 columnas:
 
 \describe{
@@ -16,7 +16,7 @@ columnas:
 pertenece el usuario que cargó los datos en el SIA}
 
 \item{periodo}{character. Texto en formato MES AÑO (ej.: JUNIO 2012). No
-necesariamente se corresponde con fecha_muestra, ya que se trata de un
+necesariamente se corresponde con \code{fecha_muestra}, ya que se trata de un
 campo de identificación de la campaña de muestreo}
 
 \item{fecha_muestra}{date. Fecha en que se tomó la muestra.}
@@ -53,6 +53,6 @@ corresponde con el muestreo en campo en un sitio en particular (estación) y
 una fecha determinada.
 }
 \details{
-Fecha de extraccion: 2020-10-29
+Fecha de extraccion: 2021-08-05
 }
 \keyword{datasets}

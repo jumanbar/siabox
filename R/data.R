@@ -1,3 +1,17 @@
+## METADATA ----
+
+#' Metadatos de las tablas importadas del SIA
+#'
+#' Combina el output de `Sys.info()` con `Sys.Date()` para guardar la
+#' información relativa a la máquina y fecha en que se hicieron las extracciones
+#' de las tablas provenientes del SIA. La fecha en prticular se usa luego para
+#' actualizar la documentación.
+#'
+#' @examples
+#' ## Fecha de extraccion:
+#' siabox.extraction.meta['extraction.date']
+"siabox.extraction.meta"
+
 ## INFAMBIENTALBD ----
 
 ## . sia_cuenca ----
@@ -7,7 +21,7 @@
 #' La tabla de cuencas tiene `r nrow(sia_cuenca)` cuencas definidas, incluyendo
 #' categorías extra (Falta Cuenca y Dato Migrado).
 #'
-#' Fecha de extraccion: 2020-10-22
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(sia_cuenca)` filas y
 #'   `r ncol(sia_cuenca)` columnas:
@@ -34,7 +48,7 @@
 #' Esta tabla guarda los datos de cada muestra. Cada fila representa una
 #' combinación única de parámetro, fecha, hora y sitio (estación).
 #'
-#' Fecha de extraccion: 2020-10-29.
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @section Atencion: La tabla puede tener datos repetidos. La función
 #'   \code{\link{consulta_muestras}} se encarga de descartar repeticiones.
@@ -100,7 +114,7 @@
 #' estaciones del programa de monitoreo "Laguna Garzón" presentan esta categoría
 #' en la columna "departamento" (Se encuentran entre Maldonado y Rocha).
 #'
-#' Fecha de extraccion: 2020-10-22
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(sia_departamento)` filas y
 #'   `r ncol(sia_departamento)` columnas:
@@ -129,7 +143,7 @@
 #' una determinada matriz y programa. También se usa para determinar la matriz
 #' de cada programa de monitoreo.
 #'
-#' Fecha de extraccion: 2020-10-22
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(sia_estacion)` filas y `r ncol(sia_estacion)`
 #'   columnas:
@@ -189,7 +203,7 @@
 #'
 #' Instituciones asociadas a los usuarios que suben los datos al SIA.
 #'
-#' Fecha de extraccion: 2020-10-22
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(sia_institucion)` filas y `r ncol(sia_institucion)`
 #'   columnas:
@@ -212,7 +226,7 @@
 #' La tabla tiene los nombres y abreviaciones de las matrices ambientales
 #' definidas e infambientalbd, así como el id único de cada clase.
 #'
-#' Fecha de extraccion: 2020-10-22
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(sia_matriz)` filas y `r ncol(sia_matriz)` columnas:
 #'
@@ -241,7 +255,7 @@
 #' corresponde con el muestreo en campo en un sitio en particular (estación) y
 #' una fecha determinada.
 #'
-#' Fecha de extraccion: 2020-10-29
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(sia_muestra)` filas y `r ncol(sia_muestra)`
 #'   columnas:
@@ -254,7 +268,7 @@
 #'   pertenece el usuario que cargó los datos en el SIA}
 #'
 #'   \item{periodo}{character. Texto en formato MES AÑO (ej.: JUNIO 2012). No
-#'   necesariamente se corresponde con fecha_muestra, ya que se trata de un
+#'   necesariamente se corresponde con `fecha_muestra`, ya que se trata de un
 #'   campo de identificación de la campaña de muestreo}
 #'
 #'   \item{fecha_muestra}{date. Fecha en que se tomó la muestra.}
@@ -290,7 +304,7 @@
 #' matriz ambiental. Necesaria para conectar \code{\link{sia_parametro}} con
 #' \code{\link{sia_unidad}}
 #'
-#' Fecha de extraccion: 2020-10-22
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(sia_param_unidad)` filas y
 #'   `r ncol(sia_param_unidad)` columnas:
@@ -321,7 +335,7 @@
 #' infambientalbd. Para conectarla con \code{\link{sia_unidad}}, es necesaria la
 #' tabla \code{\link{sia_param_unidad}}.
 #'
-#' Fecha de extraccion: 2020-10-22
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(sia_parametro)` filas y `r ncol(sia_parametro)`
 #'   columnas:
@@ -357,7 +371,7 @@
 #' infambientalbd). Corresponden a las matrices ambientales "Aguas
 #' superficiales" y "Sedimentos"
 #'
-#' Fecha de extraccion: 2020-10-22
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(sia_programa)` filas y `r ncol(sia_programa)`
 #'   columnas:
@@ -388,7 +402,7 @@
 #' Tabla que (intenta) registrar los parametros que son monitoreados en cada
 #' programa.
 #'
-#' Fecha de extraccion: 2020-10-22
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(sia_programa_parametro)` filas y
 #'   `r ncol(sia_programa_parametro)` columnas:
@@ -418,7 +432,7 @@
 #' \code{cursos_de_agua} refieren a otras tablas de \code{infambientalbd} no
 #' incluidas en el presente paquete.
 #'
-#' Fecha de extraccion: 2020-10-22
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(sia_sub_cuenca)` filas y
 #'   `r ncol(sia_sub_cuenca)` columnas:
@@ -457,7 +471,7 @@
 #' Tipos de estaciones de monitoreo, según (la profundidad de) las muestras que
 #' se toman
 #'
-#' Fecha de extraccion: 2020-10-22
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(sia_tipo_punto_estacion)` filas y
 #'   `r ncol(sia_tipo_punto_estacion)` columnas:
@@ -485,7 +499,7 @@
 #' las unidades con \code{\link{sia_parametro}} es necesaria la tabla
 #' \code{\link{sia_param_unidad}}
 #'
-#' Fecha de extraccion: 2020-10-22
+#' Fecha de extraccion: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(sia_unidad)` filas y `r ncol(sia_unidad)` columnas:
 #'
@@ -509,7 +523,9 @@
 #' Datos extraídos del SIA.
 #'
 #' La tibble `datos_sia` tiene datos de matriz Aguas superficiales y
-#' `datos_sia_sed` de Sedimentos. Fecha de extracción: 2020-11-04.
+#' `datos_sia_sed` de Sedimentos.
+#'
+#' Fecha de extracción: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(datos_sia)` filas y `r ncol(datos_sia)` columnas:
 #'
@@ -607,7 +623,7 @@
 #'   \item{nombre_subcuenca_informes}{Nombre dado a cada subcuenca dentro de los
 #'   informes anuales de los programas de monitoreo.}
 #'
-#'   \item{codigo_pto_mnod}{Nombre de la estación modificado, siguiendo los 
+#'   \item{codigo_pto_mnod}{Nombre de la estación modificado, siguiendo los
 #'   códigos presentes en la tabla \code{\link{cuencas_informes}}}
 #'
 #'   \item{grupo}{Grupo al que pertenece el parámetro (ej.: Parámetros de
@@ -828,7 +844,7 @@
 #'   distintos programas. Es útil para separar datos en informes.}
 #'
 #'   \item{codigo_pto}{Códigos de las estaciones tal como están en el SIA (a la
-#'   fecha de extracción: 2020-10-22)}
+#'   fecha de extracción: `r siabox.extraction.meta['extraction.date']`)}
 #'
 #'   \item{codigo_pto_mod}{Nuevos códigos para algunas estaciones del programa
 #'   Santa Lucía}
@@ -949,7 +965,7 @@
 #' etc. Se espera poder construir la tabla en base a acuerdos y eventualmente
 #' tener etiquetas unificadas para todos los parámetros.
 #'
-#' Fecha de creación: 2020-10-29
+#' Fecha de creación: `r siabox.extraction.meta['extraction.date']`
 #'
 #' @format Tabla con `r nrow(t_eti_base)` filas y `r ncol(t_eti_base)` columnas:
 #'
