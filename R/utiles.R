@@ -221,6 +221,32 @@ parentesis <- function(v, ini = "(", fin = ")", comillas = FALSE) {
   paste0(ini, paste(v, collapse = ", "), fin)
 }
 
+#' Pegar observaciones
+#'
+#' Pensada para trabajar internamente en \code{link{consulta_muestras}} y en la
+#' creación de \code{link{datos_sia}} (en código de carpeta data-raw)
+#'
+#' @param obs_a character. Vector de observaciones.
+#' @param obs_b character. Vector de observaciones.
+#'
+#' @return Vector character con observaciones de uno u otro vector, o, en caso
+#'   de que ambos tengan, observacones pegadas.
+#'
+#' @examples
+#' a <- c("", NA, "Nubes", "Sin calibrar", "")
+#' b <- c("Lluvia", NA, NA, "Con cuchillo", "")
+#' data.frame(a, b, pegar_obs(a, b))
+pegar_obs <- function(obs_a, obs_b) {
+  hay_a <- obs_a != "" & !is.na(obs_a)
+  hay_b <- obs_b != "" & !is.na(obs_b)
+  out <- dplyr::case_when(
+    hay_a & !hay_b ~ obs_a,
+    !hay_a & hay_b ~ obs_b,
+    hay_a & hay_b ~ paste0(obs_a, '. ', obs_b),
+    TRUE ~ NA_character_
+  )
+  return(out)
+}
 
 #' Codificar columnas con UTF-8
 #'

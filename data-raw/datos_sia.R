@@ -35,7 +35,7 @@ out <-
     mes = as.integer(lubridate::month(fecha_muestra)),
     anio_mes = paste0(anio, "_", stringr::str_pad(mes, pad = '0', width = 2)),
     fecha_muestra, fecha_hora = paste(fecha_muestra, hora_muestra),
-    observaciones = paste0(observacion, '. ', observaciones),
+    observaciones = siabox:::pegar_obs(observacion, observaciones),
     id_matriz = matriz_estacion, id_parametro, parametro,
     nombre_clave, id_unidad = id_unidad_medida, uni_nombre,
     valor_minimo_str, limite_deteccion, limite_cuantificacion
@@ -149,4 +149,4 @@ out <- out %>%
 # 2        11   3898
 
 datos_sia <- out
-# save(datos_sia, file = 'data/datos_sia.rda')
+save(datos_sia, file = 'data/datos_sia.rda')

@@ -126,16 +126,18 @@ ancho <- function(.data, unidades = FALSE) {
   # Doy por sentado que está id_muestra? o que está observaciones?
 
   if ('observaciones' %in% names(.data)) {
-    obs <- dplyr::distinct(.data, id_muestra, observaciones)
+    obs <- dplyr::distinct(.data, id_muestra, nombre_clave, observaciones)
 
     if (nrow(obs) > length(unique(.data$id_muestra))) {
       .data <- obs %>%
+        dplyr::filter(!is.na(observaciones), observaciones != "") %>%
         # Capaz que en vez de usar id_muestra se puede usar any_of y poner todas
         # las columnas que podrían servir luego en el pivot wider para ser
         # id_cols... de esta forma la función sería relativamente flexible...
         # aunque no sé si vale la pena.
         dplyr::group_by(id_muestra) %>%
-        dplyr::summarise(OBS = paste(observaciones, collapse = '. ')) %>%
+        dplyr::summarise(OBS = paste(paste0(nombre_clave, ": ", observaciones),
+                                     collapse = '. ')) %>%
         dplyr::left_join(.data, ., by = 'id_muestra') %>%
         dplyr::mutate(observaciones = OBS) %>%
         dplyr::select(-OBS)
@@ -568,7 +570,8 @@ consulta_muestras <- function(con, id_matriz = 6L,
     m.fecha_muestra,
     cast(m.fecha_muestra as char(12)) || ' ' || ",
     "cast(m.hora_muestra as char(12)) as fecha_hora,
-    dmp.observacion || '. ' || m.observaciones as observaciones,
+    dmp.observacion,
+	  m.observaciones,
     pu.id_matriz,
     p.id_parametro,
     p.parametro,
@@ -605,6 +608,10 @@ consulta_muestras <- function(con, id_matriz = 6L,
   out <- out %>%
     # set_utf8() %>%
     tibble::as_tibble()
+
+  # out$obs_tmp <- pegar_obs(out$observacion, out$observaciones)
+  out$observaciones <- pegar_obs(out$observacion, out$observaciones)
+  out <- out[names(out) != "observacion"]
 
   if (!is.null(anios))
     out <- dplyr::filter(out, anio %in% anios)
