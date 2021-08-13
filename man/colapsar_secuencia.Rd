@@ -12,8 +12,9 @@ colapsar_secuencia(x, conector = " y ", comillas = FALSE)
 \item{conector}{Caracter para conectar el ultimo elemento de la lista
 (tipicamente 'y', '&', 'and', etc...)}
 
-\item{comillas}{Determina si se deben agregar comillas a los elementos de
-\code{x}}
+\item{comillas}{logical o character. Si es logical, determina si se deben
+agregar comillas a los elementos de \code{x}. Si es character, usa el valor
+asignado para agregar antes y después de cada elemento de \code{x}}
 }
 \value{
 Vector character. Ver ejemplos.
