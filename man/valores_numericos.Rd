@@ -11,7 +11,7 @@ valores_numericos(.data, filtrar_no_num = FALSE, metodo = "simple")
 (infambientalbd), con al menos tres columnas: \code{valor_minimo_str},
 \code{limite_deteccion} y \code{limite_cuantificacion} (ver detalles).}
 
-\item{filtrar_no_num}{\code{logical} (bandera). ¿Conservar los valores que no se
+\item{filtrar_no_num}{\code{logical} (bandera). ¿Eliminar los valores que no se
 pudieron convertir en numéricos?}
 
 \item{metodo}{character. Opciones: "sin_cambios", "basico", "simple",
