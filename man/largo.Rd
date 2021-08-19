@@ -29,3 +29,21 @@ formato de \code{\link[siabox]{datos_sia}} (previamente transformados con la
 función \code{\link[siabox]{ancho}}), de forma que se espera que los valores
 sean numéricos.
 }
+\examples{
+#' d <- filtrar_datos(datos_sia,
+                   id_programa = 10L,
+                   rango_fechas = c("2019-01-01", "2020-12-31"),
+                   id_parametro = c(2099, 2098)) \%>\%
+  dplyr::select(codigo_pto, fecha_muestra, id_parametro, param, id_unidad,
+                uni_nombre, limite_deteccion, limite_cuantificacion, valor)
+da <- ancho(d)
+(dal <- largo(da))
+
+dim(d)
+dim(dal)
+
+datos_sia \%>\%
+  dplyr::filter(id_programa == 4, id_parametro \%in\% c(2017, 2021)) \%>\%
+  ancho \%>\%
+  largo
+}

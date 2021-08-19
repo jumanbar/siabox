@@ -2,7 +2,7 @@
 % Please edit documentation in R/basicas.R
 \name{largo.default}
 \alias{largo.default}
-\title{Formato ancho}
+\title{Formato largo}
 \usage{
 \method{largo}{default}(.data)
 }
