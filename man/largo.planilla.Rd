@@ -54,4 +54,9 @@ largo(lista_campo$datos, lista_campo$columnas)
 lista_lab <- readRDS("tmp/lab.rds")
 largo(lista_lab$datos)
 largo(lista_lab$datos, lista_lab$columnas$tabla_columnas)
+lista_pd <- readRDS("~/R/sia_apps/vSIA/tmp/lista_pd.rds")
+largo.planilla(lista_pd$datos, lista_pd$ppd)
+datos_sin_ppd <-
+  lista_pd$datos[- lista_pd$ppd$ncol[lista_pd$ppd$tabla == "Campo"]]
+largo.planilla(datos_sin_ppd)
 }

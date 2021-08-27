@@ -1167,8 +1167,8 @@ d_lon <- function(.data,
 #' Las estaciones deben estar previamente ordenadas (como factores, no
 #' necesariamente factores ordenados). Específicamente, el campo de los datos
 #' que debe ser un factor es el de `codigo_pto`. El argumento \code{orden_est}
-#' de la función \code{\link{filtrar_datos}} puede ayudar a preparar los
-#' datos de esta manera.
+#' de la función \code{\link{filtrar_datos}} puede ayudar a preparar los datos
+#' de esta manera.
 #'
 #' El gráfico creado con \code{g_lon} es considerablemente complejo, ya que usa
 #' una leyenda con categorías cualitativamente diferentes (meses en el año de
@@ -1201,6 +1201,10 @@ d_lon <- function(.data,
 #'   `valor`, y `extremo` tal como en la tabla \code{\link{decreto}}
 #' @param path character. Ruta de directorio en donde guardar las imágenes
 #'   generadas por `g_lon_pto`
+#' @param dims list. Lista con tres elementos: `ancho`, `alto` y `escala`, que
+#'   determinan los valores de `width`, `height` y `scale` (los dos primeros, en
+#'   milímetros) en el uso de la función \code{\link[ggplot2]{ggsave}} por parte
+#'   de `g_lon_pto_files_loop`.
 #'
 #' @return
 #' @export
@@ -1346,7 +1350,8 @@ g_lon_pto <- function(.data,
 #'   por parámetro.
 #'
 #' @export
-g_lon_pto_files <- function(.data, anio, ventana_anios = 5L, tabla_horiz, path) {
+g_lon_pto_files <- function(.data, anio, ventana_anios = 5L, tabla_horiz, path,
+                            dims = list(ancho = 80, alto = 80, escala = 1.2)) {
 
   directorio <- if (missing(path)) tempdir() else path
 
@@ -1359,15 +1364,24 @@ g_lon_pto_files <- function(.data, anio, ventana_anios = 5L, tabla_horiz, path) 
         message = "Preparando gr\u00e1ficas...", value = 0, min = 0, max = 1,
         session = ses, expr = g_lon_pto_files_loop(.data, anio, ventana_anios,
                                                 tabla_horiz, directorio,
-                                                pbar = TRUE)
+                                                pbar = TRUE,
+                                                width = dims$ancho,
+                                                height = dims$alto,
+                                                scale = dims$escala)
       )
     } else {
       out <- g_lon_pto_files_loop(.data, anio, ventana_anios, tabla_horiz,
-                               directorio, pbar = FALSE)
+                               directorio, pbar = FALSE,
+                               width = dims$ancho,
+                               height = dims$alto,
+                               scale = dims$escala)
     }
   } else {
     out <- g_lon_pto_files_loop(.data, anio, ventana_anios, tabla_horiz,
-                             directorio, pbar = FALSE)
+                             directorio, pbar = FALSE,
+                             width = dims$ancho,
+                             height = dims$alto,
+                             scale = dims$escala)
   }
   return(out)
 
@@ -1382,7 +1396,7 @@ g_lon_pto_files <- function(.data, anio, ventana_anios = 5L, tabla_horiz, path) 
 #' @inheritParams g_lon_pto_files
 #' @return Directorio con los archivos creados.
 g_lon_pto_files_loop <- function(.data, anio, ventana_anios, tabla_horiz,
-                                 directorio, pbar = FALSE) {
+                                 directorio, pbar = FALSE, ...) {
   id_par <- sort(unique(.data$id_parametro))
   n <- length(id_par)
 
@@ -1414,7 +1428,8 @@ g_lon_pto_files_loop <- function(.data, anio, ventana_anios, tabla_horiz,
                 colores_meses = paleta, horiz = horiz)
 
     if (!is.null(g))
-      ggsave(archivos[i], g, device = "png", path = directorio, scale = .6)
+      ggsave(archivos[i], g, device = "png", path = directorio,
+             units = "mm", ...)
 
     # Increment the progress bar, and update the detail text.
     if (pbar)

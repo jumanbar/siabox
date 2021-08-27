@@ -10,7 +10,8 @@ g_lon_pto_files_loop(
   ventana_anios,
   tabla_horiz,
   directorio,
-  pbar = FALSE
+  pbar = FALSE,
+  ...
 )
 }
 \arguments{

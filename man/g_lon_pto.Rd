@@ -24,7 +24,14 @@ g_lon_pto(
   horiz
 )
 
-g_lon_pto_files(.data, anio, ventana_anios = 5L, tabla_horiz, path)
+g_lon_pto_files(
+  .data,
+  anio,
+  ventana_anios = 5L,
+  tabla_horiz,
+  path,
+  dims = list(ancho = 80, alto = 80, escala = 1.2)
+)
 }
 \arguments{
 \item{.data}{data.frame. Datos del SIA (ver \code{\link{datos_sia}} y
@@ -54,6 +61,11 @@ establecidos por decretos.}
 
 \item{path}{character. Ruta de directorio en donde guardar las imágenes
 generadas por \code{g_lon_pto}}
+
+\item{dims}{list. Lista con tres elementos: \code{ancho}, \code{alto} y \code{escala}, que
+determinan los valores de \code{width}, \code{height} y \code{scale} (los dos primeros, en
+milímetros) en el uso de la función \code{\link[ggplot2]{ggsave}} por parte
+de \code{g_lon_pto_files_loop}.}
 }
 \value{
 
@@ -66,8 +78,8 @@ con años anteriores.
 Las estaciones deben estar previamente ordenadas (como factores, no
 necesariamente factores ordenados). Específicamente, el campo de los datos
 que debe ser un factor es el de \code{codigo_pto}. El argumento \code{orden_est}
-de la función \code{\link{filtrar_datos}} puede ayudar a preparar los
-datos de esta manera.
+de la función \code{\link{filtrar_datos}} puede ayudar a preparar los datos
+de esta manera.
 
 El gráfico creado con \code{g_lon} es considerablemente complejo, ya que usa
 una leyenda con categorías cualitativamente diferentes (meses en el año de
