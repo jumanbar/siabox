@@ -9,7 +9,7 @@ ancho(.data, unidades = FALSE)
 \arguments{
 \item{.data}{Tabla de datos obtenida con \code{\link{consulta_muestras}},
 posiblemente modificada con valores_numericos y con columnas agregadas por
-\code{\link[dplyr]{left_join}}.}
+\code{\link[dplyr:mutate-joins]{left_join}}.}
 
 \item{unidades}{TRUE o FALSE. Determina si se agregan las unidades a las
 columnas de los parámetros (ej.: 'SatO (\%)' en lugar de 'SatO')}

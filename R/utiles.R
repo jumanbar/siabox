@@ -100,11 +100,11 @@ mat_id <- function(patron, ...) {
 #'
 #' Buscadores de id para las varias tablas importadas del SIA, usando un texto
 #' (un google de id_parametros). El texto o patrón puede ser una expresión
-#' regular (la cual será evaluada por \code{\link[base]{agrepl}}).
+#' regular (la cual será evaluada por \code{\link[base:agrep]{agrepl}}).
 #'
 #' @param patron character o numeric. Si es character, expresión regular tipo
 #'   \code{\link[base]{regex}}. Si es numeric, el id_parametro de interés.
-#' @param ... Argumentos pasados a \code{\link[base]{agrepl}} para buscar en las
+#' @param ... Argumentos pasados a \code{\link[base:agrep]{agrepl}} para buscar en las
 #'   columnas `parametro` y `nombre_clave` de \code{\link{sia_parametro}}
 #'
 #' @seealso \code{\link{sia_parametro}}
@@ -328,4 +328,3 @@ demo_lm <- function(extension = c('html', 'pdf', 'doc')) {
     file.edit(demoname)
   }
 }
-

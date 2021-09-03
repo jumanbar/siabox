@@ -25,7 +25,7 @@ decimales y sin espacios en blanco al inicio o al final.)}
 
 \item{tipos}{Vector integer (de misma longitud que \code{x}) con los id de
 los tipos de datos, tal como se pueden encontrar en la tabla
-\link{\code{tipos_de_dato}} (por ahora no está presente en el SIA, sino en
+\code{\link{tipos_de_dato}} (por ahora no está presente en el SIA, sino en
 la carpeta \code{sia_apps/data}).}
 
 }

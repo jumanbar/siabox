@@ -28,7 +28,7 @@ uni_id(patron, ...)
 \item{patron}{character o numeric. Si es character, expresión regular tipo
 \code{\link[base]{regex}}. Si es numeric, el id_parametro de interés.}
 
-\item{...}{Argumentos pasados a \code{\link[base]{agrepl}} para buscar en las
+\item{...}{Argumentos pasados a \code{\link[base:agrep]{agrepl}} para buscar en las
 columnas \code{parametro} y \code{nombre_clave} de \code{\link{sia_parametro}}}
 }
 \value{
@@ -41,7 +41,7 @@ del SIA: \code{par_id} trae de \code{sia_parametro}, \code{pro_id} de
 \description{
 Buscadores de id para las varias tablas importadas del SIA, usando un texto
 (un google de id_parametros). El texto o patrón puede ser una expresión
-regular (la cual será evaluada por \code{\link[base]{agrepl}}).
+regular (la cual será evaluada por \code{\link[base:agrep]{agrepl}}).
 }
 \section{Functions}{
 \itemize{

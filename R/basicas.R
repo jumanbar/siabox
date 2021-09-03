@@ -60,7 +60,7 @@
 #'
 #' @param .data Tabla de datos obtenida con \code{\link{consulta_muestras}},
 #'   posiblemente modificada con valores_numericos y con columnas agregadas por
-#'   \code{\link[dplyr]{left_join}}.
+#'   \code{\link[dplyr:mutate-joins]{left_join}}.
 #'
 #' @param unidades TRUE o FALSE. Determina si se agregan las unidades a las
 #'   columnas de los parámetros (ej.: 'SatO (%)' en lugar de 'SatO')
@@ -244,7 +244,7 @@ ancho <- function(.data, unidades = FALSE) {
 #'
 #'   \item{tipos}{Vector integer (de misma longitud que \code{x}) con los id de
 #'   los tipos de datos, tal como se pueden encontrar en la tabla
-#'   \link{\code{tipos_de_dato}} (por ahora no está presente en el SIA, sino en
+#'   \code{\link{tipos_de_dato}} (por ahora no está presente en el SIA, sino en
 #'   la carpeta \code{sia_apps/data}).}
 #'
 #'   }
@@ -1147,7 +1147,8 @@ largo.planilla <- function(.data, tcols = NULL) {
 #'
 #'   En la columna `valor` de la salida, se encuentran los valores de los
 #'   parámetros, convertidos en numéricos. Sin importar el método elegido, la
-#'   modificación mínima, además de aplicar \code{\link[base]{as.numeric}}, es
+#'   modificación mínima, además de aplicar
+#'   \code{\link[base:numeric]{as.numeric}}, es
 #'   cambiar comas, comas repetidas y puntos repetidos por un único punto
 #'   (marcador de decimales).
 #'
@@ -1159,7 +1160,7 @@ largo.planilla <- function(.data, tcols = NULL) {
 #'   \item{sin_cambios}{No se aplican cambios, de forma que la columna `valor`
 #'   resultante es character e idéntica a `valor_minimo_str`}
 #'
-#'   \item{basico}{Se aplica \code{\link[base]{as.numeric}} a la columna
+#'   \item{basico}{Se aplica \code{\link[base:numeric]{as.numeric}} a la columna
 #'   `valor_minimo_str`, luego de hacer unos cambios mínimos (corrigiendo comas
 #'   por puntos, etc...). El resultado concreto es que todo lo que es
 #'   reconocible como valor numérico, se mantiene en `valor`, mientras que el
@@ -1318,4 +1319,3 @@ valores_numericos <- function(.data,
 
   return(out)
 }
-

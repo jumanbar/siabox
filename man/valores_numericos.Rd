@@ -49,7 +49,8 @@ parámetro correspondiente a cada fila.
 
 En la columna \code{valor} de la salida, se encuentran los valores de los
 parámetros, convertidos en numéricos. Sin importar el método elegido, la
-modificación mínima, además de aplicar \code{\link[base]{as.numeric}}, es
+modificación mínima, además de aplicar
+\code{\link[base:numeric]{as.numeric}}, es
 cambiar comas, comas repetidas y puntos repetidos por un único punto
 (marcador de decimales).
 
@@ -61,7 +62,7 @@ un valor numérico):
 \item{sin_cambios}{No se aplican cambios, de forma que la columna \code{valor}
 resultante es character e idéntica a \code{valor_minimo_str}}
 
-\item{basico}{Se aplica \code{\link[base]{as.numeric}} a la columna
+\item{basico}{Se aplica \code{\link[base:numeric]{as.numeric}} a la columna
 \code{valor_minimo_str}, luego de hacer unos cambios mínimos (corrigiendo comas
 por puntos, etc...). El resultado concreto es que todo lo que es
 reconocible como valor numérico, se mantiene en \code{valor}, mientras que el
