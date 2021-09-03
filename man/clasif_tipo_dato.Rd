@@ -4,7 +4,7 @@
 \alias{clasif_tipo_dato}
 \title{Asignar categorías a los datos SIA}
 \usage{
-clasif_tipo_dato(x, metodo = "simple")
+clasif_tipo_dato(x)
 }
 \arguments{
 \item{x}{Character. En principio puede ser cualquier vector de tipo
@@ -25,8 +25,8 @@ decimales y sin espacios en blanco al inicio o al final.)}
 
 \item{tipos}{Vector integer (de misma longitud que \code{x}) con los id de
 los tipos de datos, tal como se pueden encontrar en la tabla
-\code{tipos_de_dato} (por ahora no está presente en el SIA, sino en la
-carpeta \code{sia_apps/data}).}
+\link{\code{tipos_de_dato}} (por ahora no está presente en el SIA, sino en
+la carpeta \code{sia_apps/data}).}
 
 }
 }
@@ -35,14 +35,8 @@ Evalúa vector character que expresan valores numéricos, según las categorías
 de la tabla \code{\link{tipos_de_dato}}.
 }
 \details{
-El método por defecto, "simple", no diferencia "<LC" de "LD<X<LC",
-cosa que sí ocurre cuando el método es "informe". En cualquiera de estos
-casos se incluyen los tipos "NUMERICO", "<LD", "<LC", "<X", ">X" y "OTRO"
-(ids: 1:3 y 5:7, tal como están definidos en la tabla
-\code{tipos_de_dato}). Cualquier valor diferente de "simple" o "informe"
-clasificará los datos en dos categorías: "NUMERICO" (id = 1) u "OTRO" (id =
-7). Números con comas (en vez de puntos) como indicador de decimales, son
-considerados numéricos.
+Números con comas (en vez de puntos) como indicador de decimales,
+son considerados numéricos.
 
 El reconocimiento de valores equivalentes a "<LD" y "<LC" se basa en los
 datos encontrados en la base infambientalbd, por lo que contempla casos
@@ -53,6 +47,4 @@ Detectado, respectivamente).
 x <- c(" 32,87 ", "2.14", "5e-3", "<ld", ">LC", "ld<x<LC", " < 10", "L.O.Q",
        "ND", "L.O, D ", "LC>X>LD")
 clasif_tipo_dato(x) \%>\% as.data.frame()
-clasif_tipo_dato(x, "informe")
-clasif_tipo_dato(x, "")
 }
