@@ -1231,7 +1231,7 @@ valores_numericos <- function(.data,
   info <- grepl("informe", metodo, ignore.case = TRUE)
 
   out <- .data
-  clasif <- clasif_tipo_dato(out$valor_minimo_str, metodo = metodo)
+  clasif <- clasif_tipo_dato(out$valor_minimo_str)
   out$valor <- clasif$valores
 
   # Casos de >X o <X:
@@ -1314,7 +1314,7 @@ valores_numericos <- function(.data,
   if (!any(names(out) == "id_tipo_dato"))
     out <- dplyr::left_join(out, siabox::tipos_de_dato, by = "id_tipo_dato")
 
-  if (filtrar_no_num) out <- dplyr::filter(out, !is.na(valor))
+  if (filtrar_no_num) out <- dplyr::filter(out, id_tipo_dato != 7L)
 
   return(out)
 }
