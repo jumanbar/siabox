@@ -227,14 +227,8 @@ ancho <- function(.data, unidades = FALSE) {
 #' @param metodo String. El valor de este argumento define la forma en que se
 #'   clasifican los valores de X. Opciones: "simple" o "informe". Ver detalles.
 #'
-#' @details El método por defecto, "simple", no diferencia "<LC" de "LD<X<LC",
-#'   cosa que sí ocurre cuando el método es "informe". En cualquiera de estos
-#'   casos se incluyen los tipos "NUMERICO", "<LD", "<LC", "<X", ">X" y "OTRO"
-#'   (ids: 1:3 y 5:7, tal como están definidos en la tabla
-#'   \code{tipos_de_dato}). Cualquier valor diferente de "simple" o "informe"
-#'   clasificará los datos en dos categorías: "NUMERICO" (id = 1) u "OTRO" (id =
-#'   7). Números con comas (en vez de puntos) como indicador de decimales, son
-#'   considerados numéricos.
+#' @details Números con comas (en vez de puntos) como indicador de decimales,
+#'   son considerados numéricos.
 #'
 #'   El reconocimiento de valores equivalentes a "<LD" y "<LC" se basa en los
 #'   datos encontrados en la base infambientalbd, por lo que contempla casos
@@ -250,8 +244,8 @@ ancho <- function(.data, unidades = FALSE) {
 #'
 #'   \item{tipos}{Vector integer (de misma longitud que \code{x}) con los id de
 #'   los tipos de datos, tal como se pueden encontrar en la tabla
-#'   \code{tipos_de_dato} (por ahora no está presente en el SIA, sino en la
-#'   carpeta \code{sia_apps/data}).}
+#'   \link{\code{tipos_de_dato}} (por ahora no está presente en el SIA, sino en
+#'   la carpeta \code{sia_apps/data}).}
 #'
 #'   }
 #'
@@ -261,18 +255,12 @@ ancho <- function(.data, unidades = FALSE) {
 #' x <- c(" 32,87 ", "2.14", "5e-3", "<ld", ">LC", "ld<x<LC", " < 10", "L.O.Q",
 #'        "ND", "L.O, D ", "LC>X>LD")
 #' clasif_tipo_dato(x) %>% as.data.frame()
-#' clasif_tipo_dato(x, "informe")
-#' clasif_tipo_dato(x, "")
-clasif_tipo_dato <- function(x, metodo = "simple") {
-
-  if (is.null(metodo)) metodo <- ""
-
-  sust <- grepl("simple|informe", metodo, ignore.case = TRUE)
-  info <- grepl("informe", metodo, ignore.case = TRUE)
+clasif_tipo_dato <- function(x) {
 
   # Cambiar comas, comas repetidas y puntos repetidos por un único punto:
   y <- toascii(limpia_num(x))
   num <- !is.na(as.numeric(y))
+  sust <- TRUE
 
   ## El siguiente paso es importante, porque los "LD<x<LC" se convierten en
   ## "LDXLC". De esta forma, en pasos subsiguientes, no hay peligro de confundir
@@ -280,34 +268,15 @@ clasif_tipo_dato <- function(x, metodo = "simple") {
   ## palabras completas:
   v <- if (sust) gsub("[^[:alpha:]]", "", y, useBytes = TRUE) else x
 
-  ld <- if (sust)
-    grepl("(\\bLD\\b|\\bLOD\\b|\\bND\\b)", v, ignore.case = TRUE) else
-      logical(length(x))
-
-  if (sust) {
-    menorX <- grepl("^\\s*<+\\s*\\.*\\s*[[:digit:]]+", y)
-    mayorX <- grepl("^\\s*>+\\s*\\.*\\s*[[:digit:]]+", y)
-  } else {
-    menorX <- mayorX <- ld
-  }
-
-  if (info) {
-    lc <- grepl("(\\bLC\\b|\\bLOQ\\b)", v, ignore.case = TRUE)
-    ldxlc <- grepl("\\bL[DC]XL[DC]\\b", v, ignore.case = TRUE)
-  } else if (sust) {
-    lc <- grepl("(\\bLC\\b|\\bLOQ\\b|\\bL[DC]XL[DC]\\b)", v, ignore.case = TRUE)
-    ldxlc <- logical(length(x))
-  } else {
-    ldxlc <- lc <- ld
-  }
-
-  tipos <- dplyr::case_when(num    ~ 1L,
-                            ld     ~ 2L,
-                            lc     ~ 3L,
-                            ldxlc  ~ 4L,
-                            menorX ~ 5L,
-                            mayorX ~ 6L,
-                            TRUE   ~ 7L)
+  tipos <- dplyr::case_when(
+    num    ~ 1L,
+    grepl("(\\bLD\\b|\\bLOD\\b|\\bND\\b)", v, ignore.case = TRUE)     ~ 2L,
+    grepl("(\\bLC\\b|\\bLOQ\\b)", v, ignore.case = TRUE)     ~ 3L,
+    grepl("\\bL[DC]XL[DC]\\b", v, ignore.case = TRUE)  ~ 4L,
+    grepl("^\\s*<+\\s*\\.*\\s*[[:digit:]]+", y) ~ 5L,
+    grepl("^\\s*>+\\s*\\.*\\s*[[:digit:]]+", y) ~ 6L,
+    TRUE   ~ 7L
+    )
 
   return(list(valores = y, tipos = tipos))
 }
