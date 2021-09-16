@@ -810,7 +810,7 @@ filtrar_datos <- function(.data,
   return(out)
 }
 
-#' Pasar a formato ancho
+#' Pasar a formato largo
 #'
 #' Los valores vienen en character cuando se importan tablas de campo o
 #' laboratorio (clase "planilla"), en el contexto de la app vSIA, y son

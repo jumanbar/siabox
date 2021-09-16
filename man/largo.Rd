@@ -2,7 +2,7 @@
 % Please edit documentation in R/basicas.R
 \name{largo}
 \alias{largo}
-\title{Pasar a formato ancho}
+\title{Pasar a formato largo}
 \usage{
 largo(.data, ...)
 }
