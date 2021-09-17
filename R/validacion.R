@@ -15,24 +15,46 @@
 #' @export
 #'
 #' @examples
-#' lista_pd <- readRDS("~/R/sia_apps/vSIA/tmp/lista_pd.rds")
-#' dl <- siabox::largo.planilla(lista_pd$datos, lista_pd$ppd)
-#' dl$id_programa <- 13L
-#' dl$id_matriz <- 6L
-#' sitio_ <- dplyr::filter(sitio,
-#'                         id_fuente == 1L,
-#'                         id_matriz == 6L) %>%
-#'   dplyr::select(id_sitio, id_interno)
-#'
-#' datos <- siabox::sia_estacion %>%
-#'   dplyr::filter(prog_monitoreo == 13L) %>%
-#'   dplyr::select(codigo_pto, id_interno = id) %>%
-#'   dplyr::left_join(sitio_, by = "id_interno") %>%
-#'   dplyr::right_join(dl, by = c("codigo_pto" = "Estacion")) %>%
-#'   valores_numericos(metodo = "basico")
-#' valida_eval(datos)
-valida_eval <- function(.data) {
+#' alt <- siabox::datos_sia %>%
+#'   dplyr::mutate(
+#'     limite_deteccion = as.numeric(limpia_num(limite_deteccion)),
+#'     limite_cuantificacion = as.numeric(limpia_num(limite_cuantificacion))
+#'   ) %>%
+#'   dplyr::left_join(
+#'     dplyr::select(siabox::sitio,
+#'                   id_sitio, id_matriz, id_estacion = id_interno),
+#'     by = c("id_matriz", "id_estacion")
+#'   ) %>%
+#'   dplyr::select(id_sitio, codigo_pto, fecha_muestra, id_matriz, id_parametro,
+#'                 param, valor, limite_deteccion, limite_cuantificacion) %>%
+#'   v_valor %>%
+#'   dplyr::filter(menor_minimo | mayor_maximo | valor_menor_ld |
+#'                   valor_menor_lc | ld_mayor_lc) %>%
+#'   dplyr::filter(mayor_maximo) %>%
+#'   dplyr::select(codigo_pto, param, fecha_muestra,
+#'                 valor_max, valor_max_sitio, vsup, valor)
+v_valor <- function(.data) {
   require(magrittr)
+
+  col_enc <- names(.data)
+
+  col_esp <- c("valor", "limite_deteccion", "limite_cuantificacion",
+               "id_parametro", "id_matriz", "id_sitio")
+
+  w <- which(!(col_esp %in% col_enc))
+  if (length(w)) stop("No se encontraron una o más columnas en .data: ",
+                      colapsar_secuencia(col_esp[w]))
+
+  if (!is.numeric(.data$valor))
+    stop(".data$valor no es numérico (", typeof(.data$valor), ")")
+
+  if (!is.numeric(.data$limite_deteccion))
+    stop(".data$limite_deteccion no es numérico (",
+         typeof(.data$limite_deteccion), ")")
+
+  if (!is.numeric(.data$limite_cuantificacion))
+    stop(".data$limite_cuantificacion no es numérico (",
+         typeof(.data$limite_cuantificacion), ")")
 
   out <- NULL
   djoins <- .data %>%

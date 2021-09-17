@@ -5,7 +5,7 @@
 \alias{sia_muestra}
 \title{Inventario de muestras de infambientalbd}
 \format{
-Tabla con 19952 filas y 11
+Tabla con 20332 filas y 11
 columnas:
 
 \describe{
@@ -53,6 +53,6 @@ corresponde con el muestreo en campo en un sitio en particular (estación) y
 una fecha determinada.
 }
 \details{
-Fecha de extraccion: 2021-08-05
+Fecha de extraccion: 2021-09-17
 }
 \keyword{datasets}

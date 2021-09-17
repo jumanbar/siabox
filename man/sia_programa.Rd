@@ -36,6 +36,6 @@ infambientalbd). Corresponden a las matrices ambientales "Aguas
 superficiales" y "Sedimentos"
 }
 \details{
-Fecha de extraccion: 2021-08-05
+Fecha de extraccion: 2021-09-17
 }
 \keyword{datasets}

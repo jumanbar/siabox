@@ -14,7 +14,7 @@ Tabla con 51 filas y
 distintos programas. Es útil para separar datos en informes.}
 
 \item{codigo_pto}{Códigos de las estaciones tal como están en el SIA (a la
-fecha de extracción: `2021-08-05}
+fecha de extracción: `2021-09-17}
 
 \item{codigo_pto_mod}{Nuevos códigos para algunas estaciones del programa
 Santa Lucía}

@@ -126,7 +126,7 @@ La tibble \code{datos_sia} tiene datos de matriz Aguas superficiales y
 \code{datos_sia_sed} de Sedimentos.
 }
 \details{
-Fecha de extracción: `2021-08-05
+Fecha de extracción: `2021-09-17
 }
 \seealso{
 \code{\link{tipos_de_dato}}, \code{\link{consulta_muestras}},

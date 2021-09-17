@@ -1,0 +1,92 @@
+---
+title: "Validación"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    tod_depth: 2
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{validacion}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 6, fig.height = 4,
+                      fig.align='center')
+```
+
+# Resumen
+
+```r
+vignette('validacion', package = 'siabox')
+```
+
+# Un ejemplo para iniciar
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(siabox)
+alt <- siabox::datos_sia %>%
+  dplyr::mutate(
+    limite_deteccion = as.numeric(limpia_num(limite_deteccion)),
+    limite_cuantificacion = as.numeric(limpia_num(limite_cuantificacion))
+    ) %>%
+  dplyr::left_join(
+    dplyr::select(siabox::sitio,
+                  id_sitio, id_matriz, id_estacion = id_interno),
+    by = c("id_matriz", "id_estacion")
+  ) %>%
+  dplyr::select(id_sitio, codigo_pto, fecha_muestra, id_matriz, id_parametro,
+                param, valor, limite_deteccion, limite_cuantificacion) %>%
+  v_valor %>%
+  filter(menor_minimo | mayor_maximo | valor_menor_ld | valor_menor_lc | ld_mayor_lc)
+
+alt %>%
+  dplyr::filter(menor_minimo) %>%
+  dplyr::select(codigo_pto, param, fecha_muestra,
+                valor_min, valor_min_sitio, vinf, valor)
+
+alt %>%
+  dplyr::filter(menor_minimo, !is.na(valor_min_sitio), valor > 0) %>%
+  dplyr::select(codigo_pto, param, fecha_muestra,
+                valor_min, valor_min_sitio, vinf, valor)
+
+alt %>%
+  dplyr::filter(mayor_maximo) %>%
+  dplyr::select(codigo_pto, param, fecha_muestra,
+                valor_max, valor_max_sitio, vsup, valor)
+
+alt %>%
+  dplyr::filter(mayor_maximo, !is.na(valor_max_sitio)) %>%
+  dplyr::select(codigo_pto, param, fecha_muestra,
+                valor_max, valor_max_sitio, vsup, valor)
+
+alt %>%
+  dplyr::filter(valor_menor_ld) %>%
+  dplyr::select(codigo_pto, param, fecha_muestra, limite_deteccion, valor)
+
+alt %>%
+  dplyr::filter(valor_menor_lc) %>%
+  dplyr::select(codigo_pto, param, fecha_muestra, limite_cuantificacion, valor)
+
+alt %>%
+  dplyr::filter(ld_mayor_lc) %>%
+  dplyr::select(codigo_pto, param, fecha_muestra,
+                limite_deteccion, limite_cuantificacion)
+
+alt %>%
+  dplyr::filter(ld_mayor_lc, limite_deteccion > limite_cuantificacion) %>%
+  dplyr::select(codigo_pto, param, fecha_muestra,
+                limite_deteccion, limite_cuantificacion)
+```
+
+Este ejemplo usa la tabla `datos_sia`, la cual viene incluida en el paquete. Para saber más sobre los datos incluídos, se recomienda la viñeta correspondiente:
+
+```r
+vignette('datos-incluidos', package = 'siabox')
+```
+
+

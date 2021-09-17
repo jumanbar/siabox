@@ -258,8 +258,8 @@ ancho <- function(.data, unidades = FALSE) {
 clasif_tipo_dato <- function(x) {
 
   # Cambiar comas, comas repetidas y puntos repetidos por un único punto:
-  y <- toascii(limpia_num(x))
-  num <- !is.na(as.numeric(y))
+  y    <- toascii(limpia_num(x))
+  num  <- !is.na(as.numeric(y))
   sust <- TRUE
 
   ## El siguiente paso es importante, porque los "LD<x<LC" se convierten en
@@ -269,13 +269,13 @@ clasif_tipo_dato <- function(x) {
   v <- if (sust) gsub("[^[:alpha:]]", "", y, useBytes = TRUE) else x
 
   tipos <- dplyr::case_when(
-    num    ~ 1L,
-    grepl("(\\bLD\\b|\\bLOD\\b|\\bND\\b)", v, ignore.case = TRUE)     ~ 2L,
-    grepl("(\\bLC\\b|\\bLOQ\\b)", v, ignore.case = TRUE)     ~ 3L,
-    grepl("\\bL[DC]XL[DC]\\b", v, ignore.case = TRUE)  ~ 4L,
+    num ~ 1L,
+    grepl("(\\bLD\\b|\\bLOD\\b|\\bND\\b)", v, ignore.case = TRUE) ~ 2L,
+    grepl("(\\bLC\\b|\\bLOQ\\b)", v, ignore.case = TRUE) ~ 3L,
+    grepl("\\bL[DC]XL[DC]\\b", v, ignore.case = TRUE) ~ 4L,
     grepl("^\\s*<+\\s*\\.*\\s*[[:digit:]]+", y) ~ 5L,
     grepl("^\\s*>+\\s*\\.*\\s*[[:digit:]]+", y) ~ 6L,
-    TRUE   ~ 7L
+    TRUE ~ 7L
     )
 
   return(list(valores = y, tipos = tipos))

@@ -6,27 +6,6 @@
 #
 # . . . . . . . . .  . . . . .  .  . . . . . . . . -----
 
-#' Determinar cuáles son no numéricos
-#'
-#' Determina si un valor es no numérico. Excluye valores escritos con notación
-#' científica.
-#'
-#' @param v Character con valores potencialmente convertibles a numéricos. No
-#'   debe haber espacios en blanco en ninguno de los valores.
-#'
-#' @return
-#'
-#' @examples
-#' v <- c("1.347e4", "<LC", "<78", "14.447", "7", "1,3E+02")
-#' siabox:::det_nonum(v)
-det_nonum <- function(v) {
-  cientif <- grepl("^[[:digit:]]+[,\\.]*[[:digit:]]*([Ee][+-]*[[:digit:]]+)*$",
-                   v, ignore.case = TRUE)
-  comun   <- grepl("^[[:digit:]]+[,\\.]*[[:digit:]]*$", v)
-  # desubic <- grepl("[^[:digit:]]", v)
-  return(!cientif & !comun)
-}
-
 #' Conexión con SIA
 #'
 #' Genera una conexión con la base de datos infambiental, usando el usuario y
@@ -73,30 +52,6 @@ con_sia <- function() {
                    password = 'shiny')
   }
 
-  return(out)
-}
-
-#' Limpiar texto con valores numéricos
-#'
-#' Quita espacios en blanco, y sustituye comas, comas
-#' repetidas y puntos repetidos por un único punto (indicador de decimales). Se
-#' basa en expresiones regulares y el paquete \code{stringr}.
-#'
-#' @param x character. Valores numéricos expresados en varias formas posibles.
-#'
-#' @return
-#'
-#' @examples
-#' siabox:::limpia_num("2.3")
-#' siabox:::limpia_num("2..3")
-#' siabox:::limpia_num("2,3")
-#' siabox:::limpia_num("2,,,,3")
-#' siabox:::limpia_num("   2,,,, 3   ")
-limpia_num <- function(x) {
-  out <- x %>%
-    # stringr::str_trim() %>%
-    stringr::str_replace_all("[.,]+", ".") %>%
-    stringr::str_replace_all("\\s+", "")
   return(out)
 }
 

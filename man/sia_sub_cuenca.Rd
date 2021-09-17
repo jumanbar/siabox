@@ -44,7 +44,7 @@ Las columnas \code{sub_cue_curso}, \code{sub_cue_cod_sc} y
 \code{cursos_de_agua} refieren a otras tablas de \code{infambientalbd} no
 incluidas en el presente paquete.
 
-Fecha de extraccion: 2021-08-05
+Fecha de extraccion: 2021-09-17
 }
 \examples{
 dplyr::left_join(dplyr::select(sia_sub_cuenca, id:sub_cue_cuenca_id),

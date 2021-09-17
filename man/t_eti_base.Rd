@@ -31,7 +31,7 @@ utilizadas en los contenidos creados por DCA, incluyendo informes, reportes,
 etc. Se espera poder construir la tabla en base a acuerdos y eventualmente
 tener etiquetas unificadas para todos los parámetros.
 
-Fecha de creación: `2021-08-05
+Fecha de creación: `2021-09-17
 }
 \examples{
 # CÃ³digo de creaciÃ³n:

@@ -5,7 +5,7 @@
 \alias{sia_programa_parametro}
 \title{Parámetros en cada programa}
 \format{
-Tabla con 1686 filas y
+Tabla con 1673 filas y
 3)` columnas:
 
 \describe{
@@ -29,6 +29,6 @@ Tabla que (intenta) registrar los parametros que son monitoreados en cada
 programa.
 }
 \details{
-Fecha de extraccion: 2021-08-05
+Fecha de extraccion: 2021-09-17
 }
 \keyword{datasets}

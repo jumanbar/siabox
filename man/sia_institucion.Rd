@@ -26,6 +26,6 @@ sia_institucion
 Instituciones asociadas a los usuarios que suben los datos al SIA.
 }
 \details{
-Fecha de extraccion: 2021-08-05
+Fecha de extraccion: 2021-09-17
 }
 \keyword{datasets}

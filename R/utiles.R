@@ -266,6 +266,11 @@ unipar <- function(id_parametro, id_matriz = 6L, nombre_clave) {
 #' cat("Numbers:", colapsar_secuencia(4:8, " & "), "\n")
 #' cat("Numeros:", colapsar_secuencia(4:8, comillas = TRUE), "\n")
 colapsar_secuencia <- function(x, conector = " y ", comillas = FALSE) {
+
+  if (substr(x[length(x)], 0, 1) %in% c("y", "i") &&
+      grepl("\\s*y\\s*", conector, ignore.case = TRUE))
+    conector <- sub("(\\s*)y(\\s*)", "\\1e\\2", conector)
+
   if (is.character(comillas)) {
     z <- comillas
   } else if (is.logical(comillas)) {
@@ -327,4 +332,87 @@ demo_lm <- function(extension = c('html', 'pdf', 'doc')) {
             '" en la carpeta de trabajo')
     file.edit(demoname)
   }
+}
+
+#' Determinar cuáles son no numéricos
+#'
+#' Determina si un valor es no numérico. Excluye valores escritos con notación
+#' científica.
+#'
+#' @param v Character con valores potencialmente convertibles a numéricos. No
+#'   debe haber espacios en blanco en ninguno de los valores.
+#'
+#' @return
+#'
+#' @export
+#'
+#' @examples
+#' v <- c("1.347e4", "<LC", "<78", "14.447", "7", "1,3E+02")
+#' siabox:::det_nonum(v)
+det_nonum <- function(v) {
+  cientif <- grepl("^[[:digit:]]+[,\\.]*[[:digit:]]*([Ee][+-]*[[:digit:]]+)*$",
+                   v, ignore.case = TRUE)
+  comun   <- grepl("^[[:digit:]]+[,\\.]*[[:digit:]]*$", v)
+  # desubic <- grepl("[^[:digit:]]", v)
+  return(!cientif & !comun)
+}
+
+
+#' Limpiar texto con valores numéricos
+#'
+#' Quita espacios en blanco, y sustituye comas, comas
+#' repetidas y puntos repetidos por un único punto (indicador de decimales). Se
+#' basa en expresiones regulares y el paquete \code{stringr}.
+#'
+#' Combina muy bien con \code{link{extrae_num}}
+#'
+#' @param x character. Valores numéricos expresados en varias formas posibles.
+#'
+#' @return Vector character sin comas o puntos repetidos, simplemente 1 punto,
+#'   y sin espacios en blanco.
+#'
+#' @seealso \code{link{extrae_num}}
+#'
+#' @export
+#'
+#' @examples
+#' limpia_num("2.3")
+#' limpia_num("2..3")
+#' limpia_num("2,3")
+#' limpia_num("2,,,,3")
+#' limpia_num("   2,,,, 3   ")
+#' limpia_num("< 0,015 mg /L")
+limpia_num <- function(x) {
+  out <- x %>%
+    # stringr::str_trim() %>%
+    stringr::str_replace_all("[.,]+", ".") %>%
+    stringr::str_replace_all("\\s+", "")
+  return(out)
+}
+
+
+#' Extraer números
+#'
+#' Combina muy bien con \code{link{limpia_num}} (ver ejemplos)
+#'
+#' @param x character. Vector con expresiones (presumiblemente) numéricas
+#'
+#' @return Vector character en los que sólamente figuran
+#'
+#' @seealso \code{link{limpia_num}}
+#'
+#' @export
+#'
+#' @examples
+#' v <- c("2,0e-4 µg/L", "<0...0002", "<0,0002", "<0.5", "<0,,5", "0.02 µg/L",
+#'        "<1,0E+02", "<P0.Ea5", "< 0.2", "<< 34. 06E + 12 ug /L")
+#' extrae_num(v)
+#' extrae_num(v) %>% limpia_num()
+#' extrae_num(v) %>% limpia_num() %>% as.numeric
+#' limpia_num(extrae_num(v))
+#' limpia_num(extrae_num(v))
+extrae_num <- function(x) {
+  patron <- "[0-9]+\\s*[.,]*\\s*[0-9]*\\s*[Ee]*\\s*[+-]{0,1}\\s*[0-9]+"
+  out <- stringr::str_extract(x, patron)
+  return(out)
 }

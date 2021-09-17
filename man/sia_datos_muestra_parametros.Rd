@@ -5,7 +5,7 @@
 \alias{sia_datos_muestra_parametros}
 \title{Tabla con datos de infambientalbd}
 \format{
-Tabla con 270184 filas y
+Tabla con 281767 filas y
 17)` columnas:
 
 \describe{
@@ -60,7 +60,7 @@ Esta tabla guarda los datos de cada muestra. Cada fila representa una
 combinación única de parámetro, fecha, hora y sitio (estación).
 }
 \details{
-Fecha de extraccion: 2021-08-05
+Fecha de extraccion: 2021-09-17
 }
 \section{Atencion}{
  La tabla puede tener datos repetidos. La función
