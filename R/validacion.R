@@ -36,8 +36,10 @@ valida_eval <- function(.data) {
 
   out <- NULL
   djoins <- .data %>%
-    dplyr::left_join(rango_param, by = c("id_parametro", "id_matriz")) %>%
-    dplyr::left_join(rango_param_sitio, by = c("id_sitio", "id_parametro"))
+    dplyr::left_join(siabox::rango_param,
+                     by = c("id_parametro", "id_matriz")) %>%
+    dplyr::left_join(siabox::rango_param_sitio,
+                     by = c("id_sitio", "id_parametro"))
 
   out <- djoins %>%
     dplyr::mutate(

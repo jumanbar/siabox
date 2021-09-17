@@ -23,7 +23,7 @@ dep_id <- function(patron, ...) {
     if (pnum != patron)
       warning('Se cambi\u00f3 el n\u00famero de patron: de ',
               patron, ' a ', pnum)
-    return(dplyr::filter(sia_departamento, id == pnum))
+    return(dplyr::filter(siabox::sia_departamento, id == pnum))
   }
   dplyr::filter(siabox::sia_departamento,
                 agrepl(toascii(patron),
@@ -43,7 +43,7 @@ est_id <- function(patron, ...) {
     if (pnum != patron)
       warning('Se cambi\u00f3 el n\u00famero de patron: de ',
               patron, ' a ', pnum)
-    return(dplyr::filter(sia_estacion, id == pnum))
+    return(dplyr::filter(siabox::sia_estacion, id == pnum))
   }
 
   patron <- toascii(patron)
@@ -68,7 +68,7 @@ ins_id <- function(patron, ...) {
     if (pnum != patron)
       warning('Se cambi\u00f3 el n\u00famero de patron: de ',
               patron, ' a ', pnum)
-    return(dplyr::filter(sia_institucion, id_institucion == pnum))
+    return(dplyr::filter(siabox::sia_institucion, id_institucion == pnum))
   }
   dplyr::filter(siabox::sia_institucion,
                 agrepl(toascii(patron),
@@ -87,7 +87,7 @@ mat_id <- function(patron, ...) {
     if (pnum != patron)
       warning('Se cambi\u00f3 el n\u00famero de patron: de ',
               patron, ' a ', pnum)
-    return(dplyr::filter(sia_matriz, id_matriz == pnum))
+    return(dplyr::filter(siabox::sia_matriz, id_matriz == pnum))
   }
   dplyr::filter(siabox::sia_matriz,
                 agrepl(toascii(patron),
@@ -142,7 +142,7 @@ par_id <- function(patron, ...) {
     if (pnum != patron)
       warning('Se cambi\u00f3 el n\u00famero de patron: de ',
               patron, ' a ', pnum)
-    return(dplyr::filter(sia_parametro, id_parametro == pnum))
+    return(dplyr::filter(siabox::sia_parametro, id_parametro == pnum))
   }
 
   patron <- toascii(tolower(patron))
@@ -175,7 +175,7 @@ pro_id <- function(patron, ...) {
     if (pnum != patron)
       warning('Se cambi\u00f3 el n\u00famero de patron: de ',
               patron, ' a ', pnum)
-    return(dplyr::filter(sia_programa, id_programa == pnum))
+    return(dplyr::filter(siabox::sia_programa, id_programa == pnum))
   }
 
   dplyr::filter(siabox::sia_programa, agrepl(toascii(patron),
